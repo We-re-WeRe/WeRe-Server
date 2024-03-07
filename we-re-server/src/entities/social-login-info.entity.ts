@@ -1,8 +1,9 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToOne } from 'typeorm';
 import DefaultEntity from './default.entity';
+import { User } from './user.entity';
 
 @Entity()
-export class Storage extends DefaultEntity {
+export class SocialLoginInfo extends DefaultEntity {
   @Column()
   kakao: string;
 
@@ -11,4 +12,7 @@ export class Storage extends DefaultEntity {
 
   @Column()
   google: string;
+
+  @OneToOne(() => User)
+  user: User;
 }

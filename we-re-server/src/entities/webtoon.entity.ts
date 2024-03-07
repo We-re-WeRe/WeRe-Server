@@ -1,10 +1,14 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
+import { Review } from './review.entity';
 
 @Entity()
 export class Webtoon extends DefaultEntity {
   @Column()
   title: string;
+
+  @Column()
+  image: string;
 
   @Column()
   author: string;
@@ -13,23 +17,17 @@ export class Webtoon extends DefaultEntity {
   providingCompany: string;
 
   @Column()
-  day!: string;
+  day?: string;
 
   @Column()
   genre!: string;
 
   @Column()
-  explain!: string;
+  explain?: string;
 
   @Column()
   viewCount: number;
 
-  @Column()
-  starPointAverage: number;
-
-  @Column()
-  reviewCount: number;
-
-  @Column()
-  likeCount: number;
+  @ManyToMany(() => Review, (review) => review.webtoons)
+  reviews?: Review[];
 }
