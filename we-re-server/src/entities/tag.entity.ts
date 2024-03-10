@@ -5,7 +5,7 @@ import { Storage } from './storage.entity';
 
 @Entity()
 export class Tag extends DefaultEntity {
-  @Column()
+  @Column({ type: 'varchar', length: 10 })
   contents: string;
 
   @ManyToOne(() => Review, (review) => review.tags)

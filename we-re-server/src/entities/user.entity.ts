@@ -1,28 +1,35 @@
 import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import DefaultEntity from './default.entity';
 
+export const SEX = {
+  MALE: 'M',
+  FEMALE: 'F',
+} as const;
+
+export type Sex = (typeof SEX)[keyof typeof SEX];
+
 @Entity()
 export class User extends DefaultEntity {
-  @Column()
+  @Column({ type: 'varchar', length: 20 })
   userId: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 16 })
   password: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
+  imageURL: string;
+
+  @Column({ type: 'varchar', length: 10 })
   nickname: string;
 
-  @Column()
-  sex: string;
+  @Column({ type: 'char', length: 1 })
+  sex: Sex;
 
-  @Column()
+  @Column({ type: 'date' })
   birth: Date;
 
-  @Column()
-  image: string;
-
-  @Column()
-  introduceMe!: string;
+  @Column({ type: 'varchar', nullable: true })
+  introduceMe?: string;
 
   @ManyToMany(() => User, (user) => user.following)
   @JoinTable({

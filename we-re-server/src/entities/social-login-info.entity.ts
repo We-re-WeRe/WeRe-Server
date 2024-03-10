@@ -4,13 +4,13 @@ import { User } from './user.entity';
 
 @Entity()
 export class SocialLoginInfo extends DefaultEntity {
-  @Column()
+  @Column({ type: 'varchar' })
   kakao: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   naver: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   google: string;
 
   @OneToOne(() => User)

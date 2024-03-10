@@ -14,10 +14,10 @@ import { Tag } from './tag.entity';
 
 @Entity()
 export class Review extends DefaultEntity {
-  @Column()
+  @Column({ type: 'varchar' })
   contents: string;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   starPoint: number;
 
   @ManyToOne(() => User)
@@ -29,7 +29,11 @@ export class Review extends DefaultEntity {
   @OneToMany(() => Like, (like) => like.review)
   likes?: Like[];
 
-  @OneToMany(() => Tag, (tag) => tag.review)
+  @OneToMany(() => Tag, (tag) => tag.review, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   tags?: Tag[];
 
   @ManyToMany(() => Webtoon, (webtoon) => webtoon.reviews)
