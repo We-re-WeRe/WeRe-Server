@@ -11,6 +11,7 @@ import { Point } from './entities/point.entity';
 import { Tag } from './entities/tag.entity';
 import { Like } from './entities/like.entity';
 import { SocialLoginInfo } from './entities/social-login-info.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SocialLoginInfo } from './entities/social-login-info.entity';
       ],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
