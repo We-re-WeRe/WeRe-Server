@@ -3,7 +3,13 @@ import DefaultEntity from './default.entity';
 import { User } from './user.entity';
 
 @Entity()
-export class SocialLoginInfo extends DefaultEntity {
+export class LoginInfo extends DefaultEntity {
+  @Column({ type: 'varchar', length: 20, unique: true })
+  userId: string;
+
+  @Column({ type: 'varchar', length: 16 })
+  password: string;
+
   @Column({ type: 'varchar' })
   kakao: string;
 
