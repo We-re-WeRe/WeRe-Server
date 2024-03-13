@@ -10,6 +10,9 @@ export type Reason = (typeof REASON)[keyof typeof REASON];
 
 @Entity()
 export class Point extends DefaultEntity {
+  @Column({ type: 'int', unsigned: true })
+  mount: number;
+
   @Column({ type: 'varchar' })
   reason: Reason;
 
