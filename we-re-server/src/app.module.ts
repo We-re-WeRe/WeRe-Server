@@ -10,7 +10,8 @@ import { Storage } from './entities/storage.entity';
 import { Point } from './entities/point.entity';
 import { Tag } from './entities/tag.entity';
 import { Like } from './entities/like.entity';
-import { SocialLoginInfo } from './entities/social-login-info.entity';
+import { LoginInfo } from './entities/login-info.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -24,18 +25,10 @@ import { SocialLoginInfo } from './entities/social-login-info.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [
-        User,
-        Review,
-        Webtoon,
-        Storage,
-        Point,
-        Tag,
-        Like,
-        SocialLoginInfo,
-      ],
+      entities: [User, Review, Webtoon, Storage, Point, Tag, Like, LoginInfo],
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

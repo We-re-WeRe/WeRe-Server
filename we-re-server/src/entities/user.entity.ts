@@ -1,5 +1,6 @@
-import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
+import { Point } from './point.entity';
 
 export const SEX = {
   MALE: 'M',
@@ -10,12 +11,6 @@ export type Sex = (typeof SEX)[keyof typeof SEX];
 
 @Entity()
 export class User extends DefaultEntity {
-  @Column({ type: 'varchar', length: 20 })
-  userId: string;
-
-  @Column({ type: 'varchar', length: 16 })
-  password: string;
-
   @Column({ type: 'varchar' })
   imageURL: string;
 
@@ -41,4 +36,7 @@ export class User extends DefaultEntity {
 
   @ManyToMany(() => User, (user) => user.followers)
   following: User[];
+
+  @OneToMany(() => Point, (points) => points.user)
+  points: Point[];
 }
