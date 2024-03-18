@@ -12,6 +12,7 @@ import { Tag } from './entities/tag.entity';
 import { Like } from './entities/like.entity';
 import { LoginInfo } from './entities/login-info.entity';
 import { UsersModule } from './users/users.module';
+import { PointsModule } from './points/points.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module';
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     UsersModule,
+    PointsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
