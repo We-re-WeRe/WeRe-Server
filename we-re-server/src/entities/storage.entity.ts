@@ -1,8 +1,16 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import DefaultEntity from './default.entity';
 import { User } from './user.entity';
 import { Tag } from './tag.entity';
 import { Like } from './like.entity';
+import { Webtoon } from './webtoon.entity';
 
 export const DISCLOSURESCOPE = {
   PRIVATE: 'pri',
@@ -38,4 +46,12 @@ export class Storage extends DefaultEntity {
 
   @OneToMany(() => Like, (like) => like.id)
   likes?: Like[];
+
+  @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages)
+  @JoinTable({
+    name: 'storage_webtoon',
+    joinColumn: { name: 'storageId' },
+    inverseJoinColumn: { name: 'webtoonId' },
+  })
+  webtoons?: Webtoon[];
 }
