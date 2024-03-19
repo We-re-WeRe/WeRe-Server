@@ -16,7 +16,7 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Get('list/writer/:id')
-  findOne(@Param('id') id: string) {
+  findManyByUserId(@Param('id') id: string) {
     return this.reviewsService.findManyByUserId(+id);
   }
 }
