@@ -13,6 +13,7 @@ import { Like } from './entities/like.entity';
 import { LoginInfo } from './entities/login-info.entity';
 import { UsersModule } from './users/users.module';
 import { PointsModule } from './points/points.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PointsModule } from './points/points.module';
     }),
     UsersModule,
     PointsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
