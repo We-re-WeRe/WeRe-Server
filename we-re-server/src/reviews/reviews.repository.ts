@@ -13,8 +13,10 @@ export class ReviewRepository extends Repository<Review> {
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
+        'review.id',
         'review.contents as contents',
         'review.starpoint as starpoint',
+        'webtoon.id',
         'webtoon.title',
         'webtoon.imageURL',
       ])
