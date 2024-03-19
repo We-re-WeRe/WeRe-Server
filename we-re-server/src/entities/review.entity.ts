@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { User } from './user.entity';
 import { Webtoon } from './webtoon.entity';
@@ -35,12 +28,4 @@ export class Review extends DefaultEntity {
     onUpdate: 'CASCADE',
   })
   tags?: Tag[];
-
-  @ManyToMany(() => Webtoon, (webtoon) => webtoon.reviews)
-  @JoinTable({
-    name: 'review_webtoon',
-    joinColumn: { name: 'reviewId' },
-    inverseJoinColumn: { name: 'webtoonId' },
-  })
-  webtoons?: Webtoon[];
 }

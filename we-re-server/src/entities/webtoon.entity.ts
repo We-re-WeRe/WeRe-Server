@@ -54,8 +54,8 @@ export class Webtoon extends DefaultEntity {
   @Column({ unsigned: true, type: 'int' })
   viewCount: number;
 
-  @ManyToMany(() => Review, (review) => review.webtoons, {
+  @ManyToMany(() => Storage, (storage) => storage.webtoons, {
     nullable: true,
   })
-  reviews?: Review[];
+  storages?: Storage[];
 }
