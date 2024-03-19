@@ -24,4 +24,22 @@ export class ReviewRepository extends Repository<Review> {
       .groupBy('review.id')
       .getRawMany();
   }
+
+  public async findManyByWebtoonId(id: number): Promise<Review[]> {
+    return await this.createQueryBuilder('review')
+      .where('review.webtoonId=:id', { id })
+      .leftJoinAndSelect('review.likes', 'likes')
+      .leftJoinAndSelect('review.user', 'user')
+      .select([
+        'review.id',
+        'review.contents as contents',
+        'review.starpoint as starpoint',
+        'user.id',
+        'user.nickname',
+        'user.imageURL',
+      ])
+      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .groupBy('review.id')
+      .getRawMany();
+  }
 }

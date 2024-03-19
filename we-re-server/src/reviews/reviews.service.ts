@@ -10,4 +10,7 @@ export class ReviewsService {
   async findManyByUserId(id: number) {
     return await this.reviewRepository.findManyByUserId(id);
   }
+  async findManyByWebtoonId(id: number) {
+    return await this.reviewRepository.findManyByWebtoonId(id);
+  }
 }
