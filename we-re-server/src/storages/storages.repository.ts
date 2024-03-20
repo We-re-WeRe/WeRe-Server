@@ -27,7 +27,7 @@ export class StorageRepository extends Repository<Storage> {
         disclosureScope: DISCLOSURESCOPE.PUBLIC,
       })
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.imageURL', 'storage.name'])
+      .select(['storage.id', 'storage.imageURL', 'storage.name'])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
