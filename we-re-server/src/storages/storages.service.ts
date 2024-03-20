@@ -1,26 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
+import { StorageRepository } from './storages.repository';
 
 @Injectable()
 export class StoragesService {
-  create(createStorageDto: CreateStorageDto) {
-    return 'This action adds a new storage';
-  }
+  constructor(private readonly storageRepository: StorageRepository) {}
 
-  findAll() {
-    return `This action returns all storages`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} storage`;
-  }
-
-  update(id: number, updateStorageDto: UpdateStorageDto) {
-    return `This action updates a #${id} storage`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} storage`;
+  findOneDetailById(id: number) {
+    return this.storageRepository.findOneDetailById(id);
   }
 }
