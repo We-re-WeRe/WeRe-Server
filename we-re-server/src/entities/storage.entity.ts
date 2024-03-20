@@ -44,7 +44,7 @@ export class Storage extends DefaultEntity {
   })
   tags?: Tag[];
 
-  @OneToMany(() => Like, (like) => like.id)
+  @OneToMany(() => Like, (like) => like.storage)
   likes?: Like[];
 
   @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages)
