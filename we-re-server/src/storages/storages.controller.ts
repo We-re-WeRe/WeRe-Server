@@ -16,7 +16,12 @@ export class StoragesController {
   constructor(private readonly storagesService: StoragesService) {}
 
   @Get('detail/:id')
-  findOne(@Param('id') id: string) {
-    return this.storagesService.findOneDetailById(+id);
+  async findOneDetailById(@Param('id') id: string) {
+    return await this.storagesService.findOneDetailById(+id);
+  }
+
+  @Get('list')
+  async findManyPublicStorageList() {
+    return await this.storagesService.findManyPublicStorageList();
   }
 }

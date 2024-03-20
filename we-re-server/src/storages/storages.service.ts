@@ -7,7 +7,10 @@ import { StorageRepository } from './storages.repository';
 export class StoragesService {
   constructor(private readonly storageRepository: StorageRepository) {}
 
-  findOneDetailById(id: number) {
-    return this.storageRepository.findOneDetailById(id);
+  async findOneDetailById(id: number) {
+    return await this.storageRepository.findOneDetailById(id);
+  }
+  async findManyPublicStorageList() {
+    return await this.storageRepository.findManyPublicStorageList();
   }
 }

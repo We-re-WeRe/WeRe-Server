@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Storage } from 'src/entities/storage.entity';
+import { Storage, DISCLOSURESCOPE } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -21,10 +21,16 @@ export class StorageRepository extends Repository<Storage> {
       .getRawOne();
   }
 
-  public async findOneProfileImageById(id: number) {
-    return await this.createQueryBuilder('user')
-      .select(['imageURL'])
-      .where('id=:id', { id })
-      .getRawOne();
+  public async findManyPublicStorageList(): Promise<Storage[]> {
+    return await this.createQueryBuilder('storage')
+      .where('storage.disclosureScope=:disclosureScope', {
+        disclosureScope: DISCLOSURESCOPE.PUBLIC,
+      })
+      .leftJoinAndSelect('storage.likes', 'likes')
+      .select(['storage.imageURL', 'storage.name'])
+      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .orderBy('totalLikes', 'DESC')
+      .groupBy('storage.id')
+      .getRawMany();
   }
 }
