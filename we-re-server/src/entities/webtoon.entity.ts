@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
-import { Review } from './review.entity';
+import { Storage } from './storage.entity';
 
 export const DAYS = {
   MONDAY: 'mon',

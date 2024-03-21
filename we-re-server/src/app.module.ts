@@ -14,6 +14,7 @@ import { LoginInfo } from './entities/login-info.entity';
 import { UsersModule } from './users/users.module';
 import { PointsModule } from './points/points.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { StoragesModule } from './storages/storages.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     UsersModule,
     PointsModule,
     ReviewsModule,
+    StoragesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
