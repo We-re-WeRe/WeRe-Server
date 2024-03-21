@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Storage, DISCLOSURESCOPE } from 'src/entities/storage.entity';
+import {
+  Storage,
+  DISCLOSURESCOPE,
+  DisclosureScope,
+} from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -42,6 +46,23 @@ export class StorageRepository extends Repository<Storage> {
         disclosureScope: DISCLOSURESCOPE.PUBLIC,
       })
       .andWhere('storage.id IN (:...ids)', { ids })
+      .leftJoinAndSelect('storage.likes', 'likes')
+      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .orderBy('totalLikes', 'DESC')
+      .groupBy('storage.id')
+      .getRawMany();
+  }
+
+  public async findManyStorageListByUserIdAndDisclosureScope(
+    userId: number,
+    disclosureScope: DisclosureScope[],
+  ): Promise<Storage[]> {
+    return await this.createQueryBuilder('storage')
+      .where('storage.user=:userId', { userId })
+      .andWhere('storage.disclosureScope IN (:...disclosureScope)', {
+        disclosureScope,
+      })
       .leftJoinAndSelect('storage.likes', 'likes')
       .select(['storage.id', 'storage.imageURL', 'storage.name'])
       .addSelect('COUNT(likes.id)', 'totalLikes')

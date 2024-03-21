@@ -24,4 +24,13 @@ export class StoragesController {
   async findManyPublicStorageList() {
     return await this.storagesService.findManyPublicStorageList();
   }
+
+  @Get('list/owner/:userId')
+  async findManyStorageListByUserIdAndDisclosureScope(
+    @Param('userId') userId: string,
+  ) {
+    return await this.storagesService.findManyStorageListByUserIdAndDisclosureScope(
+      +userId,
+    );
+  }
 }
