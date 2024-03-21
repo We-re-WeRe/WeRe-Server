@@ -13,4 +13,7 @@ export class StoragesService {
   async findManyPublicStorageList() {
     return await this.storageRepository.findManyPublicStorageList();
   }
+  async findManyPublicStorageListByIds(ids: number[]) {
+    return await this.storageRepository.findManyPublicStorageListByIds(ids);
+  }
 }

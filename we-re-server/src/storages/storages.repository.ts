@@ -33,4 +33,20 @@ export class StorageRepository extends Repository<Storage> {
       .groupBy('storage.id')
       .getRawMany();
   }
+
+  public async findManyPublicStorageListByIds(
+    ids: number[],
+  ): Promise<Storage[]> {
+    return await this.createQueryBuilder('storage')
+      .where('storage.disclosureScope=:disclosureScope', {
+        disclosureScope: DISCLOSURESCOPE.PUBLIC,
+      })
+      .andWhere('storage.id IN (:...ids)', { ids })
+      .leftJoinAndSelect('storage.likes', 'likes')
+      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .orderBy('totalLikes', 'DESC')
+      .groupBy('storage.id')
+      .getRawMany();
+  }
 }
