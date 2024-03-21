@@ -33,4 +33,11 @@ export class StoragesController {
       +userId,
     );
   }
+
+  @Get('liked-list/owner/:userId')
+  async findManyPublicStorageLikedListByIds(@Param('userId') userId: string) {
+    return await this.storagesService.findManyPublicStorageLikedListByIds(
+      +userId,
+    );
+  }
 }

@@ -25,7 +25,13 @@ export class StoragesService {
       disclosureScope,
     );
   }
-  async findManyPublicStorageListByIds(ids: number[]) {
+  async findManyPublicStorageLikedListByIds(userId: number) {
+    //TODO:: like를 user ID로 조인해서 storage id를 다 가져온 값을 인자로 전달 필요.
+    // user id 본인 건지 체크 필요.
+    const ids: number[] = [1, 2];
+    return await this.storageRepository.findManyPublicStorageListByIds(ids);
+  }
+  async findManyPublicStorageOwnedListByIds(ids: number[]) {
     return await this.storageRepository.findManyPublicStorageListByIds(ids);
   }
 }
