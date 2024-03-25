@@ -6,5 +6,6 @@ import { StorageRepository } from './storages.repository';
 @Module({
   controllers: [StoragesController],
   providers: [StoragesService, StorageRepository],
+  exports: [StoragesService],
 })
 export class StoragesModule {}
