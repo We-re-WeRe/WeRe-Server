@@ -32,4 +32,18 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .addSelect('storages.id')
       .getRawMany();
   }
+
+  public async findManyThumbnailByIds(ids: number[]) {
+    return await this.createQueryBuilder('webtoon')
+      .where('webtoon.id IN (:...ids)', { ids })
+      .leftJoinAndSelect('webtoon.likes', 'likes')
+      .select([
+        'webtoon.id',
+        'webtoon.title',
+        'webtoon.imageURL',
+        'webtoon.author',
+        'webtoon.painter',
+      ])
+      .getMany();
+  }
 }

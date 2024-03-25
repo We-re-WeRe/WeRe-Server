@@ -19,4 +19,9 @@ export class WebtoonsController {
   findOneDetailById(@Param('id') id: string) {
     return this.webtoonsService.findOneDetailById(+id);
   }
+
+  @Get('liked-list/user/:userId')
+  findManyLikedThumbnailByUserId(@Param('userId') userId: string) {
+    return this.webtoonsService.findManyLikedThumbnailByUserId(+userId);
+  }
 }
