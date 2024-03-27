@@ -15,6 +15,7 @@ import { UsersModule } from './users/users.module';
 import { PointsModule } from './points/points.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { StoragesModule } from './storages/storages.module';
+import { WebtoonsModule } from './webtoons/webtoons.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { StoragesModule } from './storages/storages.module';
     PointsModule,
     ReviewsModule,
     StoragesModule,
+    WebtoonsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
