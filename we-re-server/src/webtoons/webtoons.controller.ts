@@ -30,6 +30,11 @@ export class WebtoonsController {
     return this.webtoonsService.findManyNewThumbnail();
   }
 
+  @Get('list/hot')
+  findManyHotThumbnail() {
+    return this.webtoonsService.findManyHotThumbnail();
+  }
+
   @Get('list/storage/:storageId')
   findManyBreifInfoWithReviewByStorageId(
     @Param('storageId') storageId: string,

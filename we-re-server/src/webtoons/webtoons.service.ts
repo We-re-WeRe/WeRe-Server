@@ -72,6 +72,14 @@ export class WebtoonsService {
     return await this.webtoonRepository.findManyNewThumbnail();
   }
 
+  /**
+   * Get New webtoons!
+   * @returns {Webtoon[]}
+   */
+  async findManyHotThumbnail() {
+    return await this.webtoonRepository.findManyHotThumbnail();
+  }
+
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {
     // TODO:: storage ID를 이용하여 웹툰 id 리스트와 user ID를 가져오기.
     const { ids, userId } = { ids: [1, 2], userId: 1 };
