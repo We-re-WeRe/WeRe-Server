@@ -64,6 +64,14 @@ export class WebtoonsService {
     );
   }
 
+  /**
+   * Get New webtoons!
+   * @returns {Webtoon[]}
+   */
+  async findManyNewThumbnail() {
+    return await this.webtoonRepository.findManyNewThumbnail();
+  }
+
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {
     // TODO:: storage ID를 이용하여 웹툰 id 리스트와 user ID를 가져오기.
     const { ids, userId } = { ids: [1, 2], userId: 1 };

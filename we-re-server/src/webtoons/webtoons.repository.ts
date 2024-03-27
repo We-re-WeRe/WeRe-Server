@@ -50,6 +50,28 @@ export class WebtoonRepository extends Repository<Webtoon> {
   }
 
   /**
+   * Get New webtoons!
+   * @returns {Webtoon[]}
+   */
+  public async findManyNewThumbnail() {
+    return await this.createQueryBuilder('webtoon')
+      .leftJoinAndSelect('webtoon.reviews', 'reviews')
+      .select([
+        'webtoon.id',
+        'webtoon.title',
+        'webtoon.imageURL',
+        'webtoon.author',
+        'webtoon.painter',
+      ])
+      .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
+      .addSelect('COUNT(reviews.id)', 'reviewCount')
+      .groupBy('webtoon.id')
+      .orderBy('webtoon.created_at', 'DESC')
+      .limit(5)
+      .getRawMany();
+  }
+
+  /**
    * Get Filtered webtoon list for webtoon list page.
    * @param {Days} day The day what user want to see
    * @param {ProvidingCompany[]} providingCompanies the providing company ex)kakao-k, naver-n

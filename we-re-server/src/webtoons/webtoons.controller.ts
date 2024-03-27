@@ -25,6 +25,11 @@ export class WebtoonsController {
     return this.webtoonsService.findManyLikedThumbnailByUserId(+userId);
   }
 
+  @Get('list/new')
+  findManyNewThumbnail() {
+    return this.webtoonsService.findManyNewThumbnail();
+  }
+
   @Get('list/storage/:storageId')
   findManyBreifInfoWithReviewByStorageId(
     @Param('storageId') storageId: string,
