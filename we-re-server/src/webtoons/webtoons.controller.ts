@@ -24,4 +24,13 @@ export class WebtoonsController {
   findManyLikedThumbnailByUserId(@Param('userId') userId: string) {
     return this.webtoonsService.findManyLikedThumbnailByUserId(+userId);
   }
+
+  @Get('list/storage/:storageId')
+  findManyBreifInfoWithReviewByStorageId(
+    @Param('storageId') storageId: string,
+  ) {
+    return this.webtoonsService.findManyBreifInfoWithReviewByStorageId(
+      +storageId,
+    );
+  }
 }

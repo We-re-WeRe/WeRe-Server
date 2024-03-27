@@ -35,4 +35,13 @@ export class WebtoonsService {
     const ids = [1, 2];
     return await this.webtoonRepository.findManyThumbnailByIds(ids);
   }
+
+  async findManyBreifInfoWithReviewByStorageId(storageId: number) {
+    // TODO:: storage ID를 이용하여 웹툰 id 리스트와 user ID를 가져오기.
+    const { ids, userId } = { ids: [1, 2], userId: 1 };
+    return await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
+      ids,
+      userId,
+    );
+  }
 }
