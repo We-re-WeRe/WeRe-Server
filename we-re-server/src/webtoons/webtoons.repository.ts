@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Review } from 'src/entities/review.entity';
-import { Webtoon } from 'src/entities/webtoon.entity';
+import { Days, ProvidingCompany, Webtoon } from 'src/entities/webtoon.entity';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -47,6 +47,35 @@ export class WebtoonRepository extends Repository<Webtoon> {
         'webtoon.painter',
       ])
       .getMany();
+  }
+
+  /**
+   * Get Filtered webtoon list for webtoon list page.
+   * @param {Days} day The day what user want to see
+   * @param {ProvidingCompany[]} providingCompanies the providing company ex)kakao-k, naver-n
+   * @returns {Webtoon[]} breif style
+   */
+  public async findManyFilteredThumbnail(
+    day: Days,
+    providingCompanies: ProvidingCompany[],
+  ) {
+    return await this.createQueryBuilder('webtoon')
+      .where('webtoon.day = :day', { day })
+      .andWhere('webtoon.providingCompany IN (:...providingCompanies)', {
+        providingCompanies,
+      })
+      .leftJoinAndSelect('webtoon.reviews', 'reviews')
+      .select([
+        'webtoon.id',
+        'webtoon.title',
+        'webtoon.imageURL',
+        'webtoon.author',
+        'webtoon.painter',
+      ])
+      .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
+      .addSelect('COUNT(reviews.id)', 'reviewCount')
+      .groupBy('webtoon.id')
+      .getRawMany();
   }
 
   public async findManyBreifInfoWithReviewByIds(ids: number[], userId: number) {

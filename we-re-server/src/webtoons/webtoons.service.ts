@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
 import { UpdateWebtoonDto } from './dto/update-webtoon.dto';
 import { WebtoonRepository } from './webtoons.repository';
 import { StoragesService } from 'src/storages/storages.service';
+import {
+  PROVIDINGCOMPANY,
+  Webtoon,
+  stringToDays,
+  stringToProvidingCompany,
+} from 'src/entities/webtoon.entity';
 
 @Injectable()
 export class WebtoonsService {
@@ -34,6 +40,28 @@ export class WebtoonsService {
     // 좋아요 순서는 최신 순으로 정렬해서 가져오까용
     const ids = [1, 2];
     return await this.webtoonRepository.findManyThumbnailByIds(ids);
+  }
+
+  /**
+   * do filtering to get webtoon  list for webtoon list page
+   * @param dayString string formatted day
+   * @param providingCompaniesString  string formatted providing company
+   * @returns {Webtoon[]}
+   */
+  async findManyFilteredThumbnail(
+    dayString: string,
+    providingCompaniesString: string,
+  ) {
+    const day = stringToDays(dayString);
+    const providingCompanies = stringToProvidingCompany(
+      providingCompaniesString,
+    );
+    return await this.webtoonRepository.findManyFilteredThumbnail(
+      day,
+      providingCompanies
+        ? [providingCompanies]
+        : [PROVIDINGCOMPANY.KAKAO, PROVIDINGCOMPANY.NAVER],
+    );
   }
 
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {

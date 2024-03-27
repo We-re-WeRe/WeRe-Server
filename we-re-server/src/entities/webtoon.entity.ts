@@ -67,3 +67,17 @@ export class Webtoon extends DefaultEntity {
   })
   storages?: Storage[];
 }
+
+export function stringToDays(day: string): Days | undefined {
+  const dayKey = Object.keys(DAYS).find((key) => DAYS[key as Days] === day);
+  return dayKey ? DAYS[dayKey as Days] : undefined;
+}
+
+export function stringToProvidingCompany(
+  providingCompany: string,
+): ProvidingCompany | undefined {
+  const pcKey = Object.keys(PROVIDINGCOMPANY).find(
+    (key) => PROVIDINGCOMPANY[key as ProvidingCompany] === providingCompany,
+  );
+  return pcKey ? PROVIDINGCOMPANY[pcKey as ProvidingCompany] : undefined;
+}

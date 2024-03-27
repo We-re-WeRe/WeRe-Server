@@ -33,4 +33,15 @@ export class WebtoonsController {
       +storageId,
     );
   }
+
+  @Get('list/filter/day/:day/providing-company/:providingCompany')
+  findManyFilteredThumbnail(
+    @Param('day') day: string,
+    @Param('providingCompany') providingCompany: string,
+  ) {
+    return this.webtoonsService.findManyFilteredThumbnail(
+      day,
+      providingCompany,
+    );
+  }
 }
