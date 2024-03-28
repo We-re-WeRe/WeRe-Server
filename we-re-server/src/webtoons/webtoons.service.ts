@@ -86,6 +86,7 @@ export class WebtoonsService {
    * @returns {Webtoon[]} webtoon breif list with related reviews
    */
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {
+    // TODO:: NULL일때 Error 처리 필요.
     const { webtoon_ids: ids, userId } =
       await this.storageService.findWebtoonIdListById(storageId);
     return await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
