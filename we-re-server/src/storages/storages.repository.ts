@@ -11,7 +11,7 @@ export class StorageRepository extends Repository<Storage> {
   constructor(private readonly dataSource: DataSource) {
     super(Storage, dataSource.createEntityManager());
   }
-  public async findOneDetailById(id: number): Promise<Storage> {
+  public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('storage')
       .where('storage.id=:id', { id })
       .leftJoinAndSelect('storage.likes', 'likes')
@@ -20,6 +20,7 @@ export class StorageRepository extends Repository<Storage> {
         'storage.name',
         'storage.explain',
         'storage.disclosureScope',
+        'storage.userId',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .getRawOne();
@@ -68,6 +69,19 @@ export class StorageRepository extends Repository<Storage> {
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
+      .getRawMany();
+  }
+
+  /**
+   * get user id and webtoon id list related with storage.
+   * @param id storage id
+   * @returns {{userId,webtoon_id}[]} webtoon id list and storage owner's id
+   */
+  public async findWebtoonIdListById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .leftJoinAndSelect('storage.webtoons', 'webtoons')
+      .select(['storage.user', 'webtoons.id'])
       .getRawMany();
   }
 }

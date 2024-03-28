@@ -23,4 +23,18 @@ export class UserRepository extends Repository<User> {
       .where('id=:id', { id })
       .getRawOne();
   }
+
+  /**
+   * get user breif infos.
+   * @param id userId
+   * @returns {User} user breif infos
+   */
+  public async findOneBriefById(id: number): Promise<User> {
+    return await this.createQueryBuilder('user')
+      .where('user.id=:id', { id })
+      .leftJoinAndSelect('user.following', 'followers')
+      .select(['user.imageURL', 'user.nickname', 'user.id'])
+      .addSelect('COUNT(followers.id)', 'totalFollowers')
+      .getRawOne();
+  }
 }
