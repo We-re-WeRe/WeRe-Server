@@ -16,6 +16,7 @@ import { PointsModule } from './points/points.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { StoragesModule } from './storages/storages.module';
 import { WebtoonsModule } from './webtoons/webtoons.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { WebtoonsModule } from './webtoons/webtoons.module';
     ReviewsModule,
     StoragesModule,
     WebtoonsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
