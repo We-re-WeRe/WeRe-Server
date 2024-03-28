@@ -50,4 +50,23 @@ export class StoragesService {
   async findManyPublicStorageOwnedListByIds(ids: number[]) {
     return await this.storageRepository.findManyPublicStorageListByIds(ids);
   }
+
+  /**
+   * get user id and webtoon id list related with storage.
+   * @param id storage id
+   * @returns {{userId,webtoon_id[]}}webtoon id list and storage owner's id
+   */
+  async findWebtoonIdListById(id: number) {
+    const webtoon_id_list = await this.storageRepository.findWebtoonIdListById(
+      id,
+    );
+    if (webtoon_id_list.length === 0) {
+      return null;
+    }
+    const webtoon_ids = [];
+    const user_id = webtoon_id_list[0].userId;
+    webtoon_id_list.forEach((r) => webtoon_ids.push(r.webtoons_id));
+    const result = { userId: user_id, webtoon_ids };
+    return result;
+  }
 }

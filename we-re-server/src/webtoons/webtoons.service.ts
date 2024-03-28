@@ -80,9 +80,14 @@ export class WebtoonsService {
     return await this.webtoonRepository.findManyHotThumbnail();
   }
 
+  /**
+   * Get webtoon id list from storage service and return webtoon breif infos
+   * @param storageId storage id
+   * @returns {Webtoon[]} webtoon breif list with related reviews
+   */
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {
-    // TODO:: storage ID를 이용하여 웹툰 id 리스트와 user ID를 가져오기.
-    const { ids, userId } = { ids: [1, 2], userId: 1 };
+    const { webtoon_ids: ids, userId } =
+      await this.storageService.findWebtoonIdListById(storageId);
     return await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
       ids,
       userId,

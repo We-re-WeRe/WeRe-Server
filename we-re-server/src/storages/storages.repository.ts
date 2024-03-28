@@ -71,4 +71,17 @@ export class StorageRepository extends Repository<Storage> {
       .groupBy('storage.id')
       .getRawMany();
   }
+
+  /**
+   * get user id and webtoon id list related with storage.
+   * @param id storage id
+   * @returns {{userId,webtoon_id}[]} webtoon id list and storage owner's id
+   */
+  public async findWebtoonIdListById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .leftJoinAndSelect('storage.webtoons', 'webtoons')
+      .select(['storage.user', 'webtoons.id'])
+      .getRawMany();
+  }
 }
