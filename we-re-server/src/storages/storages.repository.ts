@@ -11,7 +11,7 @@ export class StorageRepository extends Repository<Storage> {
   constructor(private readonly dataSource: DataSource) {
     super(Storage, dataSource.createEntityManager());
   }
-  public async findOneDetailById(id: number): Promise<Storage> {
+  public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('storage')
       .where('storage.id=:id', { id })
       .leftJoinAndSelect('storage.likes', 'likes')
@@ -20,6 +20,7 @@ export class StorageRepository extends Repository<Storage> {
         'storage.name',
         'storage.explain',
         'storage.disclosureScope',
+        'storage.userId',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .getRawOne();

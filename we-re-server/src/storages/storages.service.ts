@@ -1,16 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { StorageRepository } from './storages.repository';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
+import { UserRepository } from 'src/users/users.repository';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class StoragesService {
-  constructor(private readonly storageRepository: StorageRepository) {}
+  constructor(
+    private readonly storageRepository: StorageRepository,
+    private readonly userService: UsersService,
+  ) {}
 
+  /**
+   * get Storage Detail for storage page.
+   * @param id storage id
+   * @returns storage detail and user brief info
+   */
   async findOneDetailById(id: number) {
-    return await this.storageRepository.findOneDetailById(id);
+    const storage_details = await this.storageRepository.findOneDetailById(id);
+    const { userId } = storage_details;
+    const user_brief_info = await this.userService.findOneBriefById(userId);
+    delete storage_details.userId;
+    const result = { ...storage_details, ...user_brief_info };
+    return result;
   }
+
   async findManyPublicStorageList() {
     return await this.storageRepository.findManyPublicStorageList();
   }
