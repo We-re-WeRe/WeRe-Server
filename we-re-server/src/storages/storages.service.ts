@@ -5,12 +5,14 @@ import { StorageRepository } from './storages.repository';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
 import { UserRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
+import { LikesService } from 'src/likes/likes.service';
 
 @Injectable()
 export class StoragesService {
   constructor(
     private readonly storageRepository: StorageRepository,
     private readonly userService: UsersService,
+    private readonly likeService: LikesService,
   ) {}
 
   /**
@@ -42,9 +44,9 @@ export class StoragesService {
     );
   }
   async findManyPublicStorageLikedListByIds(userId: number) {
-    //TODO:: like를 user ID로 조인해서 storage id를 다 가져온 값을 인자로 전달 필요.
-    // user id 본인 건지 체크 필요.
-    const ids: number[] = [1, 2];
+    //TODO:: user id 본인 건지 체크 필요.
+    const { storage_ids: ids } =
+      await this.likeService.findManyStorageIdsByUserId(userId);
     return await this.storageRepository.findManyPublicStorageListByIds(ids);
   }
   async findManyPublicStorageOwnedListByIds(ids: number[]) {
