@@ -10,18 +10,22 @@ import {
 import { PointsService } from './points.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Points')
 @Controller('points')
 export class PointsController {
   constructor(private readonly pointsService: PointsService) {}
 
-  @Get('history/:id')
-  findHistoryById(@Param('id') id: string) {
-    return this.pointsService.findHistoryById(+id);
+  @ApiOperation({ summary: 'get point history API' })
+  @Get('history/:userId')
+  findHistoryById(@Param('userId') user_id: string) {
+    return this.pointsService.findHistoryById(+user_id);
   }
 
-  @Get(':id')
-  findSumById(@Param('id') id: string) {
-    return this.pointsService.findSumById(+id);
+  @ApiOperation({ summary: "get user's total point API" })
+  @Get('sum/:userId')
+  findSumById(@Param('userId') user_id: string) {
+    return this.pointsService.findSumById(+user_id);
   }
 }

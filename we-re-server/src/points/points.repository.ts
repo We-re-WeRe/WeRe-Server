@@ -8,18 +8,18 @@ export class PointRepository extends Repository<Point> {
     super(Point, dataSource.createEntityManager());
   }
 
-  public async findHistoryById(id: number): Promise<Point[]> {
+  public async findHistoryById(user_id: number): Promise<Point[]> {
     return await this.createQueryBuilder('point')
       .select(['point.mount', 'point.reason', 'point.created_at'])
-      .where('point.user=:id', { id })
+      .where('point.user=:user_id', { user_id })
       .orderBy('point.created_at', 'DESC')
       .getMany();
   }
 
-  public async findSumById(id: number) {
+  public async findSumById(user_id: number) {
     return await this.createQueryBuilder('point')
       .select(['SUM(point.mount) as point_sum'])
-      .where('point.user=:id', { id })
+      .where('point.user=:user_id', { user_id })
       .getRawOne();
   }
 }
