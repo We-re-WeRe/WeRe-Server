@@ -5,7 +5,6 @@ import { version } from '../package.json';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const config = new DocumentBuilder()
     .setTitle('We-Re API Document')
     .setDescription('WeRe API description')
