@@ -8,7 +8,7 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager());
   }
 
-  public async findOneWithDetailById(id: number): Promise<User> {
+  public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
 
   public async findOneProfileImageById(id: number) {
     return await this.createQueryBuilder('user')
-      .select(['imageURL'])
+      .select(['id as userId', 'imageURL'])
       .where('id=:id', { id })
       .getRawOne();
   }
@@ -29,7 +29,7 @@ export class UserRepository extends Repository<User> {
    * @param id userId
    * @returns {User} user breif infos
    */
-  public async findOneBriefById(id: number): Promise<User> {
+  public async findOneBriefById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
