@@ -27,6 +27,12 @@ export class ReadUserDto {
     this.nickname = raw.user_nickname;
     return this;
   }
+  public getId(): number {
+    return this.id;
+  }
+  public setId(id: number): void {
+    this.id = id;
+  }
 }
 
 @Exclude()
