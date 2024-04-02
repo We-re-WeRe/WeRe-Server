@@ -24,9 +24,7 @@ export class WebtoonsService {
     const storageIdArr = [];
     webtoon_details.forEach((r) => storageIdArr.push(r.storages_id));
     const storageList =
-      await this.storageService.findManyPublicStorageOwnedListByIds(
-        storageIdArr,
-      );
+      await this.storageService.findManyPublicStorageListByIds(storageIdArr);
     const result = { ...webtoon_details[0], storageList };
     delete result.storages_id;
     return result;
@@ -89,7 +87,7 @@ export class WebtoonsService {
    */
   async findManyBreifInfoWithReviewByStorageId(storageId: number) {
     // TODO:: NULL일때 Error 처리 필요.
-    const { webtoon_ids: ids, userId } =
+    const { webtoonIds: ids, userId } =
       await this.storageService.findWebtoonIdListById(storageId);
     return await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
       ids,

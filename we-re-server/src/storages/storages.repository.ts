@@ -16,17 +16,18 @@ export class StorageRepository extends Repository<Storage> {
       .where('storage.id=:id', { id })
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
+        'storage.id',
         'storage.imageURL',
         'storage.name',
         'storage.explain',
         'storage.disclosureScope',
-        'storage.userId',
+        'storage.user_id',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .getRawOne();
   }
 
-  public async findManyPublicStorageList(): Promise<Storage[]> {
+  public async findManyPublicStorageList() {
     return await this.createQueryBuilder('storage')
       .where('storage.disclosureScope=:disclosureScope', {
         disclosureScope: DISCLOSURESCOPE.PUBLIC,
@@ -39,9 +40,7 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
-  public async findManyPublicStorageListByIds(
-    ids: number[],
-  ): Promise<Storage[]> {
+  public async findManyPublicStorageListByIds(ids: number[]) {
     return await this.createQueryBuilder('storage')
       .where('storage.disclosureScope=:disclosureScope', {
         disclosureScope: DISCLOSURESCOPE.PUBLIC,
@@ -55,10 +54,10 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
-  public async findManyStorageListByUserIdAndDisclosureScope(
+  public async findManyStorageListByUserId(
     userId: number,
     disclosureScope: DisclosureScope[],
-  ): Promise<Storage[]> {
+  ) {
     return await this.createQueryBuilder('storage')
       .where('storage.user=:userId', { userId })
       .andWhere('storage.disclosureScope IN (:...disclosureScope)', {
@@ -75,7 +74,7 @@ export class StorageRepository extends Repository<Storage> {
   /**
    * get user id and webtoon id list related with storage.
    * @param id storage id
-   * @returns {{userId,webtoon_id}[]} webtoon id list and storage owner's id
+   * @returns {{any}[]} webtoon id list and storage owner's id
    */
   public async findWebtoonIdListById(id: number) {
     return await this.createQueryBuilder('storage')
