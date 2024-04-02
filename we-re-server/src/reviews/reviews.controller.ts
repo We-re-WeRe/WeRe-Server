@@ -15,8 +15,8 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
-  @Get('list/writer/:id')
-  findManyByUserId(@Param('id') id: string) {
-    return this.reviewsService.findManyByWebtoonId(+id);
+  @Get('list/user/:userId')
+  findManyByUserId(@Param('userId') userId: string) {
+    return this.reviewsService.findManyByWebtoonId(+userId);
   }
 }

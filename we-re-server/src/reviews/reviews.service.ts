@@ -8,11 +8,13 @@ import { ReadReviewAndUserDto } from './dto/read-review.dto';
 export class ReviewsService {
   constructor(private readonly reviewRepository: ReviewRepository) {}
 
-  async findManyByUserId(id: number) {
-    return this.reviewRepository.findManyByUserId(id);
+  async findManyByUserId(userId: number) {
+    return this.reviewRepository.findManyByUserId(userId);
   }
-  async findManyByWebtoonId(id: number) {
-    const queryResult = await this.reviewRepository.findManyByWebtoonId(+id);
+  async findManyByWebtoonId(webtoonId: number) {
+    const queryResult = await this.reviewRepository.findManyByWebtoonId(
+      +webtoonId,
+    );
     const result: ReadReviewAndUserDto[] = queryResult.map(
       (r) => new ReadReviewAndUserDto(r),
     );

@@ -7,9 +7,9 @@ export class ReviewRepository extends Repository<Review> {
   constructor(private readonly datasource: DataSource) {
     super(Review, datasource.createEntityManager());
   }
-  public async findManyByUserId(id: number): Promise<Review[]> {
+  public async findManyByUserId(userId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.user=:id', { id })
+      .where('review.user=:userId', { userId })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
@@ -25,9 +25,9 @@ export class ReviewRepository extends Repository<Review> {
       .getRawMany();
   }
 
-  public async findManyByWebtoonId(id: number): Promise<Review[]> {
+  public async findManyByWebtoonId(webtoonId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.webtoon_id=:id', { id })
+      .where('review.webtoon_id=:webtoonId', { webtoonId })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.user', 'user')
       .select([
