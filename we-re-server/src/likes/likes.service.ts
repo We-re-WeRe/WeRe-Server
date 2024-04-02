@@ -9,7 +9,7 @@ export class LikesService {
     const storage_id_object_arr =
       await this.likeRepository.findManyStorageIdsByUserId(id);
     const storage_ids = [];
-    storage_id_object_arr.forEach((r) => storage_ids.push(r.storageId));
+    storage_id_object_arr.forEach((r) => storage_ids.push(r.storage_id));
     const result = { storage_ids };
     return result;
   }
