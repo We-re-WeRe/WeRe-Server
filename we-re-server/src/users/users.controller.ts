@@ -14,19 +14,14 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  ReadUserDetailDto,
-  ReadUserProfileImageDto,
-} from './dto/read-user.dto';
+import { ReadUserDetailDto, ReadUserDto } from './dto/read-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('profile-image/:id')
-  async findOneProfileImageById(
-    @Param('id') id: string,
-  ): Promise<ReadUserProfileImageDto> {
+  async findOneProfileImageById(@Param('id') id: string): Promise<ReadUserDto> {
     Logger.log(id);
     return await this.usersService.findOneProfileImageById(+id);
   }

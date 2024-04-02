@@ -2,17 +2,35 @@ import { Exclude, Expose } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 @Exclude()
-export class ReadUserDetailDto {
+export class ReadUserDto {
+  constructor(raw?: any) {
+    raw && this.rawToDto(raw);
+  }
+  @Expose()
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+
   @Expose()
   @IsString()
   @IsNotEmpty()
-  userImageURL: string;
+  imageURL: string;
 
   @Expose()
   @IsString()
   @IsNotEmpty()
   nickname: string;
 
+  public rawToDto(raw: any): ReadUserDto {
+    this.id = raw.user_id;
+    this.imageURL = raw.user_image_url;
+    this.nickname = raw.user_nickname;
+    return this;
+  }
+}
+
+@Exclude()
+export class ReadUserDetailDto extends ReadUserDto {
   @Expose()
   @IsString()
   introduceMe?: string;
@@ -22,49 +40,28 @@ export class ReadUserDetailDto {
   @IsNotEmpty()
   totalFollowers: number;
 
-  public entityToDto(entity: any): ReadUserDetailDto {
-    this.userImageURL = entity.user_imageURL;
-    this.nickname = entity.user_nickname;
-    this.introduceMe = entity.user_introduceMe;
-    this.totalFollowers = entity.totalFollowers;
+  public rawToDto(raw: any): ReadUserDetailDto {
+    super.rawToDto(raw);
+    this.introduceMe = raw.user_introduce_me;
+    this.totalFollowers = raw.totalFollowers;
     return this;
   }
 }
 
 @Exclude()
-export class ReadUserBreifDto {
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  userImageURL: string;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  nickname: string;
-
+export class ReadUserBriefDto extends ReadUserDto {
+  constructor(raw: any) {
+    super();
+    this.rawToDto(raw);
+  }
   @Expose()
   @IsInt()
   @IsNotEmpty()
   totalFollowers: number;
 
-  public entityToDto(entity: any): ReadUserBreifDto {
-    this.userImageURL = entity.user_imageURL;
-    this.nickname = entity.user_nickname;
-    this.totalFollowers = entity.totalFollowers;
+  public rawToDto(raw: any): ReadUserBriefDto {
+    super.rawToDto(raw);
+    this.totalFollowers = raw.totalFollowers;
     return this;
   }
-}
-
-@Exclude()
-export class ReadUserProfileImageDto {
-  @Expose()
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  imageURL: string;
 }

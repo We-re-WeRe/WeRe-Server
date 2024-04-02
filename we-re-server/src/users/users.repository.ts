@@ -12,14 +12,14 @@ export class UserRepository extends Repository<User> {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
-      .select(['user.imageURL', 'user.nickname', 'user.introduceMe'])
+      .select(['user.id', 'user.imageURL', 'user.nickname', 'user.introduceMe'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .getRawOne();
   }
 
   public async findOneProfileImageById(id: number) {
     return await this.createQueryBuilder('user')
-      .select(['id as userId', 'imageURL'])
+      .select(['user.id', 'user.imageURL'])
       .where('id=:id', { id })
       .getRawOne();
   }
@@ -33,7 +33,7 @@ export class UserRepository extends Repository<User> {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
-      .select(['user.imageURL', 'user.nickname', 'user.id'])
+      .select(['user.id', 'user.imageURL', 'user.nickname', 'user.id'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .getRawOne();
   }
