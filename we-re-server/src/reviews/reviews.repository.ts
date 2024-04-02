@@ -9,16 +9,16 @@ export class ReviewRepository extends Repository<Review> {
   }
   public async findManyByUserId(id: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.userId=:id', { id })
+      .where('review.user=:id', { id })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
         'review.id',
-        'review.contents as contents',
-        'review.starpoint as starpoint',
+        'review.contents',
+        'review.star_point',
         'webtoon.id',
         'webtoon.title',
-        'webtoon.imageURL',
+        'webtoon.image_url',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
@@ -27,13 +27,13 @@ export class ReviewRepository extends Repository<Review> {
 
   public async findManyByWebtoonId(id: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.webtoonId=:id', { id })
+      .where('review.webtoon_id=:id', { id })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.user', 'user')
       .select([
         'review.id',
-        'review.contents as contents',
-        'review.starpoint as starpoint',
+        'review.contents',
+        'review.starPoint',
         'user.id',
         'user.nickname',
         'user.imageURL',

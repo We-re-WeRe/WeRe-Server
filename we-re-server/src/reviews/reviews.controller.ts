@@ -17,6 +17,6 @@ export class ReviewsController {
 
   @Get('list/writer/:id')
   findManyByUserId(@Param('id') id: string) {
-    return this.reviewsService.findManyByUserId(+id);
+    return this.reviewsService.findManyByWebtoonId(+id);
   }
 }
