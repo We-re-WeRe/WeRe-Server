@@ -2,96 +2,107 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
 import { UpdateWebtoonDto } from './dto/update-webtoon.dto';
 import { WebtoonRepository } from './webtoons.repository';
-import { StoragesService } from 'src/storages/storages.service';
 import {
   PROVIDINGCOMPANY,
-  Webtoon,
   stringToDays,
   stringToProvidingCompany,
 } from 'src/entities/webtoon.entity';
-import { LikesService } from 'src/likes/likes.service';
+import {
+  ReadWebtoonBriefDto,
+  ReadWebtoonDetailDto,
+  ReadWebtoonThumbnailDto,
+} from './dto/read-webtoon.dto';
 
 @Injectable()
 export class WebtoonsService {
-  constructor(
-    private readonly webtoonRepository: WebtoonRepository,
-    private readonly storageService: StoragesService,
-    private readonly likeService: LikesService,
-  ) {}
+  constructor(private readonly webtoonRepository: WebtoonRepository) {}
 
-  async findOneDetailById(id: number) {
-    const webtoon_details = await this.webtoonRepository.findOneDetailById(id);
-    const storageIdArr = [];
-    webtoon_details.forEach((r) => storageIdArr.push(r.storages_id));
-    const storageList =
-      await this.storageService.findManyPublicStorageListByIds(storageIdArr);
-    const result = { ...webtoon_details[0], storageList };
-    delete result.storages_id;
+  /**
+   * service to get webtoon detail info with related storage brief info list.
+   * @param id
+   * @returns {ReadWebtoonDetailDto}
+   */
+  async findOneDetailById(id: number): Promise<ReadWebtoonDetailDto> {
+    const queryResult = await this.webtoonRepository.findOneDetailById(id);
+    const result = new ReadWebtoonDetailDto(queryResult);
     return result;
   }
 
   /**
-   * @description 해당 유저의 좋아요 누른 웹툰 리스트를 반환한다.
-   * @param userId 웹툰을 좋아요 누른 유저 아이디.
-   * @returns 이미지 url, 제목, 글/그림 작가, id 를 필드로 가진 객체들의 배열 반환.
+   * service to get list of thumbnail of webtoons by id.
+   * @param ids
+   * @returns {ReadWebtoonThumbnailDto[]}
    */
-  async findManyLikedThumbnailByUserId(userId: number) {
-    // TODO:: 본인인지 체크 필요.
-    const { webtoon_ids: ids } =
-      await this.likeService.findManyWebtoonIdsByUserId(userId);
-    return await this.webtoonRepository.findManyThumbnailByIds(ids);
+  async findManyThumbnailByIds(
+    ids: number[],
+  ): Promise<ReadWebtoonThumbnailDto[]> {
+    if (ids.length > 0) {
+      const queryResult = await this.webtoonRepository.findManyThumbnailByIds(
+        ids,
+      );
+      const result = queryResult.map((r) => new ReadWebtoonThumbnailDto(r));
+      return result;
+    } else return [];
   }
 
   /**
    * do filtering to get webtoon  list for webtoon list page
    * @param dayString string formatted day
    * @param providingCompaniesString  string formatted providing company
-   * @returns {Webtoon[]}
+   * @returns {ReadWebtoonThumbnailDto[]}
    */
   async findManyFilteredThumbnail(
     dayString: string,
     providingCompaniesString: string,
-  ) {
+  ): Promise<ReadWebtoonThumbnailDto[]> {
     const day = stringToDays(dayString);
     const providingCompanies = stringToProvidingCompany(
       providingCompaniesString,
     );
-    return await this.webtoonRepository.findManyFilteredThumbnail(
+    const queryResult = await this.webtoonRepository.findManyFilteredThumbnail(
       day,
       providingCompanies
         ? [providingCompanies]
         : [PROVIDINGCOMPANY.KAKAO, PROVIDINGCOMPANY.NAVER],
     );
+    const result = queryResult.map((r) => new ReadWebtoonThumbnailDto(r));
+    return result;
   }
 
   /**
    * Get New webtoons!
-   * @returns {Webtoon[]}
+   * @returns {ReadWebtoonThumbnailDto[]}
    */
-  async findManyNewThumbnail() {
-    return await this.webtoonRepository.findManyNewThumbnail();
+  async findManyNewThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
+    const queryResult = await this.webtoonRepository.findManyThumbnail('new');
+    const result = queryResult.map((r) => new ReadWebtoonThumbnailDto(r));
+    return result;
   }
 
   /**
    * Get New webtoons!
-   * @returns {Webtoon[]}
+   * @returns {ReadWebtoonThumbnailDto[]}
    */
-  async findManyHotThumbnail() {
-    return await this.webtoonRepository.findManyHotThumbnail();
+  async findManyHotThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
+    const queryResult = await this.webtoonRepository.findManyThumbnail('hot');
+    const result = queryResult.map((r) => new ReadWebtoonThumbnailDto(r));
+    return result;
   }
-
   /**
    * Get webtoon id list from storage service and return webtoon breif infos
    * @param storageId storage id
    * @returns {Webtoon[]} webtoon breif list with related reviews
    */
-  async findManyBreifInfoWithReviewByStorageId(storageId: number) {
-    // TODO:: NULL일때 Error 처리 필요.
-    const { webtoonIds: ids, userId } =
-      await this.storageService.findWebtoonIdListById(storageId);
-    return await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
-      ids,
-      userId,
-    );
+  async findManyBreifInfoWithReviewByStorageId(
+    ids: number[],
+    userId: number,
+  ): Promise<ReadWebtoonBriefDto[]> {
+    const queryResult =
+      await this.webtoonRepository.findManyBreifInfoWithReviewByIds(
+        ids,
+        userId,
+      );
+    const result = queryResult.map((r) => new ReadWebtoonBriefDto(r));
+    return result;
   }
 }

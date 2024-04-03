@@ -15,8 +15,8 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .where('webtoon.id=:id', { id })
       .leftJoinAndSelect('webtoon.likes', 'likes')
       .leftJoinAndSelect('webtoon.reviews', 'reviews')
-      .leftJoinAndSelect('webtoon.storages', 'storages')
       .select([
+        'webtoon.id',
         'webtoon.title',
         'webtoon.imageURL',
         'webtoon.webtoonURL',
@@ -29,32 +29,14 @@ export class WebtoonRepository extends Repository<Webtoon> {
         'webtoon.viewCount',
       ])
       .groupBy('webtoon.id')
-      .addGroupBy('storages.id')
       .addSelect('COUNT(DISTINCT(likes.id))', 'totalLikes')
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
-      .addSelect('storages.id')
-      .getRawMany();
+      .getRawOne();
   }
 
   public async findManyThumbnailByIds(ids: number[]) {
     return await this.createQueryBuilder('webtoon')
       .where('webtoon.id IN (:...ids)', { ids })
-      .select([
-        'webtoon.id',
-        'webtoon.title',
-        'webtoon.imageURL',
-        'webtoon.author',
-        'webtoon.painter',
-      ])
-      .getMany();
-  }
-
-  /**
-   * Get New webtoons!
-   * @returns {Webtoon[]}
-   */
-  public async findManyNewThumbnail() {
-    return await this.createQueryBuilder('webtoon')
       .leftJoinAndSelect('webtoon.reviews', 'reviews')
       .select([
         'webtoon.id',
@@ -66,17 +48,15 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
       .addSelect('COUNT(reviews.id)', 'reviewCount')
       .groupBy('webtoon.id')
-      .orderBy('webtoon.created_at', 'DESC')
-      .limit(5)
       .getRawMany();
   }
 
   /**
-   * Get Hot webtoons!
+   * Get Hot and New webtoons!
    * @returns {Webtoon[]}
    */
-  public async findManyHotThumbnail() {
-    return await this.createQueryBuilder('webtoon')
+  public async findManyThumbnail(type: string) {
+    const qb = this.createQueryBuilder('webtoon')
       .leftJoinAndSelect('webtoon.reviews', 'reviews')
       .select([
         'webtoon.id',
@@ -87,10 +67,14 @@ export class WebtoonRepository extends Repository<Webtoon> {
       ])
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
       .addSelect('COUNT(reviews.id)', 'reviewCount')
-      .groupBy('webtoon.id')
-      .orderBy('reviewCount', 'DESC')
-      .limit(5)
-      .getRawMany();
+      .groupBy('webtoon.id');
+    if (type === 'hot')
+      return await qb.orderBy('reviewCount', 'DESC').limit(5).getRawMany();
+    if (type === 'new')
+      return await qb
+        .orderBy('webtoon.created_at', 'DESC')
+        .limit(5)
+        .getRawMany();
   }
 
   /**
@@ -130,18 +114,18 @@ export class WebtoonRepository extends Repository<Webtoon> {
         (qb) =>
           qb
             .select([
-              'reviews.id',
-              'reviews.starPoint',
-              'reviews.contents',
-              'reviews.webtoonId',
+              'review.id',
+              'review.starPoint',
+              'review.contents',
+              'review.webtoon',
             ])
-            .from(Review, 'reviews')
-            .leftJoin('reviews.likes', 'reviewLikes')
-            .where('reviews.userId = :userId', { userId })
+            .from(Review, 'review')
+            .leftJoin('review.likes', 'reviewLikes')
+            .where('review.user = :userId', { userId })
             .addSelect('COUNT(reviewLikes.id)', 'totalLikes')
-            .groupBy('reviews.id'),
+            .groupBy('review.id'),
         'reviews',
-        'reviews.webtoonId = webtoon.id',
+        'reviews.webtoon_id = webtoon.id',
       )
       .select([
         'webtoon.id',
@@ -149,14 +133,14 @@ export class WebtoonRepository extends Repository<Webtoon> {
         'webtoon.imageURL',
         'webtoon.author',
         'webtoon.painter',
-        'reviews_id',
-        'reviews_starPoint',
-        'reviews_contents',
-        'reviews.totalLikes as totalReviewLikes',
+        'reviews.review_id',
+        'reviews.review_star_point',
+        'reviews.review_contents',
+        'reviews.totalLikes as totalLikes',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .addSelect('COUNT(likes.id)', 'totalWebtoonLikes')
       .groupBy('webtoon.id')
-      .addGroupBy('reviews_id')
+      .addGroupBy('reviews.review_id')
       .getRawMany();
   }
 }
