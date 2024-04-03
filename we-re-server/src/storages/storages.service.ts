@@ -98,9 +98,9 @@ export class StoragesService {
       return null;
     }
     const webtoonIds: number[] = [];
-    const user_id: number = queryResult[0].userId;
+    const userId: number = queryResult[0].user_id;
     queryResult.forEach((r) => webtoonIds.push(r.webtoons_id));
-    const result = { userId: user_id, webtoonIds: webtoonIds };
+    const result = { userId: userId, webtoonIds: webtoonIds };
     return result;
   }
 }
