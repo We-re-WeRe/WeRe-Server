@@ -1,7 +1,10 @@
 import { Expose } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Days, ProvidingCompany } from 'src/entities/webtoon.entity';
-import { ReadReviewDto } from 'src/reviews/dto/read-review.dto';
+import {
+  ReadReviewAndUserDto,
+  ReadReviewDto,
+} from 'src/reviews/dto/read-review.dto';
 import { ReadStorageBriefDto } from 'src/storages/dto/read-storage.dto';
 
 export class ReadWebtoonDto {
@@ -133,8 +136,11 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
 
   @Expose()
   @ValidateNested()
-  @IsNotEmpty()
   storages: ReadStorageBriefDto[];
+
+  @Expose()
+  @ValidateNested()
+  reviews: ReadReviewAndUserDto[];
 
   public rawToDto(raw: any): ReadWebtoonDetailDto {
     super.rawToDto(raw);

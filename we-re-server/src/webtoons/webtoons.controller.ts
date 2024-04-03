@@ -16,6 +16,7 @@ import {
   ReadWebtoonThumbnailDto,
 } from './dto/read-webtoon.dto';
 import { StoragesService } from 'src/storages/storages.service';
+import { ReviewsService } from 'src/reviews/reviews.service';
 
 @Controller('webtoons')
 export class WebtoonsController {
@@ -23,6 +24,7 @@ export class WebtoonsController {
     private readonly webtoonsService: WebtoonsService,
     private readonly likeService: LikesService,
     private readonly storageService: StoragesService,
+    private readonly reviewService: ReviewsService,
   ) {}
 
   @Get('detail/:id')
@@ -33,7 +35,8 @@ export class WebtoonsController {
     result.storages = await this.storageService.findManyPublicListByWebtoonId(
       +id,
     );
-    return;
+    result.reviews = await this.reviewService.findManyByWebtoonId(+id);
+    return result;
   }
 
   @Get('list/liked/user/:userId')
