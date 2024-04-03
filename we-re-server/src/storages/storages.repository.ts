@@ -71,6 +71,25 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
+  public async findManyPublicListByWebtoonId(webtoonId: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.disclosureScope=:disclosureScope', {
+        disclosureScope: DISCLOSURESCOPE.PUBLIC,
+      })
+      .leftJoinAndSelect('storage.likes', 'likes')
+      .leftJoinAndSelect(
+        'storage.webtoons',
+        'webtoons',
+        'webtoons.id = :webtoonId',
+        { webtoonId },
+      )
+      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .addSelect('COUNT(likes.id)', 'totalLikes')
+      .orderBy('totalLikes', 'DESC')
+      .groupBy('storage.id')
+      .getRawMany();
+  }
+
   /**
    * get user id and webtoon id list related with storage.
    * @param id storage id

@@ -64,6 +64,22 @@ export class StoragesService {
   }
 
   /**
+   * Service to get webtoon's storage list
+   * @param {number} webtoonId
+   * @returns {ReadStorageBriefDto[]}
+   */
+  async findManyPublicListByWebtoonId(
+    webtoonId: number,
+  ): Promise<ReadStorageBriefDto[]> {
+    const queryResult =
+      await this.storageRepository.findManyPublicListByWebtoonId(webtoonId);
+    const result: ReadStorageBriefDto[] = queryResult.map(
+      (r) => new ReadStorageBriefDto(r),
+    );
+    return result;
+  }
+
+  /**
    * Service to get with storage Ids
    * @param ids
    * @returns {ReadStorageBriefDto[]}
