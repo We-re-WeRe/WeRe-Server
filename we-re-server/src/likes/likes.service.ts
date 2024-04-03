@@ -17,9 +17,9 @@ export class LikesService {
   async findManyWebtoonIdsByUserId(id: number) {
     const webtoon_id_object_arr =
       await this.likeRepository.findManyWebtoonIdsByUserId(id);
-    const webtoon_ids = [];
-    webtoon_id_object_arr.forEach((r) => webtoon_ids.push(r.webtoonId));
-    const result = { webtoon_ids };
+    const webtoonIds = [];
+    webtoon_id_object_arr.forEach((r) => webtoonIds.push(r.webtoon_id));
+    const result = { webtoonIds };
     return result;
   }
 
