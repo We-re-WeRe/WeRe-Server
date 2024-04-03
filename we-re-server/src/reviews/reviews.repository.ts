@@ -7,33 +7,35 @@ export class ReviewRepository extends Repository<Review> {
   constructor(private readonly datasource: DataSource) {
     super(Review, datasource.createEntityManager());
   }
-  public async findManyByUserId(id: number): Promise<Review[]> {
+  public async findManyByUserId(userId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.userId=:id', { id })
+      .where('review.user=:userId', { userId })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
         'review.id',
-        'review.contents as contents',
-        'review.starpoint as starpoint',
+        'review.contents',
+        'review.starPoint',
         'webtoon.id',
         'webtoon.title',
         'webtoon.imageURL',
+        'webtoon.author',
+        'webtoon.painter',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
       .getRawMany();
   }
 
-  public async findManyByWebtoonId(id: number): Promise<Review[]> {
+  public async findManyByWebtoonId(webtoonId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.webtoonId=:id', { id })
+      .where('review.webtoon_id=:webtoonId', { webtoonId })
       .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.user', 'user')
       .select([
         'review.id',
-        'review.contents as contents',
-        'review.starpoint as starpoint',
+        'review.contents',
+        'review.starPoint',
         'user.id',
         'user.nickname',
         'user.imageURL',

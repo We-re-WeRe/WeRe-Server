@@ -9,7 +9,7 @@ export class LikesService {
     const storage_id_object_arr =
       await this.likeRepository.findManyStorageIdsByUserId(id);
     const storage_ids = [];
-    storage_id_object_arr.forEach((r) => storage_ids.push(r.storageId));
+    storage_id_object_arr.forEach((r) => storage_ids.push(r.storage_id));
     const result = { storage_ids };
     return result;
   }
@@ -17,9 +17,9 @@ export class LikesService {
   async findManyWebtoonIdsByUserId(id: number) {
     const webtoon_id_object_arr =
       await this.likeRepository.findManyWebtoonIdsByUserId(id);
-    const webtoon_ids = [];
-    webtoon_id_object_arr.forEach((r) => webtoon_ids.push(r.webtoonId));
-    const result = { webtoon_ids };
+    const webtoonIds = [];
+    webtoon_id_object_arr.forEach((r) => webtoonIds.push(r.webtoon_id));
+    const result = { webtoonIds };
     return result;
   }
 

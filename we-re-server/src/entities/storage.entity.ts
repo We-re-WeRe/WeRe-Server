@@ -50,8 +50,8 @@ export class Storage extends DefaultEntity {
   @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages)
   @JoinTable({
     name: 'storage_webtoon',
-    joinColumn: { name: 'storageId' },
-    inverseJoinColumn: { name: 'webtoonId' },
+    joinColumn: { name: 'webtoon_id' },
+    inverseJoinColumn: { name: 'storage_id' },
   })
-  webtoons?: Webtoon[];
+  webtoons: Webtoon[];
 }

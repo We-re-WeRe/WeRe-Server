@@ -17,6 +17,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { StoragesModule } from './storages/storages.module';
 import { WebtoonsModule } from './webtoons/webtoons.module';
 import { LikesModule } from './likes/likes.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { LikesModule } from './likes/likes.module';
       database: process.env.DATABASE_NAME,
       entities: [User, Review, Webtoon, Storage, Point, Tag, Like, LoginInfo],
       synchronize: process.env.NODE_ENV !== 'production',
+      namingStrategy: new SnakeNamingStrategy(),
     }),
     UsersModule,
     PointsModule,

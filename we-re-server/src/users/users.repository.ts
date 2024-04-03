@@ -8,18 +8,18 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager());
   }
 
-  public async findOneWithDetailById(id: number): Promise<User> {
+  public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
-      .select(['user.imageURL', 'user.nickname', 'user.introduceMe'])
+      .select(['user.id', 'user.imageURL', 'user.nickname', 'user.introduceMe'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .getRawOne();
   }
 
   public async findOneProfileImageById(id: number) {
     return await this.createQueryBuilder('user')
-      .select(['imageURL'])
+      .select(['user.id', 'user.imageURL'])
       .where('id=:id', { id })
       .getRawOne();
   }
@@ -29,11 +29,11 @@ export class UserRepository extends Repository<User> {
    * @param id userId
    * @returns {User} user breif infos
    */
-  public async findOneBriefById(id: number): Promise<User> {
+  public async findOneBriefById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
       .leftJoinAndSelect('user.following', 'followers')
-      .select(['user.imageURL', 'user.nickname', 'user.id'])
+      .select(['user.id', 'user.imageURL', 'user.nickname', 'user.id'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .getRawOne();
   }

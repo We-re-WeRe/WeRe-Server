@@ -10,17 +10,17 @@ export class LikesRepository extends Repository<Like> {
 
   public async findManyStorageIdsByUserId(userId: number) {
     return this.createQueryBuilder('likes')
-      .where('likes.userId=:userId', { userId })
-      .andWhere('likes.storageId IS NOT NULL')
-      .select(['likes.storageId'])
+      .where('likes.user=:userId', { userId })
+      .andWhere('likes.storage IS NOT NULL')
+      .select(['likes.storage_id'])
       .getRawMany();
   }
 
   public async findManyWebtoonIdsByUserId(userId: number) {
     return this.createQueryBuilder('likes')
-      .where('likes.userId=:userId', { userId })
-      .andWhere('likes.webtoonId IS NOT NULL')
-      .select(['likes.webtoonId'])
+      .where('likes.user=:userId', { userId })
+      .andWhere('likes.webtoon_id IS NOT NULL')
+      .select(['likes.webtoon_id'])
       .getRawMany();
   }
 

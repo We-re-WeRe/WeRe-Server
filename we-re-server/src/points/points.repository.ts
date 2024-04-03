@@ -18,7 +18,7 @@ export class PointRepository extends Repository<Point> {
 
   public async findSumById(user_id: number) {
     return await this.createQueryBuilder('point')
-      .select(['SUM(point.mount) as point_sum'])
+      .select(['SUM(point.mount) as totalPoint'])
       .where('point.user=:user_id', { user_id })
       .getRawOne();
   }
