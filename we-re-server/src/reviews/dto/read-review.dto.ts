@@ -2,6 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Webtoon } from 'src/entities/webtoon.entity';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
+import { ReadWebtoonDto } from 'src/webtoons/dto/read-webtoon.dto';
 
 @Exclude()
 export class ReadReviewDto {
@@ -45,11 +46,11 @@ export class ReadReviewAndWebtoonDto extends ReadReviewDto {
   @Expose()
   @ValidateNested()
   @IsNotEmpty()
-  webtoon: Webtoon;
+  webtoon: ReadWebtoonDto;
 
   public rawToDto(raw: any) {
     super.rawToDto(raw);
-    // this.webtoon = new ReadUserDto(raw);
+    this.webtoon = new ReadWebtoonDto(raw);
     return this;
   }
 }

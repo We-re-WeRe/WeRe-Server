@@ -15,10 +15,12 @@ export class ReviewRepository extends Repository<Review> {
       .select([
         'review.id',
         'review.contents',
-        'review.star_point',
+        'review.starPoint',
         'webtoon.id',
         'webtoon.title',
-        'webtoon.image_url',
+        'webtoon.imageURL',
+        'webtoon.author',
+        'webtoon.painter',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
