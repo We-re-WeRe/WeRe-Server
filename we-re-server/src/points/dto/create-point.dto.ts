@@ -22,4 +22,14 @@ export class CreatePointDto {
   @IsInt()
   @IsOptional()
   mount?: number;
+
+  public get UserIdString(): string {
+    return `${this.userId}`;
+  }
+  public get Reason(): Reason {
+    return this.reason;
+  }
+  public get Mount(): number {
+    return this.mount;
+  }
 }
