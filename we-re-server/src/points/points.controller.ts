@@ -11,6 +11,7 @@ import { PointsService } from './points.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 import {
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -42,5 +43,12 @@ export class PointsController {
     @Param('userId') user_id: number,
   ): Promise<ReadPointSumDto> {
     return await this.pointsService.findSumById(user_id);
+  }
+
+  @ApiOperation({ summary: 'create Point object' })
+  @ApiCreatedResponse({ description: 'Request Success' })
+  @Post()
+  async createPoint(@Body() createdPointDto: CreatePointDto) {
+    return await this.pointsService.createPoint(createdPointDto);
   }
 }

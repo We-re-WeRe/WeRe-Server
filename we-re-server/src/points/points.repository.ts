@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Point } from 'src/entities/point.entity';
 import { DataSource, Repository } from 'typeorm';
+import { CreatePointDto } from './dto/create-point.dto';
 
 @Injectable()
 export class PointRepository extends Repository<Point> {
@@ -21,5 +22,17 @@ export class PointRepository extends Repository<Point> {
       .select(['SUM(point.mount) as totalPoint'])
       .where('point.user=:user_id', { user_id })
       .getRawOne();
+  }
+
+  public async createPoint(createPointDto: CreatePointDto) {
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Point)
+      .values({
+        user: () => createPointDto.UserIdString,
+        reason: createPointDto.Reason,
+        mount: createPointDto.Mount,
+      })
+      .execute();
   }
 }
