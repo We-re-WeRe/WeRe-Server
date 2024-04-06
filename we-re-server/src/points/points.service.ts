@@ -42,4 +42,14 @@ export class PointsService {
     const result = await this.pointRepository.createPoint(createdPointDto);
     return result;
   }
+
+  async delete(id: number) {
+    const result = await this.pointRepository.delete(id);
+    return result;
+  }
+
+  async deleteByUserId(userId: number) {
+    const result = await this.pointRepository.deleteByUserId(userId);
+    return result;
+  }
 }

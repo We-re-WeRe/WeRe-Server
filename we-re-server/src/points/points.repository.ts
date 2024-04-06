@@ -9,18 +9,18 @@ export class PointRepository extends Repository<Point> {
     super(Point, dataSource.createEntityManager());
   }
 
-  public async findHistoryById(user_id: number): Promise<Point[]> {
+  public async findHistoryById(userId: number): Promise<Point[]> {
     return await this.createQueryBuilder('point')
       .select(['point.mount', 'point.reason', 'point.created_at'])
-      .where('point.user=:user_id', { user_id })
+      .where('point.user=:userId', { userId })
       .orderBy('point.created_at', 'DESC')
       .getMany();
   }
 
-  public async findSumById(user_id: number) {
+  public async findSumById(userId: number) {
     return await this.createQueryBuilder('point')
       .select(['SUM(point.mount) as totalPoint'])
-      .where('point.user=:user_id', { user_id })
+      .where('point.user=:userId', { userId })
       .getRawOne();
   }
 
@@ -33,6 +33,22 @@ export class PointRepository extends Repository<Point> {
         reason: createPointDto.Reason,
         mount: createPointDto.Mount,
       })
+      .execute();
+  }
+
+  public async delete(id: number) {
+    return await this.createQueryBuilder()
+      .delete()
+      .from(Point)
+      .where('id = :id', { id })
+      .execute();
+  }
+
+  public async deleteByUserId(userId: number) {
+    return await this.createQueryBuilder()
+      .delete()
+      .from(Point)
+      .where('user = :userId', { userId })
       .execute();
   }
 }
