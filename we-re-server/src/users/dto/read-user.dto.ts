@@ -1,22 +1,21 @@
-import { Exclude, Expose } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
-@Exclude()
 export class ReadUserDto {
   constructor(raw?: any) {
     raw && this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   id: number;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   imageURL: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   nickname: string;
@@ -35,13 +34,12 @@ export class ReadUserDto {
   }
 }
 
-@Exclude()
 export class ReadUserDetailDto extends ReadUserDto {
-  @Expose()
+  @ApiProperty()
   @IsString()
   introduceMe?: string;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalFollowers: number;
@@ -54,13 +52,12 @@ export class ReadUserDetailDto extends ReadUserDto {
   }
 }
 
-@Exclude()
 export class ReadUserBriefDto extends ReadUserDto {
   constructor(raw: any) {
     super();
     this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalFollowers: number;

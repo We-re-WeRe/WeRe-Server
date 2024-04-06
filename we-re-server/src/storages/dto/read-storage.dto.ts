@@ -1,28 +1,34 @@
-import { Expose } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { DisclosureScope } from 'src/entities/storage.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
 export class ReadStorageBriefDto {
   constructor(raw?: any) {
     raw && this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   id: number;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   imageURL: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalLikes: number;
@@ -41,18 +47,17 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
     super();
     this.rawToDto(raw);
   }
-
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   explain: string;
 
-  @Expose()
-  @ValidateNested()
+  @ApiProperty()
+  @IsEnum(DISCLOSURESCOPE)
   @IsNotEmpty()
   disclosureScope: DisclosureScope;
 
-  @Expose()
+  @ApiProperty({ type: () => ReadUserBriefDto })
   @ValidateNested()
   @IsNotEmpty()
   user: ReadUserBriefDto;
