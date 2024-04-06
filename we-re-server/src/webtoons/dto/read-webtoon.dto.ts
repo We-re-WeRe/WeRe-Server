@@ -1,6 +1,18 @@
-import { Expose } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { Days, ProvidingCompany } from 'src/entities/webtoon.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import {
+  DAYS,
+  Days,
+  PROVIDINGCOMPANY,
+  ProvidingCompany,
+} from 'src/entities/webtoon.entity';
 import {
   ReadReviewAndUserDto,
   ReadReviewDto,
@@ -11,27 +23,27 @@ export class ReadWebtoonDto {
   constructor(raw?: any) {
     raw && this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   id: number;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   imageURL: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   author: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   painter: string;
@@ -51,12 +63,12 @@ export class ReadWebtoonThumbnailDto extends ReadWebtoonDto {
     super();
     this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalStarPoint: number;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   reviewCount: number;
@@ -74,12 +86,12 @@ export class ReadWebtoonBriefDto extends ReadWebtoonDto {
     super();
     this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalLikes: number;
 
-  @Expose()
+  @ApiProperty({ type: () => ReadReviewDto })
   @ValidateNested()
   @IsNotEmpty()
   review: ReadReviewDto;
@@ -97,49 +109,51 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
     super();
     this.rawToDto(raw);
   }
-  @Expose()
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   webtoonURL: string;
 
-  @Expose()
-  @ValidateNested()
+  @ApiProperty()
+  @IsEnum(PROVIDINGCOMPANY)
   @IsNotEmpty()
   providingCompany: ProvidingCompany;
 
-  @Expose()
-  @ValidateNested()
+  @ApiProperty()
+  @IsEnum(DAYS)
   day?: Days;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   genre?: string;
 
-  @Expose()
+  @ApiProperty()
   @IsString()
   explain?: string;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   viewCount: number;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalLikes: number;
 
-  @Expose()
+  @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   totalStarPoint: number;
 
-  @Expose()
+  @ApiProperty({ type: () => [ReadStorageBriefDto] })
   @ValidateNested()
+  @IsNotEmpty()
   storages: ReadStorageBriefDto[];
 
-  @Expose()
-  @ValidateNested()
+  @ApiProperty({ type: () => [ReadReviewAndUserDto] })
+  @IsArray()
+  @IsNotEmpty()
   reviews: ReadReviewAndUserDto[];
 
   public rawToDto(raw: any): ReadWebtoonDetailDto {
