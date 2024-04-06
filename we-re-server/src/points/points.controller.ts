@@ -11,6 +11,7 @@ import { PointsService } from './points.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 import {
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -30,17 +31,36 @@ export class PointsController {
   })
   @Get('history/:userId')
   findHistoryById(
-    @Param('userId') user_id: number,
+    @Param('userId') userId: number,
   ): Promise<ReadPointHistoryDto[]> {
-    return this.pointsService.findHistoryById(user_id);
+    return this.pointsService.findHistoryById(userId);
   }
 
   @ApiOperation({ summary: "get user's total point API" })
   @ApiOkResponse({ description: 'Request Success', type: ReadPointSumDto })
   @Get('sum/:userId')
-  async findSumById(
-    @Param('userId') user_id: number,
-  ): Promise<ReadPointSumDto> {
-    return await this.pointsService.findSumById(user_id);
+  async findSumById(@Param('userId') userId: number): Promise<ReadPointSumDto> {
+    return await this.pointsService.findSumById(userId);
+  }
+
+  @ApiOperation({ summary: 'create Point object' })
+  @ApiCreatedResponse({ description: 'Request Success' })
+  @Post()
+  async createPoint(@Body() createdPointDto: CreatePointDto) {
+    return await this.pointsService.createPoint(createdPointDto);
+  }
+
+  @ApiOperation({ summary: 'create Point object' })
+  @ApiCreatedResponse({ description: 'Request Success' })
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    return await this.pointsService.delete(id);
+  }
+
+  @ApiOperation({ summary: 'create Point object' })
+  @ApiCreatedResponse({ description: 'Request Success' })
+  @Delete('user/:userId')
+  async deleteByUserId(@Param('userId') userId: number) {
+    return await this.pointsService.deleteByUserId(userId);
   }
 }
