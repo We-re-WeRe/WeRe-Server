@@ -17,7 +17,9 @@ import {
 } from './dto/read-storage.dto';
 import { LikesService } from 'src/likes/likes.service';
 import { UsersService } from 'src/users/users.service';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Storages')
 @Controller('storages')
 export class StoragesController {
   constructor(
@@ -26,6 +28,11 @@ export class StoragesController {
     private readonly userService: UsersService,
   ) {}
 
+  @ApiOperation({ summary: 'get Storage detail' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadStorageDetailDto,
+  })
   @Get('detail/:id')
   async findOneDetailById(
     @Param('id') id: string,
@@ -38,11 +45,21 @@ export class StoragesController {
     return result;
   }
 
+  @ApiOperation({ summary: 'get all of the Storages as list' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadStorageBriefDto],
+  })
   @Get('list')
   async findManyPublicStorageList(): Promise<ReadStorageBriefDto[]> {
     return await this.storagesService.findManyPublicStorageList();
   }
 
+  @ApiOperation({ summary: 'get Storages which is owned by User as list' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadStorageBriefDto],
+  })
   @Get('list/user/:userId')
   async findManyStorageListByUserId(
     @Param('userId') userId: string,
@@ -50,6 +67,11 @@ export class StoragesController {
     return await this.storagesService.findManyStorageListByUserId(+userId);
   }
 
+  @ApiOperation({ summary: 'get Storages which is liked by User as list' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadStorageBriefDto],
+  })
   @Get('list/liked/user/:userId')
   async findManyPublicStorageLikedListByIds(
     @Param('userId') userId: string,
