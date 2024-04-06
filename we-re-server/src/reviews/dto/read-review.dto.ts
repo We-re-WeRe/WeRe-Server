@@ -1,35 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-import { Webtoon } from 'src/entities/webtoon.entity';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { ReadWebtoonDto } from 'src/webtoons/dto/read-webtoon.dto';
 
-@Exclude()
 export class ReadReviewDto {
   constructor(raw?: any) {
     raw && this.rawToDto(raw);
   }
   @ApiProperty()
-  @Expose()
   @IsInt()
   @IsNotEmpty()
   id: number;
 
   @ApiProperty()
-  @Expose()
   @IsString()
   @IsNotEmpty()
   contents: string;
 
   @ApiProperty()
-  @Expose()
   @IsInt()
   @IsNotEmpty()
   starPoint: number;
 
   @ApiProperty()
-  @Expose()
   @IsInt()
   @IsNotEmpty()
   totalLikes: number;
@@ -43,14 +36,12 @@ export class ReadReviewDto {
   }
 }
 
-@Exclude()
 export class ReadReviewAndWebtoonDto extends ReadReviewDto {
   constructor(raw: any) {
     super();
     this.rawToDto(raw);
   }
-  @ApiProperty()
-  @Expose()
+  @ApiProperty({ type: () => ReadWebtoonDto })
   @ValidateNested()
   @IsNotEmpty()
   webtoon: ReadWebtoonDto;
@@ -62,14 +53,12 @@ export class ReadReviewAndWebtoonDto extends ReadReviewDto {
   }
 }
 
-@Exclude()
 export class ReadReviewAndUserDto extends ReadReviewDto {
   constructor(raw: any) {
     super();
     this.rawToDto(raw);
   }
-  @ApiProperty()
-  @Expose()
+  @ApiProperty({ type: () => ReadUserDto })
   @ValidateNested()
   @IsNotEmpty()
   user: ReadUserDto;
