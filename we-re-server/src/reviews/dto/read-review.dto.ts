@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Webtoon } from 'src/entities/webtoon.entity';
@@ -9,21 +10,25 @@ export class ReadReviewDto {
   constructor(raw?: any) {
     raw && this.rawToDto(raw);
   }
+  @ApiProperty()
   @Expose()
   @IsInt()
   @IsNotEmpty()
   id: number;
 
+  @ApiProperty()
   @Expose()
   @IsString()
   @IsNotEmpty()
   contents: string;
 
+  @ApiProperty()
   @Expose()
   @IsInt()
   @IsNotEmpty()
   starPoint: number;
 
+  @ApiProperty()
   @Expose()
   @IsInt()
   @IsNotEmpty()
@@ -38,11 +43,13 @@ export class ReadReviewDto {
   }
 }
 
+@Exclude()
 export class ReadReviewAndWebtoonDto extends ReadReviewDto {
   constructor(raw: any) {
     super();
     this.rawToDto(raw);
   }
+  @ApiProperty()
   @Expose()
   @ValidateNested()
   @IsNotEmpty()
@@ -55,11 +62,13 @@ export class ReadReviewAndWebtoonDto extends ReadReviewDto {
   }
 }
 
+@Exclude()
 export class ReadReviewAndUserDto extends ReadReviewDto {
   constructor(raw: any) {
     super();
     this.rawToDto(raw);
   }
+  @ApiProperty()
   @Expose()
   @ValidateNested()
   @IsNotEmpty()
