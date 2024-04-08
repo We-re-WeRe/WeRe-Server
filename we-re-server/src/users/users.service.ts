@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFollowDto, CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './users.repository';
 import {
@@ -7,6 +7,7 @@ import {
   ReadUserDetailDto,
   ReadUserDto,
 } from './dto/read-user.dto';
+import { FollowDto } from './dto/follow.dto';
 
 @Injectable()
 export class UsersService {
@@ -37,11 +38,11 @@ export class UsersService {
 
   /**
    * Create new follow join.
-   * @param createFollowDto follower's id and target id
+   * @param followDto follower's id and target id
    * @returns {void}
    */
-  async createFollowRelation(createFollowDto: CreateFollowDto): Promise<void> {
-    return await this.userRepository.createFollowRelation(createFollowDto);
+  async createFollowRelation(followDto: FollowDto): Promise<void> {
+    return await this.userRepository.createFollowRelation(followDto);
   }
 
   /**
@@ -51,5 +52,14 @@ export class UsersService {
    */
   async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
     await this.userRepository.update(updateUserDto.id, updateUserDto);
+  }
+
+  /**
+   * Delete follow join.
+   * @param followDto follower's id and target id
+   * @returns {void}
+   */
+  async deleteFollowRelation(followDto: FollowDto): Promise<void> {
+    return await this.userRepository.deleteFollowRelation(followDto);
   }
 }

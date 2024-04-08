@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CreateFollowDto } from './dto/create-user.dto';
+import { FollowDto } from './dto/follow.dto';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -39,10 +39,17 @@ export class UserRepository extends Repository<User> {
       .getRawOne();
   }
 
-  public async createFollowRelation(createFollowDto: CreateFollowDto) {
+  public async createFollowRelation(followDto: FollowDto) {
     return await this.createQueryBuilder()
       .relation(User, 'following')
-      .of(createFollowDto.targetId)
-      .add(createFollowDto.id);
+      .of(followDto.targetId)
+      .add(followDto.id);
+  }
+
+  public async deleteFollowRelation(followDto: FollowDto) {
+    return await this.createQueryBuilder()
+      .relation(User, 'following')
+      .of(followDto.targetId)
+      .remove(followDto.id);
   }
 }
