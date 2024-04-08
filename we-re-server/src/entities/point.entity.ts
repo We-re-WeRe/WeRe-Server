@@ -22,7 +22,11 @@ export class Point extends DefaultEntity {
   @Column({ type: 'varchar' })
   reason: Reason;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 }
 

@@ -34,7 +34,11 @@ export class Storage extends DefaultEntity {
   @Column({ type: 'varchar', length: 3 })
   disclosureScope: DisclosureScope;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 
   @OneToMany(() => Tag, (tag) => tag.storage, {

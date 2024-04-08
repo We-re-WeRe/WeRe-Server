@@ -7,6 +7,7 @@ import {
   ReadUserDetailDto,
   ReadUserDto,
 } from './dto/read-user.dto';
+import { FollowDto } from './dto/follow.dto';
 
 @Injectable()
 export class UsersService {
@@ -27,11 +28,47 @@ export class UsersService {
   /**
    * get user brief info
    * @param id user id
-   * @returns {User} user.id, user.imageURL, user.nickname, user.follower_count
+   * @returns {ReadUserBriefDto}
    */
   async findOneBriefById(id: number): Promise<ReadUserBriefDto> {
     const queryResult = await this.userRepository.findOneBriefById(id);
     const result: ReadUserBriefDto = new ReadUserBriefDto(queryResult);
     return result;
+  }
+
+  /**
+   * Create new follow join.
+   * @param followDto follower's id and target id
+   * @returns {void}
+   */
+  async createFollowRelation(followDto: FollowDto): Promise<void> {
+    return await this.userRepository.createFollowRelation(followDto);
+  }
+
+  /**
+   * update user's nickname, image or introduce.
+   * @param updateUserDto update contents
+   * @returns {Promise<void>} updated user detail info
+   */
+  async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
+    await this.userRepository.update(updateUserDto.id, updateUserDto);
+  }
+
+  /**
+   * Delete user.
+   * @param id
+   * @returns {void}
+   */
+  async delete(id: number) {
+    return await this.userRepository.delete(id);
+  }
+
+  /**
+   * Delete follow join.
+   * @param followDto follower's id and target id
+   * @returns {void}
+   */
+  async deleteFollowRelation(followDto: FollowDto): Promise<void> {
+    return await this.userRepository.deleteFollowRelation(followDto);
   }
 }
