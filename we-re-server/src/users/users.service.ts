@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateFollowDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './users.repository';
 import {
@@ -35,16 +35,16 @@ export class UsersService {
     return result;
   }
 
+  async createFollowRelation(createFollowDto: CreateFollowDto): Promise<void> {
+    return await this.userRepository.createFollowRelation(createFollowDto);
+  }
+
   /**
    * update user's nickname, image or introduce.
    * @param updateUserDto update contents
    * @returns {ReadUserDetailDto} updated user detail info
    */
-  async updateUserInfo(
-    updateUserDto: UpdateUserDto,
-  ): Promise<ReadUserDetailDto> {
+  async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
     await this.userRepository.update(updateUserDto.id, updateUserDto);
-    const result = this.userRepository.findOneDetailById(updateUserDto.id);
-    return result;
   }
 }

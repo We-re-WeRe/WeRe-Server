@@ -12,10 +12,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateFollowDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ReadUserDetailDto, ReadUserDto } from './dto/read-user.dto';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
@@ -51,6 +56,18 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'update User information and Return User detail' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadUserDetailDto,
+  })
+  @Post('follow')
+  async createFollowRelation(@Body() createFollowDto: CreateFollowDto) {
+    // 중복 키 에러 체크 필요.
+    await this.usersService.createFollowRelation(createFollowDto);
+    return this.usersService.findOneDetailById(createFollowDto.targetId);
+  }
+
+  @ApiOperation({ summary: 'update User information and Return User detail' })
   @ApiOkResponse({
     description: 'Request Success',
     type: ReadUserDetailDto,
@@ -61,6 +78,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<ReadUserDetailDto> {
     // param id와 dto 내 id 체크로 자격 여부 판단하는거도 ㄱㅊ할듯
-    return await this.usersService.updateUserInfo(updateUserDto);
+    await this.usersService.updateUserInfo(updateUserDto);
+    return await this.usersService.findOneDetailById(updateUserDto.id);
   }
 }
