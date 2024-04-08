@@ -8,7 +8,11 @@ import { Storage } from './storage.entity';
 // TODO:: 이 방식으로 쓰다가 enum으로 column 수를 줄이긴 해야할 듯. 뭐가 성능이 뛰어날지는 모르겠음 아직.
 @Entity()
 export class Like extends DefaultEntity {
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 
   @ManyToOne(() => Webtoon)

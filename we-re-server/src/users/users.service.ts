@@ -55,6 +55,15 @@ export class UsersService {
   }
 
   /**
+   * Delete user.
+   * @param id
+   * @returns {void}
+   */
+  async delete(id: number) {
+    return await this.userRepository.delete(id);
+  }
+
+  /**
    * Delete follow join.
    * @param followDto follower's id and target id
    * @returns {void}

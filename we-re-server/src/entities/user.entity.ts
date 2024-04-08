@@ -34,7 +34,11 @@ export class User extends DefaultEntity {
   })
   followers: User[];
 
-  @ManyToMany(() => User, (user) => user.followers)
+  @ManyToMany(() => User, (user) => user.followers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   following: User[];
 
   @OneToMany(() => Point, (points) => points.user)

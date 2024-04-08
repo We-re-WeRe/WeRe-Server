@@ -13,7 +13,11 @@ export class Review extends DefaultEntity {
   @Column({ type: 'int', unsigned: true })
   starPoint: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User;
 
   @ManyToOne(() => Webtoon)

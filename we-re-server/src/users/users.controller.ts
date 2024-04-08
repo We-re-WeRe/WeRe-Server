@@ -83,6 +83,15 @@ export class UsersController {
     await this.usersService.updateUserInfo(updateUserDto);
     return await this.usersService.findOneDetailById(updateUserDto.id);
   }
+  @ApiOperation({ summary: 'User unfollowed target id' })
+  @ApiNoContentResponse({
+    description: 'Request Success',
+    type: ReadUserDetailDto,
+  })
+  @Delete('/:id')
+  async delete(@Param('id') id: number) {
+    return await this.usersService.delete(id);
+  }
 
   @ApiOperation({ summary: 'User unfollowed target id' })
   @ApiNoContentResponse({
