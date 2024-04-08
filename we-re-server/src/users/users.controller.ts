@@ -62,7 +62,7 @@ export class UsersController {
     description: 'Request Success',
     type: ReadUserDetailDto,
   })
-  @Post('follow')
+  @Post('following')
   async createFollowRelation(@Body() followDto: FollowDto) {
     // 중복 키 에러 체크 필요.
     await this.usersService.createFollowRelation(followDto);
@@ -89,9 +89,9 @@ export class UsersController {
     description: 'Request Success',
     type: ReadUserDetailDto,
   })
-  @Delete('follow')
+  @Delete('/:id/following/:targetId')
   async deleteFollowRelation(
-    @Body() followDto: FollowDto,
+    @Param() followDto: FollowDto,
   ): Promise<ReadUserDetailDto> {
     await this.usersService.deleteFollowRelation(followDto);
     return await this.usersService.findOneDetailById(followDto.id);
