@@ -49,4 +49,18 @@ export class UsersController {
     Logger.log(id);
     return await this.usersService.findOneDetailById(+id);
   }
+
+  @ApiOperation({ summary: 'update User information and Return User detail' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadUserDetailDto,
+  })
+  @Patch('/:id')
+  async updateUserInfo(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<ReadUserDetailDto> {
+    // param id와 dto 내 id 체크로 자격 여부 판단하는거도 ㄱㅊ할듯
+    return await this.usersService.updateUserInfo(updateUserDto);
+  }
 }

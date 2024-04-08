@@ -27,11 +27,24 @@ export class UsersService {
   /**
    * get user brief info
    * @param id user id
-   * @returns {User} user.id, user.imageURL, user.nickname, user.follower_count
+   * @returns {ReadUserBriefDto}
    */
   async findOneBriefById(id: number): Promise<ReadUserBriefDto> {
     const queryResult = await this.userRepository.findOneBriefById(id);
     const result: ReadUserBriefDto = new ReadUserBriefDto(queryResult);
+    return result;
+  }
+
+  /**
+   * update user's nickname, image or introduce.
+   * @param updateUserDto update contents
+   * @returns {ReadUserDetailDto} updated user detail info
+   */
+  async updateUserInfo(
+    updateUserDto: UpdateUserDto,
+  ): Promise<ReadUserDetailDto> {
+    await this.userRepository.update(updateUserDto.id, updateUserDto);
+    const result = this.userRepository.findOneDetailById(updateUserDto.id);
     return result;
   }
 }
