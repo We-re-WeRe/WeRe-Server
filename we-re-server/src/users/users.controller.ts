@@ -55,7 +55,7 @@ export class UsersController {
     return await this.usersService.findOneDetailById(+id);
   }
 
-  @ApiOperation({ summary: 'update User information and Return User detail' })
+  @ApiOperation({ summary: 'User followed target id' })
   @ApiCreatedResponse({
     description: 'Request Success',
     type: ReadUserDetailDto,

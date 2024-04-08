@@ -35,6 +35,11 @@ export class UsersService {
     return result;
   }
 
+  /**
+   * Create new follow join.
+   * @param createFollowDto follower's id and target id
+   * @returns {void}
+   */
   async createFollowRelation(createFollowDto: CreateFollowDto): Promise<void> {
     return await this.userRepository.createFollowRelation(createFollowDto);
   }
@@ -42,7 +47,7 @@ export class UsersService {
   /**
    * update user's nickname, image or introduce.
    * @param updateUserDto update contents
-   * @returns {ReadUserDetailDto} updated user detail info
+   * @returns {Promise<void>} updated user detail info
    */
   async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
     await this.userRepository.update(updateUserDto.id, updateUserDto);
