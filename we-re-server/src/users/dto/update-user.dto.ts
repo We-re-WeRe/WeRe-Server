@@ -9,17 +9,17 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   imageURL?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   nickname?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   introduceMe?: string;
