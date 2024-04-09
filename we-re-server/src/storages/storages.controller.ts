@@ -17,7 +17,12 @@ import {
 } from './dto/read-storage.dto';
 import { LikesService } from 'src/likes/likes.service';
 import { UsersService } from 'src/users/users.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Storages')
 @Controller('storages')
@@ -80,5 +85,17 @@ export class StoragesController {
     const { storage_ids: ids } =
       await this.likesService.findManyStorageIdsByUserId(+userId);
     return await this.storagesService.findManyPublicStorageListByIds(ids);
+  }
+
+  @ApiOperation({ summary: 'create Storage' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadStorageDetailDto,
+  })
+  @Post()
+  async createStorage(
+    @Body() createStorageDto: CreateStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    return await this.storagesService.createStorage(createStorageDto);
   }
 }

@@ -119,4 +119,20 @@ export class StoragesService {
     const result = { userId: userId, webtoonIds: webtoonIds };
     return result;
   }
+
+  /**
+   * create storage and return storage detail
+   * @param createStorageDto
+   * @returns {Promise<ReadStorageDetailDto>}
+   */
+  async createStorage(
+    createStorageDto: CreateStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    const queryResult = await this.storageRepository.createStorage(
+      createStorageDto,
+    );
+    const id = queryResult.identifiers[0].id;
+    const result = await this.findOneDetailById(id);
+    return result;
+  }
 }
