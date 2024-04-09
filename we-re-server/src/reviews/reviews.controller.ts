@@ -10,8 +10,14 @@ import {
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { ReadReviewAndWebtoonDto } from './dto/read-review.dto';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ReadReviewAndWebtoonDto, ReadReviewDto } from './dto/read-review.dto';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Review } from 'src/entities/review.entity';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -28,5 +34,37 @@ export class ReviewsController {
     @Param('userId') userId: string,
   ): Promise<ReadReviewAndWebtoonDto[]> {
     return this.reviewsService.findManyByUserId(+userId);
+  }
+
+  @ApiOperation({ summary: 'create Review' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: Review,
+  })
+  @Post()
+  createReview(@Body() createReviewDto: CreateReviewDto): Promise<Review> {
+    return this.reviewsService.createReview(createReviewDto);
+  }
+
+  @ApiOperation({ summary: 'update Review' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: Review,
+  })
+  @Patch(':id')
+  updateReview(
+    @Param('id') id: number,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ): Promise<Review> {
+    // param id와 dto 내 id 체크로 자격 여부 판단하는거도 ㄱㅊ할듯
+    return this.reviewsService.updateReview(updateReviewDto);
+  }
+
+  @ApiOperation({ summary: 'delete Review' })
+  @ApiOkResponse({ description: 'Request Success' })
+  @Delete(':id')
+  deleteReview(@Param('id') id: number): Promise<void> {
+    // 삭제 잘 되었다는 status code 반환~
+    return this.reviewsService.deleteReview(id);
   }
 }

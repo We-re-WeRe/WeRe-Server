@@ -15,12 +15,24 @@ export class Like extends DefaultEntity {
   })
   user: User;
 
-  @ManyToOne(() => Webtoon)
+  @ManyToOne(() => Webtoon, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   webtoon?: Webtoon;
 
-  @ManyToOne(() => Review, (review) => review.likes)
+  @ManyToOne(() => Review, (review) => review.likes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   review?: Review;
 
-  @ManyToOne(() => Storage, (storage) => storage.likes)
+  @ManyToOne(() => Storage, (storage) => storage.likes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   storage?: Storage;
 }

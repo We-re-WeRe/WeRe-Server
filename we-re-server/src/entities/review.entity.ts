@@ -20,7 +20,11 @@ export class Review extends DefaultEntity {
   })
   user: User;
 
-  @ManyToOne(() => Webtoon)
+  @ManyToOne(() => Webtoon, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   webtoon: Webtoon;
 
   @OneToMany(() => Like, (like) => like.review)
