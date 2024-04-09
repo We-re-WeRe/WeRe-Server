@@ -51,7 +51,11 @@ export class Storage extends DefaultEntity {
   @OneToMany(() => Like, (like) => like.storage)
   likes?: Like[];
 
-  @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages)
+  @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable({
     name: 'storage_webtoon',
     joinColumn: { name: 'webtoon_id' },
