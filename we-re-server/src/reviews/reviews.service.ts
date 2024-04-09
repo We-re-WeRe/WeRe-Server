@@ -75,4 +75,13 @@ export class ReviewsService {
     });
     return result;
   }
+
+  async deleteReview(id: number): Promise<void> {
+    const queryResult = await this.reviewRepository.delete(id);
+    if (!queryResult) {
+      // review is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
+  }
 }

@@ -52,8 +52,19 @@ export class ReviewsController {
     type: Review,
   })
   @Patch(':id')
-  updateReview(@Body() updateReviewDto: UpdateReviewDto): Promise<Review> {
+  updateReview(
+    @Param('id') id: number,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ): Promise<Review> {
     // param id와 dto 내 id 체크로 자격 여부 판단하는거도 ㄱㅊ할듯
     return this.reviewsService.updateReview(updateReviewDto);
+  }
+
+  @ApiOperation({ summary: 'delete Review' })
+  @ApiOkResponse({ description: 'Request Success' })
+  @Delete(':id')
+  deleteReview(@Param('id') id: number): Promise<void> {
+    // 삭제 잘 되었다는 status code 반환~
+    return this.reviewsService.deleteReview(id);
   }
 }
