@@ -55,4 +55,24 @@ export class ReviewsService {
     );
     return result;
   }
+
+  /**
+   * update review and return updated review.
+   * @param updateReviewDto id and fields
+   * @returns {Promise<Review>}
+   */
+  async updateReview(updateReviewDto: UpdateReviewDto): Promise<Review> {
+    const queryResult = await this.reviewRepository.update(
+      updateReviewDto.id,
+      updateReviewDto,
+    );
+    if (!queryResult.affected) {
+      // review id is not found. not found error handling!
+      throw new Error();
+    }
+    const result = await this.reviewRepository.findOneBy({
+      id: updateReviewDto.id,
+    });
+    return result;
+  }
 }
