@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Review } from 'src/entities/review.entity';
 import { DataSource, Repository } from 'typeorm';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class ReviewRepository extends Repository<Review> {
@@ -43,5 +44,18 @@ export class ReviewRepository extends Repository<Review> {
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
       .getRawMany();
+  }
+
+  public async createReview(createReviewDto: CreateReviewDto) {
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Review)
+      .values({
+        user: () => createReviewDto.userId,
+        webtoon: () => createReviewDto.webtoonId,
+        contents: createReviewDto.contents,
+        starPoint: createReviewDto.starPoint,
+      })
+      .execute();
   }
 }
