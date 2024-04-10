@@ -9,6 +9,7 @@ import {
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
+import { WebtoonStorageDto } from './dto/webtoon-storage.dto';
 
 @Injectable()
 export class StoragesService {
@@ -154,6 +155,10 @@ export class StoragesService {
     }
     const result = await this.findOneDetailById(updateStorageDto.id);
     return result;
+  }
+
+  async addWebtoonToStorage(webtoonStorageDto: WebtoonStorageDto) {
+    await this.storageRepository.addWebtoonToStorage(webtoonStorageDto);
   }
 
   async deleteReview(id: number): Promise<void> {

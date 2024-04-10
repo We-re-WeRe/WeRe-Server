@@ -23,6 +23,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { WebtoonStorageDto } from './dto/webtoon-storage.dto';
 
 @ApiTags('Storages')
 @Controller('storages')
@@ -109,6 +110,11 @@ export class StoragesController {
       throw new Error();
     }
     return await this.storagesService.updateStorage(updateStorageDto);
+  }
+
+  @Patch(':id/webtoon/:webtoonId')
+  async addWebtoonToStorage(@Param() webtoonStorageDto: WebtoonStorageDto) {
+    return await this.storagesService.addWebtoonToStorage(webtoonStorageDto);
   }
 
   @ApiOperation({ summary: 'delete Storage' })

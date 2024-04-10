@@ -6,6 +6,7 @@ import {
 } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateStorageDto } from './dto/create-storage.dto';
+import { WebtoonStorageDto } from './dto/webtoon-storage.dto';
 
 @Injectable()
 export class StorageRepository extends Repository<Storage> {
@@ -113,5 +114,12 @@ export class StorageRepository extends Repository<Storage> {
         user: () => createStorageDto.userId,
       })
       .execute();
+  }
+
+  public async addWebtoonToStorage(webtoonStorageDto: WebtoonStorageDto) {
+    return await this.createQueryBuilder()
+      .relation(Storage, 'webtoons')
+      .of(webtoonStorageDto.id)
+      .add(webtoonStorageDto.webtoonId);
   }
 }
