@@ -9,7 +9,7 @@ import {
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
-import { WebtoonStorageDto } from './dto/webtoon-storage.dto';
+import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
 
 @Injectable()
 export class StoragesService {
@@ -157,8 +157,20 @@ export class StoragesService {
     return result;
   }
 
-  async addWebtoonToStorage(webtoonStorageDto: WebtoonStorageDto) {
-    await this.storageRepository.addWebtoonToStorage(webtoonStorageDto);
+  /**
+   * add webtoon to storage.
+   * @param webtoonInStorageDto id and webtoonId
+   */
+  async addWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.storageRepository.addWebtoonToStorage(webtoonInStorageDto);
+  }
+
+  /**
+   * remove webtoon to storage.
+   * @param webtoonInStorageDto id and webtoonId
+   */
+  async removeWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.storageRepository.removeWebtoonToStorage(webtoonInStorageDto);
   }
 
   async deleteReview(id: number): Promise<void> {

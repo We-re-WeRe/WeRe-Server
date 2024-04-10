@@ -18,12 +18,14 @@ import {
 import { LikesService } from 'src/likes/likes.service';
 import { UsersService } from 'src/users/users.service';
 import {
+  ApiAcceptedResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { WebtoonStorageDto } from './dto/webtoon-storage.dto';
+import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
 
 @ApiTags('Storages')
 @Controller('storages')
@@ -100,11 +102,13 @@ export class StoragesController {
     return await this.storagesService.createStorage(createStorageDto);
   }
 
+  @ApiOperation({ summary: 'add webtoon to Storage' })
+  @ApiOkResponse({ description: 'Request Success', type: ReadStorageDetailDto })
   @Patch(':id')
   async updateStorage(
     @Param('id') id: number,
     @Body() updateStorageDto: UpdateStorageDto,
-  ) {
+  ): Promise<ReadStorageDetailDto> {
     // id check.
     if (id !== updateStorageDto.id) {
       throw new Error();
@@ -112,13 +116,35 @@ export class StoragesController {
     return await this.storagesService.updateStorage(updateStorageDto);
   }
 
+  @ApiOperation({ summary: 'add webtoon to Storage' })
+  @ApiAcceptedResponse({
+    description: 'Request Success',
+    type: ReadStorageDetailDto,
+  })
   @Patch(':id/webtoon/:webtoonId')
-  async addWebtoonToStorage(@Param() webtoonStorageDto: WebtoonStorageDto) {
-    return await this.storagesService.addWebtoonToStorage(webtoonStorageDto);
+  async addWebtoonToStorage(
+    @Param() webtoonInStorageDto: WebtoonInStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    await this.storagesService.addWebtoonToStorage(webtoonInStorageDto);
+    return await this.storagesService.findOneDetailById(webtoonInStorageDto.id);
+  }
+
+  @ApiOperation({ summary: 'delete webtoon to Storage' })
+  @ApiNoContentResponse({
+    description: 'Request Success',
+    type: ReadStorageDetailDto,
+  })
+  @Delete(':id/webtoon/:webtoonId')
+  async removeWebtoonToStorage(
+    @Param() webtoonInStorageDto: WebtoonInStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    // 삭제 잘 되었다는 status code 반환~
+    await this.storagesService.removeWebtoonToStorage(webtoonInStorageDto);
+    return await this.storagesService.findOneDetailById(webtoonInStorageDto.id);
   }
 
   @ApiOperation({ summary: 'delete Storage' })
-  @ApiOkResponse({ description: 'Request Success' })
+  @ApiNoContentResponse({ description: 'Request Success' })
   @Delete(':id')
   deleteReview(@Param('id') id: number): Promise<void> {
     // 삭제 잘 되었다는 status code 반환~
