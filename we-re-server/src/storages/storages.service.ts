@@ -135,4 +135,33 @@ export class StoragesService {
     const result = await this.findOneDetailById(id);
     return result;
   }
+
+  /**
+   * update storage and return storage detail
+   * @param updateStorageDto
+   * @returns {Promise<ReadStorageDetailDto>}
+   */
+  async updateStorage(
+    updateStorageDto: UpdateStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    const queryResult = await this.storageRepository.update(
+      updateStorageDto.id,
+      updateStorageDto,
+    );
+    if (!queryResult.affected) {
+      // storage id is not found. not found error handling!
+      throw new Error();
+    }
+    const result = await this.findOneDetailById(updateStorageDto.id);
+    return result;
+  }
+
+  async deleteReview(id: number): Promise<void> {
+    const queryResult = await this.storageRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
+  }
 }

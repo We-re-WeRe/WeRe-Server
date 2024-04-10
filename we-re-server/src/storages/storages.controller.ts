@@ -98,4 +98,24 @@ export class StoragesController {
   ): Promise<ReadStorageDetailDto> {
     return await this.storagesService.createStorage(createStorageDto);
   }
+
+  @Patch(':id')
+  async updateStorage(
+    @Param('id') id: number,
+    @Body() updateStorageDto: UpdateStorageDto,
+  ) {
+    // id check.
+    if (id !== updateStorageDto.id) {
+      throw new Error();
+    }
+    return await this.storagesService.updateStorage(updateStorageDto);
+  }
+
+  @ApiOperation({ summary: 'delete Storage' })
+  @ApiOkResponse({ description: 'Request Success' })
+  @Delete(':id')
+  deleteReview(@Param('id') id: number): Promise<void> {
+    // 삭제 잘 되었다는 status code 반환~
+    return this.storagesService.deleteReview(id);
+  }
 }
