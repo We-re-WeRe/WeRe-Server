@@ -52,10 +52,6 @@ export class Storage extends DefaultEntity {
   likes?: Like[];
 
   @ManyToMany(() => Webtoon, (webtoons) => webtoons.storages)
-  @JoinTable({
-    name: 'storage_webtoon',
-    joinColumn: { name: 'webtoon_id' },
-    inverseJoinColumn: { name: 'storage_id' },
-  })
+  @JoinTable({ name: 'storage_webtoon' })
   webtoons: Webtoon[];
 }

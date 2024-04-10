@@ -9,6 +9,7 @@ import {
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
+import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
 
 @Injectable()
 export class StoragesService {
@@ -118,5 +119,66 @@ export class StoragesService {
     queryResult.forEach((r) => webtoonIds.push(r.webtoons_id));
     const result = { userId: userId, webtoonIds: webtoonIds };
     return result;
+  }
+
+  /**
+   * create storage and return storage detail
+   * @param createStorageDto
+   * @returns {Promise<ReadStorageDetailDto>}
+   */
+  async createStorage(
+    createStorageDto: CreateStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    const queryResult = await this.storageRepository.createStorage(
+      createStorageDto,
+    );
+    const id = queryResult.identifiers[0].id;
+    const result = await this.findOneDetailById(id);
+    return result;
+  }
+
+  /**
+   * update storage and return storage detail
+   * @param updateStorageDto
+   * @returns {Promise<ReadStorageDetailDto>}
+   */
+  async updateStorage(
+    updateStorageDto: UpdateStorageDto,
+  ): Promise<ReadStorageDetailDto> {
+    const queryResult = await this.storageRepository.update(
+      updateStorageDto.id,
+      updateStorageDto,
+    );
+    if (!queryResult.affected) {
+      // storage id is not found. not found error handling!
+      throw new Error();
+    }
+    const result = await this.findOneDetailById(updateStorageDto.id);
+    return result;
+  }
+
+  /**
+   * add webtoon to storage.
+   * @param webtoonInStorageDto id and webtoonId
+   */
+  async addWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.storageRepository.addWebtoonToStorage(webtoonInStorageDto);
+  }
+
+  /**
+   * remove webtoon to storage.
+   * @param webtoonInStorageDto id and webtoonId
+   */
+  async removeWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.storageRepository.removeWebtoonToStorage(webtoonInStorageDto);
+  }
+
+  async deleteReview(id: number): Promise<void> {
+    const queryResult = await this.storageRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
   }
 }

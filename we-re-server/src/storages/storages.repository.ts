@@ -5,6 +5,8 @@ import {
   DisclosureScope,
 } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
+import { CreateStorageDto } from './dto/create-storage.dto';
+import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
 
 @Injectable()
 export class StorageRepository extends Repository<Storage> {
@@ -101,5 +103,32 @@ export class StorageRepository extends Repository<Storage> {
       .leftJoinAndSelect('storage.webtoons', 'webtoons')
       .select(['storage.user', 'webtoons.id'])
       .getRawMany();
+  }
+
+  public async createStorage(createStorageDto: CreateStorageDto) {
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Storage)
+      .values({
+        ...createStorageDto,
+        user: () => createStorageDto.userId,
+      })
+      .execute();
+  }
+
+  public async addWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    return await this.createQueryBuilder()
+      .relation(Storage, 'webtoons')
+      .of(webtoonInStorageDto.id)
+      .add(webtoonInStorageDto.webtoonId);
+  }
+
+  public async removeWebtoonToStorage(
+    webtoonInStorageDto: WebtoonInStorageDto,
+  ) {
+    return await this.createQueryBuilder()
+      .relation(Storage, 'webtoons')
+      .of(webtoonInStorageDto.id)
+      .remove(webtoonInStorageDto.webtoonId);
   }
 }
