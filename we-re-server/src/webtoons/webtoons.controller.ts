@@ -18,7 +18,12 @@ import {
 } from './dto/read-webtoon.dto';
 import { StoragesService } from 'src/storages/storages.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -127,5 +132,17 @@ export class WebtoonsController {
       day,
       providingCompany,
     );
+  }
+
+  @ApiOperation({ summary: 'create Webtoon' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadWebtoonDetailDto,
+  })
+  @Post()
+  async createWebtoon(
+    @Body() createWebtoonDto: CreateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    return await this.webtoonsService.createStorage(createWebtoonDto);
   }
 }

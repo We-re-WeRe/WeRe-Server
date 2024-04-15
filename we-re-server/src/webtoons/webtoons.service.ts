@@ -105,4 +105,20 @@ export class WebtoonsService {
     const result = queryResult.map((r) => new ReadWebtoonBriefDto(r));
     return result;
   }
+
+  /**
+   * create webtoon and return webtoon detail
+   * @param createWebtoonDto
+   * @returns {Promise<ReadWebtoonDetailDto>}
+   */
+  async createStorage(
+    createWebtoonDto: CreateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    const queryResult = await this.webtoonRepository.createWebtoon(
+      createWebtoonDto,
+    );
+    const id = queryResult.identifiers[0].id;
+    const result = await this.findOneDetailById(id);
+    return result;
+  }
 }

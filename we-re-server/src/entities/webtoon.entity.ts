@@ -53,7 +53,7 @@ export class Webtoon extends DefaultEntity {
   @Column({ nullable: true })
   explain?: string;
 
-  @Column({ unsigned: true, type: 'int' })
+  @Column({ unsigned: true, type: 'int', default: 0 })
   viewCount: number;
 
   @OneToMany(() => Like, (likes) => likes.webtoon)
