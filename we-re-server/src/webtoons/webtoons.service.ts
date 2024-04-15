@@ -141,4 +141,18 @@ export class WebtoonsService {
     const result = await this.findOneDetailById(updateWebtoonDto.id);
     return result;
   }
+
+  /**
+   * delete Webtoon.
+   * @param id
+   * @returns {Promise<void>}
+   */
+  async deleteWebtoon(id: number): Promise<void> {
+    const queryResult = await this.webtoonRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
+  }
 }

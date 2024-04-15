@@ -20,6 +20,7 @@ import { StoragesService } from 'src/storages/storages.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import {
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -157,5 +158,13 @@ export class WebtoonsController {
     @Body() updateWebtoonDto: UpdateWebtoonDto,
   ): Promise<ReadWebtoonDetailDto> {
     return await this.webtoonsService.updateWebtoon(updateWebtoonDto);
+  }
+
+  @ApiOperation({ summary: 'delete Webtoon' })
+  @ApiNoContentResponse({ description: 'Request Success' })
+  @Delete(':id')
+  deleteReview(@Param('id') id: number): Promise<void> {
+    // 삭제 잘 되었다는 status code 반환~
+    return this.webtoonsService.deleteWebtoon(id);
   }
 }
