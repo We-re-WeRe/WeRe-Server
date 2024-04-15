@@ -105,4 +105,54 @@ export class WebtoonsService {
     const result = queryResult.map((r) => new ReadWebtoonBriefDto(r));
     return result;
   }
+
+  /**
+   * create webtoon and return webtoon detail
+   * @param createWebtoonDto
+   * @returns {Promise<ReadWebtoonDetailDto>}
+   */
+  async createWebtoon(
+    createWebtoonDto: CreateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    const queryResult = await this.webtoonRepository.createWebtoon(
+      createWebtoonDto,
+    );
+    const id = queryResult.identifiers[0].id;
+    const result = await this.findOneDetailById(id);
+    return result;
+  }
+
+  /**
+   * update webtoon and return webtoon detail
+   * @param updateStorageDto
+   * @returns {Promise<ReadWebtoonDetailDto>}
+   */
+  async updateWebtoon(
+    updateWebtoonDto: UpdateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    const queryResult = await this.webtoonRepository.update(
+      updateWebtoonDto.id,
+      updateWebtoonDto,
+    );
+    if (!queryResult.affected) {
+      // storage id is not found. not found error handling!
+      throw new Error();
+    }
+    const result = await this.findOneDetailById(updateWebtoonDto.id);
+    return result;
+  }
+
+  /**
+   * delete Webtoon.
+   * @param id
+   * @returns {Promise<void>}
+   */
+  async deleteWebtoon(id: number): Promise<void> {
+    const queryResult = await this.webtoonRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
+  }
 }

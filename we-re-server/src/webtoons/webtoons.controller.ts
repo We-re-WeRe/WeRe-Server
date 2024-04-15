@@ -18,7 +18,13 @@ import {
 } from './dto/read-webtoon.dto';
 import { StoragesService } from 'src/storages/storages.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -127,5 +133,38 @@ export class WebtoonsController {
       day,
       providingCompany,
     );
+  }
+
+  @ApiOperation({ summary: 'create Webtoon' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadWebtoonDetailDto,
+  })
+  @Post()
+  async createWebtoon(
+    @Body() createWebtoonDto: CreateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    return await this.webtoonsService.createWebtoon(createWebtoonDto);
+  }
+
+  @ApiOperation({ summary: 'update Webtoon' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadWebtoonDetailDto,
+  })
+  @Patch(':id')
+  async updateWebtoon(
+    @Param('id') id: number,
+    @Body() updateWebtoonDto: UpdateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    return await this.webtoonsService.updateWebtoon(updateWebtoonDto);
+  }
+
+  @ApiOperation({ summary: 'delete Webtoon' })
+  @ApiNoContentResponse({ description: 'Request Success' })
+  @Delete(':id')
+  deleteReview(@Param('id') id: number): Promise<void> {
+    // 삭제 잘 되었다는 status code 반환~
+    return this.webtoonsService.deleteWebtoon(id);
   }
 }

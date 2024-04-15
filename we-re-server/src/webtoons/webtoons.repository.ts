@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Review } from 'src/entities/review.entity';
 import { Days, ProvidingCompany, Webtoon } from 'src/entities/webtoon.entity';
 import { DataSource, Repository } from 'typeorm';
+import { CreateWebtoonDto } from './dto/create-webtoon.dto';
 
 @Injectable()
 export class WebtoonRepository extends Repository<Webtoon> {
@@ -142,5 +143,13 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .groupBy('webtoon.id')
       .addGroupBy('reviews.review_id')
       .getRawMany();
+  }
+
+  public async createWebtoon(createWebtoonDto: CreateWebtoonDto) {
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Webtoon)
+      .values({ ...createWebtoonDto })
+      .execute();
   }
 }
