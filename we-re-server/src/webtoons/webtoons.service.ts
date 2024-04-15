@@ -111,7 +111,7 @@ export class WebtoonsService {
    * @param createWebtoonDto
    * @returns {Promise<ReadWebtoonDetailDto>}
    */
-  async createStorage(
+  async createWebtoon(
     createWebtoonDto: CreateWebtoonDto,
   ): Promise<ReadWebtoonDetailDto> {
     const queryResult = await this.webtoonRepository.createWebtoon(
@@ -119,6 +119,26 @@ export class WebtoonsService {
     );
     const id = queryResult.identifiers[0].id;
     const result = await this.findOneDetailById(id);
+    return result;
+  }
+
+  /**
+   * update webtoon and return webtoon detail
+   * @param updateStorageDto
+   * @returns {Promise<ReadWebtoonDetailDto>}
+   */
+  async updateWebtoon(
+    updateWebtoonDto: UpdateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    const queryResult = await this.webtoonRepository.update(
+      updateWebtoonDto.id,
+      updateWebtoonDto,
+    );
+    if (!queryResult.affected) {
+      // storage id is not found. not found error handling!
+      throw new Error();
+    }
+    const result = await this.findOneDetailById(updateWebtoonDto.id);
     return result;
   }
 }

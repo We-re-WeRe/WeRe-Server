@@ -143,6 +143,19 @@ export class WebtoonsController {
   async createWebtoon(
     @Body() createWebtoonDto: CreateWebtoonDto,
   ): Promise<ReadWebtoonDetailDto> {
-    return await this.webtoonsService.createStorage(createWebtoonDto);
+    return await this.webtoonsService.createWebtoon(createWebtoonDto);
+  }
+
+  @ApiOperation({ summary: 'update Webtoon' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadWebtoonDetailDto,
+  })
+  @Patch(':id')
+  async updateWebtoon(
+    @Param('id') id: number,
+    @Body() updateWebtoonDto: UpdateWebtoonDto,
+  ): Promise<ReadWebtoonDetailDto> {
+    return await this.webtoonsService.updateWebtoon(updateWebtoonDto);
   }
 }
