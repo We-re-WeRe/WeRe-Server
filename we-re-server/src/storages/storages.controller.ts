@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Logger,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { StoragesService } from './storages.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
@@ -145,6 +147,7 @@ export class StoragesController {
 
   @ApiOperation({ summary: 'delete Storage' })
   @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteReview(@Param('id') id: number): Promise<void> {
     // 삭제 잘 되었다는 status code 반환~

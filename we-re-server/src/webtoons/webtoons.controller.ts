@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { WebtoonsService } from './webtoons.service';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
@@ -162,6 +164,7 @@ export class WebtoonsController {
 
   @ApiOperation({ summary: 'delete Webtoon' })
   @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteReview(@Param('id') id: number): Promise<void> {
     // 삭제 잘 되었다는 status code 반환~

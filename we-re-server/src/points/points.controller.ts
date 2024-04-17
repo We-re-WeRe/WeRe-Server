@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { PointsService } from './points.service';
 import { CreatePointDto } from './dto/create-point.dto';
@@ -55,12 +56,13 @@ export class PointsController {
   @ApiOperation({ summary: 'Delete Point object' })
   @ApiNoContentResponse({ description: 'Request Success' })
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: number): Promise<void> {
     return await this.pointsService.delete(id);
   }
 
   @ApiOperation({ summary: 'Delete Point object by user Id' })
   @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('user/:userId')
   async deleteByUserId(@Param('userId') userId: number) {
     return await this.pointsService.deleteByUserId(userId);

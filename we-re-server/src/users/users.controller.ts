@@ -10,6 +10,8 @@ import {
   Res,
   Logger,
   Query,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -86,10 +88,10 @@ export class UsersController {
   @ApiOperation({ summary: 'User unfollowed target id' })
   @ApiNoContentResponse({
     description: 'Request Success',
-    type: ReadUserDetailDto,
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('/:id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: number): Promise<void> {
     return await this.usersService.delete(id);
   }
 

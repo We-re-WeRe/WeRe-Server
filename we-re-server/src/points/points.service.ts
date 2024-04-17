@@ -43,9 +43,9 @@ export class PointsService {
     return result;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<void> {
     const result = await this.pointRepository.delete(id);
-    return result;
+    return;
   }
 
   async deleteByUserId(userId: number) {

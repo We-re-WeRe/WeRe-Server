@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -13,6 +15,7 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReadReviewAndWebtoonDto, ReadReviewDto } from './dto/read-review.dto';
 import {
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -61,7 +64,8 @@ export class ReviewsController {
   }
 
   @ApiOperation({ summary: 'delete Review' })
-  @ApiOkResponse({ description: 'Request Success' })
+  @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteReview(@Param('id') id: number): Promise<void> {
     // 삭제 잘 되었다는 status code 반환~

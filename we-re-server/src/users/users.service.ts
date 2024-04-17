@@ -59,8 +59,13 @@ export class UsersService {
    * @param id
    * @returns {void}
    */
-  async delete(id: number) {
-    return await this.userRepository.delete(id);
+  async delete(id: number): Promise<void> {
+    const queryResult = await this.userRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
   }
 
   /**
