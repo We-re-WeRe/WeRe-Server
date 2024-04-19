@@ -15,6 +15,7 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('user.followers', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.introduceMe'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
+      .groupBy('user.id')
       .getRawOne();
   }
 
@@ -36,6 +37,7 @@ export class UserRepository extends Repository<User> {
       .leftJoinAndSelect('user.following', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.id'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
+      .groupBy('user.id')
       .getRawOne();
   }
 
