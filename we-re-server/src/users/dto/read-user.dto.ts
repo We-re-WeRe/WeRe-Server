@@ -35,6 +35,10 @@ export class ReadUserDto {
 }
 
 export class ReadUserDetailDto extends ReadUserDto {
+  constructor(raw: any) {
+    super();
+    this.rawToDto(raw);
+  }
   @ApiProperty()
   @IsString()
   introduceMe?: string;
