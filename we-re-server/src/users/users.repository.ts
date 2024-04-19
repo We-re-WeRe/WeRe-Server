@@ -12,7 +12,7 @@ export class UserRepository extends Repository<User> {
   public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
-      .leftJoinAndSelect('user.following', 'followers')
+      .leftJoinAndSelect('user.followers', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.introduceMe'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .getRawOne();
@@ -41,14 +41,14 @@ export class UserRepository extends Repository<User> {
 
   public async createFollowRelation(followDto: FollowDto) {
     return await this.createQueryBuilder()
-      .relation(User, 'following')
+      .relation(User, 'followers')
       .of(followDto.targetId)
       .add(followDto.id);
   }
 
   public async deleteFollowRelation(followDto: FollowDto) {
     return await this.createQueryBuilder()
-      .relation(User, 'following')
+      .relation(User, 'followers')
       .of(followDto.targetId)
       .remove(followDto.id);
   }
