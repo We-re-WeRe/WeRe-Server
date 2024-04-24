@@ -39,7 +39,7 @@ export class UsersService {
    */
   async findOneBriefById(id: number): Promise<ReadUserBriefDto> {
     const queryResult = await this.userRepository.findOneBriefById(id);
-    if (!queryResult) throw new CustomNotFoundException('id');
+    if (!queryResult) throw new CustomNotFoundException('userId');
     const result: ReadUserBriefDto = new ReadUserBriefDto(queryResult);
     return result;
   }
