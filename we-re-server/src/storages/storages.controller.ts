@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Logger,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { StoragesService } from './storages.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
@@ -26,6 +28,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
+import {
+  CustomBadTypeRequestException,
+  CustomUnauthorziedException,
+} from 'src/utils/custom_exceptions';
 
 @ApiTags('Storages')
 @Controller('storages')
@@ -43,14 +49,19 @@ export class StoragesController {
   })
   @Get('detail/:id')
   async findOneDetailById(
-    @Param('id') id: string,
+    @Param('id') id: number,
   ): Promise<ReadStorageDetailDto> {
-    const result = await this.storagesService.findOneDetailById(+id);
-    const readUserBriefDto = await this.userService.findOneBriefById(
-      result.user.getId(),
-    );
-    result.user = readUserBriefDto;
-    return result;
+    try {
+      if (!id) throw new CustomBadTypeRequestException('id', id);
+      const result = await this.storagesService.findOneDetailById(id);
+      const readUserBriefDto = await this.userService.findOneBriefById(
+        result.user.getId(),
+      );
+      result.user = readUserBriefDto;
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'get all of the Storages as list' })
@@ -60,7 +71,11 @@ export class StoragesController {
   })
   @Get('list')
   async findManyPublicStorageList(): Promise<ReadStorageBriefDto[]> {
-    return await this.storagesService.findManyPublicStorageList();
+    try {
+      return await this.storagesService.findManyPublicStorageList();
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'get Storages which is owned by User as list' })
@@ -70,9 +85,14 @@ export class StoragesController {
   })
   @Get('list/user/:userId')
   async findManyStorageListByUserId(
-    @Param('userId') userId: string,
+    @Param('userId') userId: number,
   ): Promise<ReadStorageBriefDto[]> {
-    return await this.storagesService.findManyStorageListByUserId(+userId);
+    try {
+      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
+      return await this.storagesService.findManyStorageListByUserId(userId);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'get Storages which is liked by User as list' })
@@ -82,12 +102,17 @@ export class StoragesController {
   })
   @Get('list/liked/user/:userId')
   async findManyPublicStorageLikedListByIds(
-    @Param('userId') userId: string,
+    @Param('userId') userId: number,
   ): Promise<ReadStorageBriefDto[]> {
     //TODO:: user id 본인 건지 체크 필요.
-    const { storage_ids: ids } =
-      await this.likesService.findManyStorageIdsByUserId(+userId);
-    return await this.storagesService.findManyPublicStorageListByIds(ids);
+    try {
+      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
+      const { storage_ids: ids } =
+        await this.likesService.findManyStorageIdsByUserId(userId);
+      return await this.storagesService.findManyPublicStorageListByIds(ids);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'create Storage' })
@@ -99,7 +124,12 @@ export class StoragesController {
   async createStorage(
     @Body() createStorageDto: CreateStorageDto,
   ): Promise<ReadStorageDetailDto> {
-    return await this.storagesService.createStorage(createStorageDto);
+    try {
+      // TODO:: create data 조건 해야함.
+      return await this.storagesService.createStorage(createStorageDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'add webtoon to Storage' })
@@ -109,11 +139,14 @@ export class StoragesController {
     @Param('id') id: number,
     @Body() updateStorageDto: UpdateStorageDto,
   ): Promise<ReadStorageDetailDto> {
-    // id check.
-    if (id !== updateStorageDto.id) {
-      throw new Error();
+    try {
+      if (!id) throw new CustomBadTypeRequestException('id', id);
+      if (id !== updateStorageDto.id)
+        throw new CustomUnauthorziedException(`id is wrong.`);
+      return await this.storagesService.updateStorage(updateStorageDto);
+    } catch (error) {
+      throw error;
     }
-    return await this.storagesService.updateStorage(updateStorageDto);
   }
 
   @ApiOperation({ summary: 'add webtoon to Storage' })
@@ -122,32 +155,50 @@ export class StoragesController {
     type: ReadStorageDetailDto,
   })
   @Patch(':id/webtoon/:webtoonId')
-  async addWebtoonToStorage(
+  async addWebtoonAtStorage(
     @Param() webtoonInStorageDto: WebtoonInStorageDto,
   ): Promise<ReadStorageDetailDto> {
-    await this.storagesService.addWebtoonToStorage(webtoonInStorageDto);
-    return await this.storagesService.findOneDetailById(webtoonInStorageDto.id);
+    try {
+      await this.storagesService.addWebtoonAtStorage(webtoonInStorageDto);
+      // return이 storage detail이 맞나? webtoon 페이지에서 빼고 더하고 할텐데?
+      return await this.storagesService.findOneDetailById(
+        webtoonInStorageDto.id,
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'delete webtoon to Storage' })
-  @ApiNoContentResponse({
+  @ApiOkResponse({
     description: 'Request Success',
     type: ReadStorageDetailDto,
   })
   @Delete(':id/webtoon/:webtoonId')
-  async removeWebtoonToStorage(
+  async removeWebtoonAtStorage(
     @Param() webtoonInStorageDto: WebtoonInStorageDto,
   ): Promise<ReadStorageDetailDto> {
     // 삭제 잘 되었다는 status code 반환~
-    await this.storagesService.removeWebtoonToStorage(webtoonInStorageDto);
-    return await this.storagesService.findOneDetailById(webtoonInStorageDto.id);
+    try {
+      await this.storagesService.removeWebtoonAtStorage(webtoonInStorageDto);
+      return await this.storagesService.findOneDetailById(
+        webtoonInStorageDto.id,
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'delete Storage' })
   @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteReview(@Param('id') id: number): Promise<void> {
-    // 삭제 잘 되었다는 status code 반환~
-    return this.storagesService.deleteReview(id);
+    try {
+      if (!id) throw new CustomBadTypeRequestException('id', id);
+      return this.storagesService.deleteReview(id);
+    } catch (error) {
+      throw error;
+    }
   }
 }

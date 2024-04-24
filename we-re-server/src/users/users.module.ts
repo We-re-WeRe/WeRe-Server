@@ -6,6 +6,6 @@ import { UserRepository } from './users.repository';
 @Module({
   controllers: [UsersController],
   providers: [UsersService, UserRepository],
-  exports: [UsersService],
+  exports: [UsersService, UserRepository],
 })
 export class UsersModule {}

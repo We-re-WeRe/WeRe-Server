@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './users.repository';
@@ -8,20 +8,27 @@ import {
   ReadUserDto,
 } from './dto/read-user.dto';
 import { FollowDto } from './dto/follow.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async findOneDetailById(id: number): Promise<ReadUserDetailDto> {
-    const queryResult = await this.userRepository.findOneDetailById(id);
-    const result: ReadUserDetailDto = new ReadUserDetailDto(queryResult);
-    result.rawToDto(queryResult);
-    return result;
+    try {
+      const queryResult = await this.userRepository.findOneDetailById(id);
+      Logger.log(JSON.stringify(queryResult));
+      if (!queryResult) throw new CustomNotFoundException('id');
+      const result: ReadUserDetailDto = new ReadUserDetailDto(queryResult);
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findOneProfileImageById(id: number): Promise<ReadUserDto> {
     const queryResult = await this.userRepository.findOneProfileImageById(id);
+    if (!queryResult) throw new CustomNotFoundException('id');
     const result: ReadUserDto = new ReadUserDto(queryResult);
     return result;
   }
@@ -32,6 +39,7 @@ export class UsersService {
    */
   async findOneBriefById(id: number): Promise<ReadUserBriefDto> {
     const queryResult = await this.userRepository.findOneBriefById(id);
+    if (!queryResult) throw new CustomNotFoundException('userId');
     const result: ReadUserBriefDto = new ReadUserBriefDto(queryResult);
     return result;
   }
@@ -51,7 +59,13 @@ export class UsersService {
    * @returns {Promise<void>} updated user detail info
    */
   async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
-    await this.userRepository.update(updateUserDto.id, updateUserDto);
+    const queryResult = await this.userRepository.update(
+      updateUserDto.id,
+      updateUserDto,
+    );
+    if (!queryResult.affected) {
+      throw new CustomNotFoundException('id');
+    }
   }
 
   /**
@@ -59,8 +73,13 @@ export class UsersService {
    * @param id
    * @returns {void}
    */
-  async delete(id: number) {
-    return await this.userRepository.delete(id);
+  async delete(id: number): Promise<void> {
+    const queryResult = await this.userRepository.delete(id);
+    if (!queryResult) {
+      // storage is not deleted. error handling plz.
+      throw new Error();
+    }
+    return;
   }
 
   /**
@@ -69,6 +88,9 @@ export class UsersService {
    * @returns {void}
    */
   async deleteFollowRelation(followDto: FollowDto): Promise<void> {
-    return await this.userRepository.deleteFollowRelation(followDto);
+    const queryResult = await this.userRepository.deleteFollowRelation(
+      followDto,
+    );
+    return;
   }
 }

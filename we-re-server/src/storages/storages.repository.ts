@@ -26,6 +26,7 @@ export class StorageRepository extends Repository<Storage> {
         'storage.user_id',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
+      .groupBy('storage.id')
       .getRawOne();
   }
 
@@ -105,6 +106,23 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
+  public async findStorageWebtoonRelationById(
+    webtoonInStorageDto: WebtoonInStorageDto,
+  ) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id: webtoonInStorageDto.id })
+      .leftJoinAndSelect(
+        'storage.webtoons',
+        'webtoons',
+        'webtoons.id=:webtoonId',
+        {
+          webtoonId: webtoonInStorageDto.webtoonId,
+        },
+      )
+      .select(['storage.id', 'webtoons.id'])
+      .getRawOne();
+  }
+
   public async createStorage(createStorageDto: CreateStorageDto) {
     return await this.createQueryBuilder()
       .insert()
@@ -116,14 +134,14 @@ export class StorageRepository extends Repository<Storage> {
       .execute();
   }
 
-  public async addWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+  public async addWebtoonAtStorage(webtoonInStorageDto: WebtoonInStorageDto) {
     return await this.createQueryBuilder()
       .relation(Storage, 'webtoons')
       .of(webtoonInStorageDto.id)
       .add(webtoonInStorageDto.webtoonId);
   }
 
-  public async removeWebtoonToStorage(
+  public async removeWebtoonAtStorage(
     webtoonInStorageDto: WebtoonInStorageDto,
   ) {
     return await this.createQueryBuilder()
