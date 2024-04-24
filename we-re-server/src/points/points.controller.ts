@@ -21,6 +21,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ReadPointHistoryDto, ReadPointSumDto } from './dto/read-point.dto';
+import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
+import { UsersService } from 'src/users/users.service';
 
 @ApiTags('Points')
 @Controller('points')
@@ -36,28 +38,49 @@ export class PointsController {
   findHistoryById(
     @Param('userId') userId: number,
   ): Promise<ReadPointHistoryDto[]> {
-    return this.pointsService.findHistoryById(userId);
+    try {
+      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
+      return this.pointsService.findHistoryById(userId);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: "get user's total point API" })
   @ApiOkResponse({ description: 'Request Success', type: ReadPointSumDto })
   @Get('sum/:userId')
   async findSumById(@Param('userId') userId: number): Promise<ReadPointSumDto> {
-    return await this.pointsService.findSumById(userId);
+    try {
+      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
+      const result = await this.pointsService.findSumById(userId);
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'create Point object' })
   @ApiCreatedResponse({ description: 'Request Success' })
   @Post()
   async createPoint(@Body() createdPointDto: CreatePointDto) {
-    return await this.pointsService.createPoint(createdPointDto);
+    try {
+      return await this.pointsService.createPoint(createdPointDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'Delete Point object' })
   @ApiNoContentResponse({ description: 'Request Success' })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   async delete(@Param('id') id: number): Promise<void> {
-    return await this.pointsService.delete(id);
+    try {
+      if (!id) throw new CustomBadTypeRequestException('id', id);
+      return await this.pointsService.delete(id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: 'Delete Point object by user Id' })
@@ -65,6 +88,11 @@ export class PointsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('user/:userId')
   async deleteByUserId(@Param('userId') userId: number) {
-    return await this.pointsService.deleteByUserId(userId);
+    try {
+      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
+      return await this.pointsService.deleteByUserId(userId);
+    } catch (error) {
+      throw error;
+    }
   }
 }

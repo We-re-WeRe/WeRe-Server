@@ -11,7 +11,13 @@ export class PointRepository extends Repository<Point> {
 
   public async findHistoryById(userId: number): Promise<Point[]> {
     return await this.createQueryBuilder('point')
-      .select(['point.mount', 'point.reason', 'point.created_at'])
+      .select([
+        'point.id',
+        'point.user',
+        'point.mount',
+        'point.reason',
+        'point.created_at',
+      ])
       .where('point.user=:userId', { userId })
       .orderBy('point.created_at', 'DESC')
       .getMany();

@@ -6,6 +6,16 @@ export class ReadPointHistoryDto {
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
+  id: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  userId: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
   mount: number;
 
   @ApiProperty()
@@ -16,10 +26,19 @@ export class ReadPointHistoryDto {
   @ApiProperty()
   @IsDate()
   @IsNotEmpty()
-  created_at: Date;
+  createdAt: Date;
 }
 
 export class ReadPointSumDto {
+  constructor(raw: any, userId: number) {
+    this.userId = userId;
+    this.totalPoint = raw?.totalPoint || 0;
+  }
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  userId: number;
+
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
