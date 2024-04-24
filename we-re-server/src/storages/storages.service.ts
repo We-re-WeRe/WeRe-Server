@@ -10,6 +10,11 @@ import {
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
+import {
+  CustomDataAlreadyExistException,
+  CustomDataBaseException,
+  CustomNotFoundException,
+} from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class StoragesService {
@@ -22,6 +27,7 @@ export class StoragesService {
    */
   async findOneDetailById(id: number): Promise<ReadStorageDetailDto> {
     const queryResult = await this.storageRepository.findOneDetailById(id);
+    if (!queryResult) throw new CustomNotFoundException('storageId');
     const result = new ReadStorageDetailDto(queryResult);
     return result;
   }
@@ -133,6 +139,9 @@ export class StoragesService {
       createStorageDto,
     );
     const id = queryResult.identifiers[0].id;
+    if (!id) {
+      throw new CustomDataBaseException('create is not worked.');
+    }
     const result = await this.findOneDetailById(id);
     return result;
   }
@@ -150,34 +159,57 @@ export class StoragesService {
       updateStorageDto,
     );
     if (!queryResult.affected) {
-      // storage id is not found. not found error handling!
-      throw new Error();
+      throw new CustomNotFoundException('id');
     }
     const result = await this.findOneDetailById(updateStorageDto.id);
     return result;
   }
 
   /**
+   * check webtoon storage relation.
+   * @param webtoonInStorageDto id and webtoonId
+   * @returns {boolean}
+   */
+  async checkerStorageWebtoonRelation(
+    webtoonInStorageDto: WebtoonInStorageDto,
+  ): Promise<void> {
+    const result = await this.storageRepository.findStorageWebtoonRelationById(
+      webtoonInStorageDto,
+    );
+    if (result) {
+      if (!result.webtoons_id) {
+        throw new CustomNotFoundException('webtoonId');
+      } else {
+        throw new CustomDataAlreadyExistException(
+          'This webtoon is already in this Storage.',
+        );
+      }
+    } else {
+      throw new CustomNotFoundException('storageId');
+    }
+  }
+
+  /**
    * add webtoon to storage.
    * @param webtoonInStorageDto id and webtoonId
    */
-  async addWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
-    await this.storageRepository.addWebtoonToStorage(webtoonInStorageDto);
+  async addWebtoonAtStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.checkerStorageWebtoonRelation(webtoonInStorageDto);
+    await this.storageRepository.addWebtoonAtStorage(webtoonInStorageDto);
   }
 
   /**
    * remove webtoon to storage.
    * @param webtoonInStorageDto id and webtoonId
    */
-  async removeWebtoonToStorage(webtoonInStorageDto: WebtoonInStorageDto) {
-    await this.storageRepository.removeWebtoonToStorage(webtoonInStorageDto);
+  async removeWebtoonAtStorage(webtoonInStorageDto: WebtoonInStorageDto) {
+    await this.storageRepository.removeWebtoonAtStorage(webtoonInStorageDto);
   }
 
   async deleteReview(id: number): Promise<void> {
     const queryResult = await this.storageRepository.delete(id);
     if (!queryResult) {
-      // storage is not deleted. error handling plz.
-      throw new Error();
+      throw new CustomNotFoundException('id');
     }
     return;
   }
