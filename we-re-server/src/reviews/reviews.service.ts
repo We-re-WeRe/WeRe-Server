@@ -8,22 +8,37 @@ import {
   ReadReviewDto,
 } from './dto/read-review.dto';
 import { Review } from 'src/entities/review.entity';
+import {
+  CustomDataAlreadyExistException,
+  CustomDataBaseException,
+  CustomNotFoundException,
+} from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class ReviewsService {
   constructor(private readonly reviewRepository: ReviewRepository) {}
 
+  /**
+   * get user's reviews with webtoon info.
+   * @param userId
+   * @returns {Promise<[ReadReviewAndWebtoonDto]>}
+   */
   async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
     const queryResult = await this.reviewRepository.findManyByUserId(userId);
     const result = queryResult.map((r) => new ReadReviewAndWebtoonDto(r));
     return result;
   }
 
+  /**
+   * get webtoon's reviews with user info.
+   * @param webtoonId
+   * @returns {Promise<[ReadReviewAndUserDto]>}
+   */
   async findManyByWebtoonId(
     webtoonId: number,
   ): Promise<ReadReviewAndUserDto[]> {
     const queryResult = await this.reviewRepository.findManyByWebtoonId(
-      +webtoonId,
+      webtoonId,
     );
     const result: ReadReviewAndUserDto[] = queryResult.map(
       (r) => new ReadReviewAndUserDto(r),
@@ -44,15 +59,18 @@ export class ReviewsService {
       },
     });
     if (alreadyReview) {
-      // Error handling plz..!
-      throw new Error();
+      throw new CustomDataAlreadyExistException(
+        'This User already has a Review for this Webtoon.',
+      );
     }
     const queryResult = await this.reviewRepository.createReview(
       createReviewDto,
     );
-    const result = await this.reviewRepository.findOneBy(
-      queryResult.identifiers[0].id,
-    );
+    const id = queryResult.identifiers[0].id;
+    if (!id) {
+      throw new CustomDataBaseException('create is not worked.');
+    }
+    const result = await this.reviewRepository.findOneBy(id);
     return result;
   }
 
@@ -67,8 +85,7 @@ export class ReviewsService {
       updateReviewDto,
     );
     if (!queryResult.affected) {
-      // review id is not found. not found error handling!
-      throw new Error();
+      throw new CustomNotFoundException('id');
     }
     const result = await this.reviewRepository.findOneBy({
       id: updateReviewDto.id,
@@ -79,8 +96,7 @@ export class ReviewsService {
   async deleteReview(id: number): Promise<void> {
     const queryResult = await this.reviewRepository.delete(id);
     if (!queryResult) {
-      // review is not deleted. error handling plz.
-      throw new Error();
+      throw new CustomNotFoundException('id');
     }
     return;
   }
