@@ -20,6 +20,19 @@ export class CustomBadTypeRequestException extends BadRequestException {
   }
 }
 
+export class CustomDataAlreadyExistException extends BadRequestException {
+  constructor(cause?: string) {
+    // TODO::에러 메시지를 좀 더 특정해서 알려주자. 인자로 뭐가 문제인지 받아옵시다.
+
+    super({
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'Data is already exist.',
+      error: 'Bad Request',
+      cause,
+    });
+  }
+}
+
 export class CustomUnauthorziedException extends UnauthorizedException {
   constructor(cause: string) {
     // TODO::에러 메시지를 좀 더 특정해서 알려주자. 인자로 뭐가 문제인지 받아옵시다.
