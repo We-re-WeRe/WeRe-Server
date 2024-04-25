@@ -38,12 +38,12 @@ export class ReadWebtoonDto {
   @IsNotEmpty()
   imageURL: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsNotEmpty()
   author: string[];
 
-  @ApiProperty()
+  @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsNotEmpty()
   painter: string[];
