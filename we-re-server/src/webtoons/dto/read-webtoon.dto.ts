@@ -39,21 +39,27 @@ export class ReadWebtoonDto {
   imageURL: string;
 
   @ApiProperty()
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
-  author: string;
+  author: string[];
 
   @ApiProperty()
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
-  painter: string;
+  painter: string[];
 
   public rawToDto(raw: any): ReadWebtoonDto {
     this.id = raw.webtoon_id;
     this.title = raw.webtoon_title;
     this.imageURL = raw.webtoon_image_url;
-    this.author = raw.webtoon_author;
-    this.painter = raw.webtoon_painter;
+    const authors: string[] = raw.webtoon_author
+      .split(',')
+      .map((a: string) => a.trim());
+    const painters: string[] = raw.webtoon_painter
+      .split(',')
+      .map((p: string) => p.trim());
+    this.author = authors;
+    this.painter = painters;
     return this;
   }
 }
