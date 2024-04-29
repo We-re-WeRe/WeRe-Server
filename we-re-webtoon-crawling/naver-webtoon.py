@@ -18,8 +18,7 @@ for day in days:
         thumbnailUrl = webtoon["thumbnailUrl"]
         webtoonUrl = f"https://comic.naver.com/webtoon/list?titleId={titleId}&tab={day[:3]}"
         
-        if requests.get(f'{apiUrl}/webtoons/detail/{titleId}').status_code == 200:
-            response = requests.patch(f'{apiUrl}/webtoons/{titleId}',data={'id':titleId, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter})
+        if requests.patch(f'{apiUrl}/webtoons/{titleId}',data={'id':titleId, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter}).status_code == 200:
             print(f"Patch is completed {titleId}")
         else:
             webtoonInfoUrl = f"https://comic.naver.com/api/article/list/info?titleId={titleId}"
