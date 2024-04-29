@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import {
   DAYS,
   Days,
@@ -9,6 +9,11 @@ import {
 } from 'src/entities/webtoon.entity';
 
 export class CreateWebtoonDto {
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
