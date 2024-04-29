@@ -50,7 +50,7 @@ export class Webtoon extends DefaultEntity {
   @Column({ nullable: true })
   genre?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   explain?: string;
 
   @Column({ unsigned: true, type: 'int', default: 0 })
