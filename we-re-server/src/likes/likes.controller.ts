@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Logger,
   Param,
   Post,
@@ -38,6 +39,32 @@ export class LikesController {
           `Param webtoonId is different with Body's.`,
         );
       const result = await this.likeService.addLike(addAndRemoveWebtoonLikeDto);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'update like' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadLikeInfoDto,
+  })
+  @Delete('webtoon/:webtoonId')
+  async deleteWebtoonLike(
+    @Param('webtoonId') webtoonId: number,
+    @Body() addAndRemoveWebtoonLikeDto: AddAndRemoveWebtoonLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    try {
+      if (!webtoonId)
+        throw new CustomBadTypeRequestException('webtoonId', webtoonId);
+      if (webtoonId !== addAndRemoveWebtoonLikeDto.webtoonId)
+        throw new BadRequestException(
+          `Param webtoonId is different with Body's.`,
+        );
+      const result = await this.likeService.softRemoveLike(
+        addAndRemoveWebtoonLikeDto,
+      );
       return result;
     } catch (error) {
       throw error;

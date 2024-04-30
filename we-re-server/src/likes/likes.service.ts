@@ -99,4 +99,20 @@ export class LikesService {
     }
     return await this.getLikeCount(addAndRemoveLikeDto);
   }
+
+  async softRemoveLike(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    if (isLike) {
+      let isWorked = true;
+      if (id > 0) {
+        const queryResult = await this.likeRepository.softDelete(id);
+        isWorked = !!queryResult.affected;
+      }
+      if (!isWorked)
+        throw new CustomDataBaseException('update like is not worked');
+    }
+    return await this.getLikeCount(addAndRemoveLikeDto);
+  }
 }
