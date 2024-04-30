@@ -107,7 +107,7 @@ export class StoragesController {
     //TODO:: user id 본인 건지 체크 필요.
     try {
       if (!userId) throw new CustomBadTypeRequestException('userId', userId);
-      const { storage_ids: ids } =
+      const { storageIds: ids } =
         await this.likesService.findManyStorageIdsByUserId(userId);
       return await this.storagesService.findManyPublicStorageListByIds(ids);
     } catch (error) {
