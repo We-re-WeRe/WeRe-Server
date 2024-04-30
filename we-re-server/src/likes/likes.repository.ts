@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Like } from 'src/entities/like.entity';
 import { DataSource, Repository } from 'typeorm';
 import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
@@ -52,5 +52,25 @@ export class LikesRepository extends Repository<Like> {
       })
       .select('COUNT(likes.id) as count')
       .getRawOne();
+  }
+
+  public async createLike(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    const values = {
+      user: () => `${addAndRemoveLikeDto.userId}`,
+    };
+    values[addAndRemoveLikeDto.getType()] = () =>
+      `${addAndRemoveLikeDto.getTargetId()}`;
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Like)
+      .values({ ...values })
+      .execute();
+  }
+
+  public async updateLike(id: number) {
+    return await this.createQueryBuilder()
+      .where('id = :id', { id })
+      .restore()
+      .execute();
   }
 }

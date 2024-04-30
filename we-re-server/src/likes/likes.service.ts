@@ -6,6 +6,7 @@ import {
   AddAndRemoveWebtoonLikeDto,
 } from './dto/cud-like.dto';
 import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
+import { CustomDataBaseException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class LikesService {
@@ -71,5 +72,31 @@ export class LikesService {
     );
     const result = new ReadLikeInfoDto(isLike, queryResult);
     return result;
+  }
+
+  /**
+   * add like.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<ReadLikeInfoDto>}
+   */
+  async addLike(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    if (!isLike) {
+      let isWorked = true;
+      if (id > 0) {
+        const queryResult = await this.likeRepository.updateLike(id);
+        isWorked = !!queryResult.affected;
+      } else {
+        const queryResult = await this.likeRepository.createLike(
+          addAndRemoveLikeDto,
+        );
+        isWorked = !!queryResult.raw.affectedRows;
+      }
+      if (!isWorked)
+        throw new CustomDataBaseException('update like is not worked');
+    }
+    return await this.getLikeCount(addAndRemoveLikeDto);
   }
 }

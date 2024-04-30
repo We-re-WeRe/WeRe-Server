@@ -6,7 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { ReadLikeInfoDto } from './dto/read-like.dto';
 import { AddAndRemoveWebtoonLikeDto } from './dto/cud-like.dto';
@@ -20,8 +20,13 @@ import {
 export class LikesController {
   constructor(private readonly likeService: LikesService) {}
 
+  @ApiOperation({ summary: 'update like' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadLikeInfoDto,
+  })
   @Post('webtoon/:webtoonId')
-  async addLike(
+  async addWebtoonLike(
     @Param('webtoonId') webtoonId: number,
     @Body() addAndRemoveWebtoonLikeDto: AddAndRemoveWebtoonLikeDto,
   ): Promise<ReadLikeInfoDto> {
@@ -32,16 +37,7 @@ export class LikesController {
         throw new BadRequestException(
           `Param webtoonId is different with Body's.`,
         );
-      const isLiked = await this.likeService.findIsLiked(
-        addAndRemoveWebtoonLikeDto,
-      );
-      // 업뎃
-      //   if (!isLiked) {
-      //   }
-      const result = await this.likeService.getLikeCount(
-        addAndRemoveWebtoonLikeDto,
-      );
-      // 데이터 받아오기
+      const result = await this.likeService.addLike(addAndRemoveWebtoonLikeDto);
       return result;
     } catch (error) {
       throw error;
