@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Like } from 'src/entities/like.entity';
 import { DataSource, Repository } from 'typeorm';
+import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 
 @Injectable()
 export class LikesRepository extends Repository<Like> {
@@ -30,5 +31,26 @@ export class LikesRepository extends Repository<Like> {
       .andWhere('likes.reviewId IS NOT NULL')
       .select(['likes.reviewId'])
       .getRawMany();
+  }
+
+  public async findIsLiked(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    return this.createQueryBuilder('likes')
+      .where('likes.user=:userId', {
+        userId: addAndRemoveLikeDto.userId,
+      })
+      .andWhere(`likes.${addAndRemoveLikeDto.getType()}=:targetId`, {
+        targetId: addAndRemoveLikeDto.getTargetId(),
+      })
+      .withDeleted()
+      .getOne();
+  }
+
+  public async getLikeCount(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    return this.createQueryBuilder('likes')
+      .where(`likes.${addAndRemoveLikeDto.getType()}=:targetId`, {
+        targetId: addAndRemoveLikeDto.getTargetId(),
+      })
+      .select('COUNT(likes.id) as count')
+      .getRawOne();
   }
 }

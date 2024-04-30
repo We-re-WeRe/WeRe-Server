@@ -6,6 +6,13 @@ export class AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   userId: number;
+
+  public getType() {
+    return '';
+  }
+  public getTargetId(): number {
+    return;
+  }
 }
 
 export class AddAndRemoveWebtoonLikeDto extends AddAndRemoveLikeDto {
@@ -13,6 +20,13 @@ export class AddAndRemoveWebtoonLikeDto extends AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   webtoonId: number;
+
+  public getType() {
+    return 'webtoon';
+  }
+  public getTargetId(): number {
+    return this.webtoonId;
+  }
 }
 
 export class AddAndRemoveReviewLikeDto extends AddAndRemoveLikeDto {
@@ -20,6 +34,13 @@ export class AddAndRemoveReviewLikeDto extends AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   reviewId: number;
+
+  public getType() {
+    return 'review';
+  }
+  public getTargetId(): number {
+    return this.reviewId;
+  }
 }
 
 export class AddAndRemoveStorageLikeDto extends AddAndRemoveLikeDto {
@@ -27,4 +48,11 @@ export class AddAndRemoveStorageLikeDto extends AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   storageId: number;
+
+  public getType() {
+    return 'storage';
+  }
+  public getTargetId(): number {
+    return this.storageId;
+  }
 }

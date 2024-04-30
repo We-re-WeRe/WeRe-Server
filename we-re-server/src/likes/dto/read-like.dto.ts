@@ -22,3 +22,17 @@ export class ReadLikeInfoDto {
     return this;
   }
 }
+
+export class ReadIsLikeInfoDto {
+  constructor(isLike: boolean, id: number) {
+    this.isLike = isLike;
+    this.id = id;
+  }
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  isLike: boolean;
+}

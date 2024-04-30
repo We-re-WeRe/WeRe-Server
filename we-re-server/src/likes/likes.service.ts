@@ -1,5 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
+import {
+  AddAndRemoveLikeDto,
+  AddAndRemoveReviewLikeDto,
+  AddAndRemoveWebtoonLikeDto,
+} from './dto/cud-like.dto';
+import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
 
 @Injectable()
 export class LikesService {
@@ -29,6 +35,41 @@ export class LikesService {
     const reviewIds = [];
     reviewIdObjectArr.forEach((r) => reviewIds.push(r.reviewId));
     const result = { reviewIds };
+    return result;
+  }
+  /**
+   * check user's like for target.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<boolean>}
+   */
+  async findIsLiked(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadIsLikeInfoDto> {
+    const queryResult = await this.likeRepository.findIsLiked(
+      addAndRemoveLikeDto,
+    );
+    let isLike = false;
+    const id = queryResult ? queryResult.id : -1;
+    if (queryResult) {
+      isLike = !!!queryResult.deletedAt;
+    }
+    const result = new ReadIsLikeInfoDto(isLike, id);
+    return result;
+  }
+
+  /**
+   * get like count and return do i like and count.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<boolean>}
+   */
+  async getLikeCount(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    const queryResult = await this.likeRepository.getLikeCount(
+      addAndRemoveLikeDto,
+    );
+    const result = new ReadLikeInfoDto(isLike, queryResult);
     return result;
   }
 }
