@@ -1,10 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
-import {
-  AddAndRemoveLikeDto,
-  AddAndRemoveReviewLikeDto,
-  AddAndRemoveWebtoonLikeDto,
-} from './dto/cud-like.dto';
+import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
 import { CustomDataBaseException } from 'src/utils/custom_exceptions';
 
@@ -89,6 +85,8 @@ export class LikesService {
         const queryResult = await this.likeRepository.updateLike(id);
         isWorked = !!queryResult.affected;
       } else {
+        // if target id 가 없는 id일 경우 처리해줘야함.. 여기서 다른 service 받으면
+        // circular dependency라.. 흠...
         const queryResult = await this.likeRepository.createLike(
           addAndRemoveLikeDto,
         );

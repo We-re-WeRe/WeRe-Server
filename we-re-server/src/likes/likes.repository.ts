@@ -38,8 +38,8 @@ export class LikesRepository extends Repository<Like> {
       .where('likes.user=:userId', {
         userId: addAndRemoveLikeDto.userId,
       })
-      .andWhere(`likes.${addAndRemoveLikeDto.getType()}=:targetId`, {
-        targetId: addAndRemoveLikeDto.getTargetId(),
+      .andWhere(`likes.${addAndRemoveLikeDto.likeType}=:targetId`, {
+        targetId: addAndRemoveLikeDto.targetId,
       })
       .withDeleted()
       .getOne();
@@ -47,8 +47,8 @@ export class LikesRepository extends Repository<Like> {
 
   public async getLikeCount(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
     return this.createQueryBuilder('likes')
-      .where(`likes.${addAndRemoveLikeDto.getType()}=:targetId`, {
-        targetId: addAndRemoveLikeDto.getTargetId(),
+      .where(`likes.${addAndRemoveLikeDto.likeType}=:targetId`, {
+        targetId: addAndRemoveLikeDto.targetId,
       })
       .select('COUNT(likes.id) as count')
       .getRawOne();
@@ -58,8 +58,8 @@ export class LikesRepository extends Repository<Like> {
     const values = {
       user: () => `${addAndRemoveLikeDto.userId}`,
     };
-    values[addAndRemoveLikeDto.getType()] = () =>
-      `${addAndRemoveLikeDto.getTargetId()}`;
+    values[addAndRemoveLikeDto.likeType] = () =>
+      `${addAndRemoveLikeDto.targetId}`;
     return await this.createQueryBuilder()
       .insert()
       .into(Like)
