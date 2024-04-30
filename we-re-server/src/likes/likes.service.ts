@@ -1,34 +1,121 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
+import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
+import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
+import { CustomDataBaseException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class LikesService {
   constructor(private readonly likeRepository: LikesRepository) {}
 
   async findManyStorageIdsByUserId(id: number) {
-    const storage_id_object_arr =
+    const storageIdObjectArr =
       await this.likeRepository.findManyStorageIdsByUserId(id);
-    const storage_ids = [];
-    storage_id_object_arr.forEach((r) => storage_ids.push(r.storage_id));
-    const result = { storage_ids };
+    const storageIds = [];
+    storageIdObjectArr.forEach((r) => storageIds.push(r.storageId));
+    const result = { storageIds };
     return result;
   }
 
   async findManyWebtoonIdsByUserId(id: number) {
-    const webtoon_id_object_arr =
+    const webtoonIdObjectArr =
       await this.likeRepository.findManyWebtoonIdsByUserId(id);
     const webtoonIds = [];
-    webtoon_id_object_arr.forEach((r) => webtoonIds.push(r.webtoon_id));
+    webtoonIdObjectArr.forEach((r) => webtoonIds.push(r.webtoonId));
     const result = { webtoonIds };
     return result;
   }
 
   async findManyReviewIdsByUserId(id: number) {
-    const review_id_object_arr =
+    const reviewIdObjectArr =
       await this.likeRepository.findManyReviewIdsByUserId(id);
-    const review_ids = [];
-    review_id_object_arr.forEach((r) => review_ids.push(r.reviewId));
-    const result = { review_ids };
+    const reviewIds = [];
+    reviewIdObjectArr.forEach((r) => reviewIds.push(r.reviewId));
+    const result = { reviewIds };
     return result;
+  }
+  /**
+   * check user's like for target.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<boolean>}
+   */
+  async findIsLiked(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadIsLikeInfoDto> {
+    const queryResult = await this.likeRepository.findIsLiked(
+      addAndRemoveLikeDto,
+    );
+    let isLike = false;
+    const id = queryResult ? queryResult.id : -1;
+    if (queryResult) {
+      isLike = !!!queryResult.deletedAt;
+    }
+    const result = new ReadIsLikeInfoDto(isLike, id);
+    return result;
+  }
+
+  /**
+   * get like count and return do i like and count.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<boolean>}
+   */
+  async getLikeCount(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    const queryResult = await this.likeRepository.getLikeCount(
+      addAndRemoveLikeDto,
+    );
+    const result = new ReadLikeInfoDto(isLike, queryResult);
+    return result;
+  }
+
+  /**
+   * add like.
+   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @returns {Promise<ReadLikeInfoDto>}
+   */
+  async addLike(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    if (!isLike) {
+      let isWorked = true;
+      if (id > 0) {
+        const queryResult = await this.likeRepository.updateLike(id);
+        isWorked = !!queryResult.affected;
+      } else {
+        // if target id 가 없는 id일 경우 처리해줘야함.. 여기서 다른 service 받으면
+        // circular dependency라.. 흠...
+        const queryResult = await this.likeRepository.createLike(
+          addAndRemoveLikeDto,
+        );
+        isWorked = !!queryResult.raw.affectedRows;
+      }
+      if (!isWorked)
+        throw new CustomDataBaseException('update like is not worked');
+    }
+    return await this.getLikeCount(addAndRemoveLikeDto);
+  }
+
+  /**
+   * soft delete related like.
+   * @param addAndRemoveLikeDto
+   * @returns {Promise<ReadLikeInfoDto>}
+   */
+  async softRemoveLike(
+    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    if (isLike) {
+      let isWorked = true;
+      if (id > 0) {
+        const queryResult = await this.likeRepository.softDelete(id);
+        isWorked = !!queryResult.affected;
+      }
+      if (!isWorked)
+        throw new CustomDataBaseException('update like is not worked');
+    }
+    return await this.getLikeCount(addAndRemoveLikeDto);
   }
 }

@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Like } from 'src/entities/like.entity';
 import { DataSource, Repository } from 'typeorm';
+import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 
 @Injectable()
 export class LikesRepository extends Repository<Like> {
@@ -30,5 +31,46 @@ export class LikesRepository extends Repository<Like> {
       .andWhere('likes.reviewId IS NOT NULL')
       .select(['likes.reviewId'])
       .getRawMany();
+  }
+
+  public async findIsLiked(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    return this.createQueryBuilder('likes')
+      .where('likes.user=:userId', {
+        userId: addAndRemoveLikeDto.userId,
+      })
+      .andWhere(`likes.${addAndRemoveLikeDto.likeType}=:targetId`, {
+        targetId: addAndRemoveLikeDto.targetId,
+      })
+      .withDeleted()
+      .getOne();
+  }
+
+  public async getLikeCount(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    return this.createQueryBuilder('likes')
+      .where(`likes.${addAndRemoveLikeDto.likeType}=:targetId`, {
+        targetId: addAndRemoveLikeDto.targetId,
+      })
+      .select('COUNT(likes.id) as count')
+      .getRawOne();
+  }
+
+  public async createLike(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
+    const values = {
+      user: () => `${addAndRemoveLikeDto.userId}`,
+    };
+    values[addAndRemoveLikeDto.likeType] = () =>
+      `${addAndRemoveLikeDto.targetId}`;
+    return await this.createQueryBuilder()
+      .insert()
+      .into(Like)
+      .values({ ...values })
+      .execute();
+  }
+
+  public async updateLike(id: number) {
+    return await this.createQueryBuilder()
+      .where('id = :id', { id })
+      .restore()
+      .execute();
   }
 }
