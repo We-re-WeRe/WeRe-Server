@@ -6,29 +6,29 @@ export class LikesService {
   constructor(private readonly likeRepository: LikesRepository) {}
 
   async findManyStorageIdsByUserId(id: number) {
-    const storage_id_object_arr =
+    const storageIdObjectArr =
       await this.likeRepository.findManyStorageIdsByUserId(id);
-    const storage_ids = [];
-    storage_id_object_arr.forEach((r) => storage_ids.push(r.storage_id));
-    const result = { storage_ids };
+    const storageIds = [];
+    storageIdObjectArr.forEach((r) => storageIds.push(r.storageId));
+    const result = { storageIds };
     return result;
   }
 
   async findManyWebtoonIdsByUserId(id: number) {
-    const webtoon_id_object_arr =
+    const webtoonIdObjectArr =
       await this.likeRepository.findManyWebtoonIdsByUserId(id);
     const webtoonIds = [];
-    webtoon_id_object_arr.forEach((r) => webtoonIds.push(r.webtoon_id));
+    webtoonIdObjectArr.forEach((r) => webtoonIds.push(r.webtoonId));
     const result = { webtoonIds };
     return result;
   }
 
   async findManyReviewIdsByUserId(id: number) {
-    const review_id_object_arr =
+    const reviewIdObjectArr =
       await this.likeRepository.findManyReviewIdsByUserId(id);
-    const review_ids = [];
-    review_id_object_arr.forEach((r) => review_ids.push(r.reviewId));
-    const result = { review_ids };
+    const reviewIds = [];
+    reviewIdObjectArr.forEach((r) => reviewIds.push(r.reviewId));
+    const result = { reviewIds };
     return result;
   }
 }
