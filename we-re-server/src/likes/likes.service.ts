@@ -98,6 +98,11 @@ export class LikesService {
     return await this.getLikeCount(addAndRemoveLikeDto);
   }
 
+  /**
+   * soft delete related like.
+   * @param addAndRemoveLikeDto
+   * @returns {Promise<ReadLikeInfoDto>}
+   */
   async softRemoveLike(
     addAndRemoveLikeDto: AddAndRemoveLikeDto,
   ): Promise<ReadLikeInfoDto> {
