@@ -2,12 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 const types = ['review', 'webtoon', 'storage'];
-export class AddAndRemoveLikeDto {
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
-
+export class LikeRequestDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -18,4 +13,11 @@ export class AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   targetId: number;
+}
+
+export class AddAndRemoveLikeDto extends LikeRequestDto {
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  userId: number;
 }
