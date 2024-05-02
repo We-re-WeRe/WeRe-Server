@@ -18,6 +18,7 @@ import { StoragesModule } from './storages/storages.module';
 import { WebtoonsModule } from './webtoons/webtoons.module';
 import { LikesModule } from './likes/likes.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     StoragesModule,
     WebtoonsModule,
     LikesModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
