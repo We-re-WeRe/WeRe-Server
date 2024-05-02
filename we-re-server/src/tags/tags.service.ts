@@ -10,31 +10,34 @@ export class TagsService {
   constructor(private readonly tagRepository: TagRepository) {}
   async findTagsByTargetId(
     targetType: TargetTypes,
-    reviewId: number,
+    targetId: number,
   ): Promise<ReadTagDto[]> {
     const queryResult = await this.tagRepository.findTagsByTargetId(
       targetType,
-      reviewId,
+      targetId,
     );
     const result = queryResult.map((r) => new ReadTagDto(r));
     return result;
   }
 
-  async checkIsDuplicate(
+  async getNotDuplicatedContents(
     targetType: TargetTypes,
     targetId: number,
     inputs: string[],
-  ): Promise<boolean> {
-    let FLAG = false;
+  ): Promise<string[]> {
+    const contents: string[] = [];
     const alreadyTags = await this.findTagsByTargetId(targetType, targetId);
-    for (const tag of alreadyTags) {
-      for (const input of inputs) {
+    for (const input of inputs) {
+      let FLAG = true;
+      for (const tag of alreadyTags) {
         if (tag.contents === input) {
-          FLAG = true;
-          return FLAG;
+          FLAG = false;
+          break;
         }
       }
+      Logger.log(FLAG, input);
+      if (FLAG) contents.push(input);
     }
-    return FLAG;
+    return contents;
   }
 }

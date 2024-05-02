@@ -27,7 +27,7 @@ export class TagsController {
     type: ReadTagDto,
   })
   @Get('tag-type/:tagType/target-id/:targetId')
-  findTagsByTargetId(
+  async findTagsByTargetId(
     @Param('tagType') tagType: TargetTypes,
     @Param('targetId') targetId: number,
   ) {
@@ -38,7 +38,7 @@ export class TagsController {
         throw new CustomBadTypeRequestException('tagType', tagType);
       if (!targetId)
         throw new CustomBadTypeRequestException('targetId', targetId);
-      return this.tagsService.findTagsByTargetId(tagType, targetId);
+      return await this.tagsService.findTagsByTargetId(tagType, targetId);
     } catch (error) {
       throw error;
     }
