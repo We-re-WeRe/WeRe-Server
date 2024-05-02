@@ -11,7 +11,6 @@ export class ReviewRepository extends Repository<Review> {
   public async findManyByUserId(userId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
       .where('review.user=:userId', { userId })
-      .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
         'review.id',
@@ -23,7 +22,6 @@ export class ReviewRepository extends Repository<Review> {
         'webtoon.author',
         'webtoon.painter',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
       .getRawMany();
   }
@@ -31,7 +29,6 @@ export class ReviewRepository extends Repository<Review> {
   public async findManyByWebtoonId(webtoonId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
       .where('review.webtoon_id=:webtoonId', { webtoonId })
-      .leftJoinAndSelect('review.likes', 'likes')
       .leftJoinAndSelect('review.user', 'user')
       .select([
         'review.id',
@@ -41,7 +38,6 @@ export class ReviewRepository extends Repository<Review> {
         'user.nickname',
         'user.imageURL',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('review.id')
       .getRawMany();
   }

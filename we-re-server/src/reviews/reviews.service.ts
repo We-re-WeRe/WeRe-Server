@@ -13,10 +13,15 @@ import {
   CustomDataBaseException,
   CustomNotFoundException,
 } from 'src/utils/custom_exceptions';
+import { LikesService } from 'src/likes/likes.service';
+import { AddAndRemoveLikeDto } from 'src/likes/dto/cud-like.dto';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly reviewRepository: ReviewRepository) {}
+  constructor(
+    private readonly reviewRepository: ReviewRepository,
+    private readonly likesService: LikesService,
+  ) {}
 
   /**
    * get user's reviews with webtoon info.
@@ -25,7 +30,18 @@ export class ReviewsService {
    */
   async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
     const queryResult = await this.reviewRepository.findManyByUserId(userId);
-    const result = queryResult.map((r) => new ReadReviewAndWebtoonDto(r));
+    const result = await Promise.all(
+      queryResult.map(async (r) => {
+        const temp = new ReadReviewAndWebtoonDto(r);
+        const addAndRemoveLikeDto = new AddAndRemoveLikeDto(
+          userId,
+          'review',
+          temp.id,
+        );
+        temp.like = await this.likesService.getLikeCount(addAndRemoveLikeDto);
+        return temp;
+      }),
+    );
     return result;
   }
 

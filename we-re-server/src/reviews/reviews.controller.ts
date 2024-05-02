@@ -42,7 +42,8 @@ export class ReviewsController {
   ): Promise<ReadReviewAndWebtoonDto[]> {
     try {
       if (!userId) throw new CustomBadTypeRequestException('userId', userId);
-      return await this.reviewsService.findManyByUserId(userId);
+      const result = await this.reviewsService.findManyByUserId(userId);
+      return result;
     } catch (error) {
       throw error;
     }

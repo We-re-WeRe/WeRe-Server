@@ -2,8 +2,10 @@ import { Module } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { ReviewsController } from './reviews.controller';
 import { ReviewRepository } from './reviews.repository';
+import { LikesModule } from 'src/likes/likes.module';
 
 @Module({
+  imports: [LikesModule],
   controllers: [ReviewsController],
   providers: [ReviewsService, ReviewRepository],
   exports: [ReviewsService],
