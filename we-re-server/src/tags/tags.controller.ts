@@ -13,11 +13,19 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
 import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ReadTagDto } from './dto/read-tag.dto';
 
+@ApiTags('Tags')
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
+  @ApiOperation({ summary: 'get Tag list at storage/review by each Id' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadTagDto,
+  })
   @Get('tag-type/:tagType/target-id/:targetId')
   findTagsByTargetId(
     @Param('tagType') tagType: TargetTypes,
