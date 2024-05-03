@@ -7,6 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
+import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
 export class ReadStorageBriefDto {
@@ -56,6 +57,11 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   @IsEnum(DISCLOSURESCOPE)
   @IsNotEmpty()
   disclosureScope: DisclosureScope;
+
+  @ApiProperty({ type: () => [ReadTagDto] })
+  @ValidateNested()
+  @IsNotEmpty()
+  tags: ReadTagDto[];
 
   @ApiProperty({ type: () => ReadUserBriefDto })
   @ValidateNested()

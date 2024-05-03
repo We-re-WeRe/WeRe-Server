@@ -43,7 +43,9 @@ export class TagsController {
     }
   }
 
-  @ApiOperation({ summary: 'get Tag list at storage/review by each Id' })
+  @ApiOperation({
+    summary: 'add and remove Tag list at storage/review by each Id',
+  })
   @ApiOkResponse({
     description: 'Request Success',
     type: ReadTagDto,

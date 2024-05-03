@@ -5,9 +5,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
+import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
 export class UpdateStorageDto {
   @ApiProperty()
@@ -35,4 +37,9 @@ export class UpdateStorageDto {
   @Transform(({ value }) => DISCLOSURESCOPE[value.toUpperCase()])
   @IsOptional()
   disclosureScope?: DisclosureScope;
+
+  @ApiProperty({ type: () => AddAndRemoveTagRequestDto })
+  @ValidateNested()
+  @IsNotEmpty()
+  addAndRemoveTagRequestDto: AddAndRemoveTagRequestDto;
 }
