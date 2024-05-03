@@ -9,8 +9,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { TagsService } from './tags.service';
-import { CreateTagDto } from './dto/create-tag.dto';
-import { UpdateTagDto } from './dto/update-tag.dto';
+import { AddAndRemoveTagRequestDto } from './dto/process-tag.dto';
 import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
 import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -39,6 +38,22 @@ export class TagsController {
       if (!targetId)
         throw new CustomBadTypeRequestException('targetId', targetId);
       return await this.tagsService.findTagsByTargetId(tagType, targetId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'get Tag list at storage/review by each Id' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadTagDto,
+  })
+  @Post()
+  async addAndRemoveTags(
+    @Body() addAndRemoveTagRequestDto: AddAndRemoveTagRequestDto,
+  ) {
+    try {
+      return await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
     } catch (error) {
       throw error;
     }
