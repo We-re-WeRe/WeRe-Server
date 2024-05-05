@@ -41,6 +41,6 @@ export class UpdateStorageDto {
 
   @ApiProperty({ type: () => [String] })
   @IsArray()
-  @IsNotEmpty()
+  @IsOptional()
   contentsArray?: string[];
 }

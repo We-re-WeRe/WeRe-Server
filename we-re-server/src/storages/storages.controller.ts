@@ -168,15 +168,17 @@ export class StoragesController {
       const result = await this.storagesService.updateStorage(
         tempUpdateStorageDto,
       );
-      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
-        TARGET_TYPES.STORAGE,
-        result.id,
-        contentsArray,
-      );
-      const createTagResult = await this.tagsService.addAndRemoveTag(
-        addAndRemoveTagRequestDto,
-      );
-      result.tags = createTagResult;
+      if (!!contentsArray) {
+        const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+          TARGET_TYPES.STORAGE,
+          result.id,
+          contentsArray,
+        );
+        const createTagResult = await this.tagsService.addAndRemoveTag(
+          addAndRemoveTagRequestDto,
+        );
+        result.tags = createTagResult;
+      }
       return result;
     } catch (error) {
       throw error;
