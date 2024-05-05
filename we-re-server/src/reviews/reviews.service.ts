@@ -13,10 +13,15 @@ import {
   CustomDataBaseException,
   CustomNotFoundException,
 } from 'src/utils/custom_exceptions';
+import { TagsService } from 'src/tags/tags.service';
+import { TARGET_TYPES } from 'src/utils/types_and_enums';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly reviewRepository: ReviewRepository) {}
+  constructor(
+    private readonly reviewRepository: ReviewRepository,
+    private readonly tagsService: TagsService,
+  ) {}
 
   /**
    * get user's reviews with webtoon info.
@@ -26,6 +31,15 @@ export class ReviewsService {
   async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
     const queryResult = await this.reviewRepository.findManyByUserId(userId);
     const result = queryResult.map((r) => new ReadReviewAndWebtoonDto(r));
+    await Promise.all(
+      result.map(
+        async (r) =>
+          (r.tags = await this.tagsService.findTagsByTargetId(
+            TARGET_TYPES.REVIEW,
+            r.id,
+          )),
+      ),
+    );
     return result;
   }
 
@@ -42,6 +56,15 @@ export class ReviewsService {
     );
     const result: ReadReviewAndUserDto[] = queryResult.map(
       (r) => new ReadReviewAndUserDto(r),
+    );
+    await Promise.all(
+      result.map(
+        async (r) =>
+          (r.tags = await this.tagsService.findTagsByTargetId(
+            TARGET_TYPES.REVIEW,
+            r.id,
+          )),
+      ),
     );
     return result;
   }
