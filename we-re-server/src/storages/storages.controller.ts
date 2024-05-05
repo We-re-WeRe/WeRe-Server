@@ -32,6 +32,9 @@ import {
   CustomBadTypeRequestException,
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
+import { TagsService } from 'src/tags/tags.service';
+import { TARGET_TYPES } from 'src/utils/types_and_enums';
+import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
 @ApiTags('Storages')
 @Controller('storages')
@@ -40,6 +43,7 @@ export class StoragesController {
     private readonly storagesService: StoragesService,
     private readonly likesService: LikesService,
     private readonly userService: UsersService,
+    private readonly tagsService: TagsService,
   ) {}
 
   @ApiOperation({ summary: 'get Storage detail' })
@@ -54,6 +58,11 @@ export class StoragesController {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       const result = await this.storagesService.findOneDetailById(id);
+      const readTagDtoArray = await this.tagsService.findTagsByTargetId(
+        TARGET_TYPES.STORAGE,
+        id,
+      );
+      result.tags = readTagDtoArray;
       const readUserBriefDto = await this.userService.findOneBriefById(
         result.user.getId(),
       );
@@ -126,7 +135,22 @@ export class StoragesController {
   ): Promise<ReadStorageDetailDto> {
     try {
       // TODO:: create data 조건 해야함.
-      return await this.storagesService.createStorage(createStorageDto);
+      const { tags, ...tempCreateStorageDto } = createStorageDto;
+      const result = await this.storagesService.createStorage(
+        tempCreateStorageDto,
+      );
+      if (!!tags) {
+        const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+          TARGET_TYPES.STORAGE,
+          result.id,
+          tags,
+        );
+        const createTagResult = await this.tagsService.addAndRemoveTag(
+          addAndRemoveTagRequestDto,
+        );
+        result.tags = createTagResult;
+      }
+      return result;
     } catch (error) {
       throw error;
     }
@@ -143,7 +167,22 @@ export class StoragesController {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       if (id !== updateStorageDto.id)
         throw new CustomUnauthorziedException(`id is wrong.`);
-      return await this.storagesService.updateStorage(updateStorageDto);
+      const { tags: contentsArray, ...tempUpdateStorageDto } = updateStorageDto;
+      const result = await this.storagesService.updateStorage(
+        tempUpdateStorageDto,
+      );
+      if (!!contentsArray) {
+        const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+          TARGET_TYPES.STORAGE,
+          result.id,
+          contentsArray,
+        );
+        const createTagResult = await this.tagsService.addAndRemoveTag(
+          addAndRemoveTagRequestDto,
+        );
+        result.tags = createTagResult;
+      }
+      return result;
     } catch (error) {
       throw error;
     }

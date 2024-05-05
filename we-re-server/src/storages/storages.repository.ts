@@ -124,11 +124,12 @@ export class StorageRepository extends Repository<Storage> {
   }
 
   public async createStorage(createStorageDto: CreateStorageDto) {
+    const { tags, ...tempCreateStorageDto } = createStorageDto;
     return await this.createQueryBuilder()
       .insert()
       .into(Storage)
       .values({
-        ...createStorageDto,
+        ...tempCreateStorageDto,
         user: () => createStorageDto.userId,
       })
       .execute();
