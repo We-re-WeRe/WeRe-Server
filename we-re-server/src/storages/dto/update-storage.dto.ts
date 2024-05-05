@@ -10,7 +10,6 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
-import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
 export class UpdateStorageDto {
   @ApiProperty()
@@ -42,5 +41,5 @@ export class UpdateStorageDto {
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
-  contentsArray?: string[];
+  tags?: string[];
 }

@@ -154,14 +154,15 @@ export class StoragesService {
   async updateStorage(
     updateStorageDto: UpdateStorageDto,
   ): Promise<ReadStorageDetailDto> {
+    const { tags, ...tempUpdateStorageDto } = updateStorageDto;
     const queryResult = await this.storageRepository.update(
-      updateStorageDto.id,
-      updateStorageDto,
+      tempUpdateStorageDto.id,
+      tempUpdateStorageDto,
     );
     if (!queryResult.affected) {
       throw new CustomNotFoundException('id');
     }
-    const result = await this.findOneDetailById(updateStorageDto.id);
+    const result = await this.findOneDetailById(tempUpdateStorageDto.id);
     return result;
   }
 

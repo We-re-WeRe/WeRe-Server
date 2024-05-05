@@ -41,5 +41,5 @@ export class CreateStorageDto {
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
-  contentsArray?: string[];
+  tags?: string[];
 }

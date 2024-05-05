@@ -87,7 +87,7 @@ export class ReviewsService {
         'This User already has a Review for this Webtoon.',
       );
     }
-    const { tags: contentsArray, ...tempCreateReviewDto } = createReviewDto;
+    const { tags, ...tempCreateReviewDto } = createReviewDto;
     const queryResult = await this.reviewRepository.createReview(
       tempCreateReviewDto,
     );
@@ -96,11 +96,11 @@ export class ReviewsService {
       throw new CustomDataBaseException('create is not worked.');
     }
     const result = await this.reviewRepository.findOneBy({ id });
-    if (!!contentsArray) {
+    if (!!tags) {
       const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
         TARGET_TYPES.REVIEW,
         id,
-        contentsArray,
+        tags,
       );
       await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
     }
@@ -113,7 +113,7 @@ export class ReviewsService {
    * @returns {Promise<Review>}
    */
   async updateReview(updateReviewDto: UpdateReviewDto): Promise<Review> {
-    const { tags: contentsArray, ...tempUpdateReviewDto } = updateReviewDto;
+    const { tags, ...tempUpdateReviewDto } = updateReviewDto;
     const queryResult = await this.reviewRepository.update(
       tempUpdateReviewDto.id,
       tempUpdateReviewDto,
@@ -124,11 +124,11 @@ export class ReviewsService {
     const result = await this.reviewRepository.findOneBy({
       id: tempUpdateReviewDto.id,
     });
-    if (!!contentsArray) {
+    if (!!tags) {
       const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
         TARGET_TYPES.REVIEW,
         result.id,
-        contentsArray,
+        tags,
       );
       await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
     }

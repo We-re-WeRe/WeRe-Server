@@ -135,12 +135,15 @@ export class StoragesController {
   ): Promise<ReadStorageDetailDto> {
     try {
       // TODO:: create data 조건 해야함.
-      const result = await this.storagesService.createStorage(createStorageDto);
-      if (!!createStorageDto.contentsArray) {
+      const { tags, ...tempCreateStorageDto } = createStorageDto;
+      const result = await this.storagesService.createStorage(
+        tempCreateStorageDto,
+      );
+      if (!!tags) {
         const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
           TARGET_TYPES.STORAGE,
           result.id,
-          createStorageDto.contentsArray,
+          tags,
         );
         const createTagResult = await this.tagsService.addAndRemoveTag(
           addAndRemoveTagRequestDto,
@@ -164,7 +167,7 @@ export class StoragesController {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       if (id !== updateStorageDto.id)
         throw new CustomUnauthorziedException(`id is wrong.`);
-      const { contentsArray, ...tempUpdateStorageDto } = updateStorageDto;
+      const { tags: contentsArray, ...tempUpdateStorageDto } = updateStorageDto;
       const result = await this.storagesService.updateStorage(
         tempUpdateStorageDto,
       );
