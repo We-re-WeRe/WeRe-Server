@@ -15,6 +15,7 @@ import {
 } from 'src/utils/custom_exceptions';
 import { TagsService } from 'src/tags/tags.service';
 import { TARGET_TYPES } from 'src/utils/types_and_enums';
+import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -86,14 +87,23 @@ export class ReviewsService {
         'This User already has a Review for this Webtoon.',
       );
     }
+    const { tags: contentsArray, ...tempCreateReviewDto } = createReviewDto;
     const queryResult = await this.reviewRepository.createReview(
-      createReviewDto,
+      tempCreateReviewDto,
     );
     const id = queryResult.identifiers[0].id;
     if (!id) {
       throw new CustomDataBaseException('create is not worked.');
     }
-    const result = await this.reviewRepository.findOneBy(id);
+    const result = await this.reviewRepository.findOneBy({ id });
+    if (!!contentsArray) {
+      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+        TARGET_TYPES.REVIEW,
+        id,
+        contentsArray,
+      );
+      await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
+    }
     return result;
   }
 
@@ -103,16 +113,25 @@ export class ReviewsService {
    * @returns {Promise<Review>}
    */
   async updateReview(updateReviewDto: UpdateReviewDto): Promise<Review> {
+    const { tags: contentsArray, ...tempUpdateReviewDto } = updateReviewDto;
     const queryResult = await this.reviewRepository.update(
-      updateReviewDto.id,
-      updateReviewDto,
+      tempUpdateReviewDto.id,
+      tempUpdateReviewDto,
     );
     if (!queryResult.affected) {
       throw new CustomNotFoundException('id');
     }
     const result = await this.reviewRepository.findOneBy({
-      id: updateReviewDto.id,
+      id: tempUpdateReviewDto.id,
     });
+    if (!!contentsArray) {
+      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+        TARGET_TYPES.REVIEW,
+        result.id,
+        contentsArray,
+      );
+      await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
+    }
     return result;
   }
 

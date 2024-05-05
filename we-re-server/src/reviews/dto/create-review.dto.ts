@@ -31,5 +31,5 @@ export class CreateReviewDto {
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
-  contentsArray?: string[];
+  tags?: string[];
 }

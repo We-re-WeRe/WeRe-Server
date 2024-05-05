@@ -26,5 +26,5 @@ export class UpdateReviewDto {
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
-  contentsArray?: string[];
+  tags?: string[];
 }
