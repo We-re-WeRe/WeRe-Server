@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { ReadWebtoonDto } from 'src/webtoons/dto/read-webtoon.dto';
 
@@ -26,6 +27,11 @@ export class ReadReviewDto {
   @IsInt()
   @IsNotEmpty()
   totalLikes: number;
+
+  @ApiProperty({ type: () => [ReadTagDto] })
+  @ValidateNested()
+  @IsNotEmpty()
+  tags: ReadTagDto[];
 
   public rawToDto(raw: any) {
     this.id = raw.review_id;
