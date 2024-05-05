@@ -53,7 +53,6 @@ export class TagsService {
     for (const tag of alreadyTags) {
       if (!notDeleteIds.has(tag.id)) addAndRemoveTagDto.addDeleteId(tag.id);
     }
-    Logger.log([...addAndRemoveTagDto.contentsArray]);
     if (
       alreadyTags.length -
         addAndRemoveTagDto.deleteIds.length +

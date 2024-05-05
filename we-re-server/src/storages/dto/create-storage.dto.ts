@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
 import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
@@ -31,8 +38,8 @@ export class CreateStorageDto {
   @IsNotEmpty()
   userId: string;
 
-  @ApiProperty({ type: () => AddAndRemoveTagRequestDto })
-  @ValidateNested()
-  @IsNotEmpty()
-  addAndRemoveTagRequestDto: AddAndRemoveTagRequestDto;
+  @ApiProperty({ type: () => [String] })
+  @IsArray()
+  @IsOptional()
+  contentsArray?: string[];
 }

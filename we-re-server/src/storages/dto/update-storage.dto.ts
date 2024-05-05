@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -38,8 +39,8 @@ export class UpdateStorageDto {
   @IsOptional()
   disclosureScope?: DisclosureScope;
 
-  @ApiProperty({ type: () => AddAndRemoveTagRequestDto })
-  @ValidateNested()
+  @ApiProperty({ type: () => [String] })
+  @IsArray()
   @IsNotEmpty()
-  addAndRemoveTagRequestDto: AddAndRemoveTagRequestDto;
+  contentsArray?: string[];
 }
