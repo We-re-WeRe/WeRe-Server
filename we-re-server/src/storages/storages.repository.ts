@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Storage,
-  DISCLOSURESCOPE,
-  DisclosureScope,
-} from 'src/entities/storage.entity';
+import { Storage } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
@@ -23,7 +19,7 @@ export class StorageRepository extends Repository<Storage> {
         'storage.imageURL',
         'storage.name',
         'storage.explain',
-        'storage.disclosureScope',
+        'storage.isPublic',
         'storage.user_id',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
@@ -33,13 +29,11 @@ export class StorageRepository extends Repository<Storage> {
 
   public async findManyPublicStorageList() {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
-        'storage.created_at',
+        'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
@@ -51,14 +45,12 @@ export class StorageRepository extends Repository<Storage> {
 
   public async findManyPublicStorageListByIds(ids: number[]) {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .andWhere('storage.id IN (:...ids)', { ids })
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
-        'storage.created_at',
+        'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
@@ -68,19 +60,17 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
-  public async findManyStorageListByUserId(
-    userId: number,
-    disclosureScope: DisclosureScope[],
-  ) {
-    return await this.createQueryBuilder('storage')
-      .where('storage.user=:userId', { userId })
-      .andWhere('storage.disclosureScope IN (:...disclosureScope)', {
-        disclosureScope,
-      })
+  public async findManyStorageListByUserId(userId: number, isMe: boolean) {
+    const qb = this.createQueryBuilder('storage').where(
+      'storage.user=:userId',
+      { userId },
+    );
+    if (!isMe) qb.andWhere('storage.isPublic=true');
+    return await qb
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
-        'storage.created_at',
+        'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
@@ -92,9 +82,7 @@ export class StorageRepository extends Repository<Storage> {
 
   public async findManyPublicListByWebtoonId(webtoonId: number) {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .leftJoinAndSelect('storage.likes', 'likes')
       .leftJoinAndSelect(
         'storage.webtoons',
