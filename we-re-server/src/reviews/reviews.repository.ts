@@ -51,8 +51,8 @@ export class ReviewRepository extends Repository<Review> {
       .insert()
       .into(Review)
       .values({
-        user: () => createReviewDto.userId,
-        webtoon: () => createReviewDto.webtoonId,
+        user: () => createReviewDto.getStringUserId(),
+        webtoon: () => createReviewDto.getStringWebtoonId(),
         contents: createReviewDto.contents,
         starPoint: createReviewDto.starPoint,
       })
