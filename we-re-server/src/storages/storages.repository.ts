@@ -19,6 +19,7 @@ export class StorageRepository extends Repository<Storage> {
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
+        'storage.createdAt',
         'storage.imageURL',
         'storage.name',
         'storage.explain',
@@ -36,7 +37,12 @@ export class StorageRepository extends Repository<Storage> {
         disclosureScope: DISCLOSURESCOPE.PUBLIC,
       })
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.created_at',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
@@ -50,7 +56,12 @@ export class StorageRepository extends Repository<Storage> {
       })
       .andWhere('storage.id IN (:...ids)', { ids })
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.created_at',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
@@ -67,7 +78,12 @@ export class StorageRepository extends Repository<Storage> {
         disclosureScope,
       })
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.created_at',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')

@@ -27,6 +27,7 @@ export class StoragesService {
    */
   async findOneDetailById(id: number): Promise<ReadStorageDetailDto> {
     const queryResult = await this.storageRepository.findOneDetailById(id);
+    Logger.log(JSON.stringify(queryResult));
     if (!queryResult) throw new CustomNotFoundException('storageId');
     const result = new ReadStorageDetailDto(queryResult);
     return result;
