@@ -2,9 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { StorageRepository } from './storages.repository';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
-import { UserRepository } from 'src/users/users.repository';
-import { UsersService } from 'src/users/users.service';
 import {
   ReadStorageBriefDto,
   ReadStorageDetailDto,
@@ -26,6 +23,7 @@ export class StoragesService {
    * @returns storage detail and user brief info
    */
   async findOneDetailById(id: number): Promise<ReadStorageDetailDto> {
+    // user id와 storage user id 비교해서 ispublic이랑 조건이 맞을 때만 반환해야게따
     const queryResult = await this.storageRepository.findOneDetailById(id);
     Logger.log(JSON.stringify(queryResult));
     if (!queryResult) throw new CustomNotFoundException('storageId');
@@ -56,15 +54,8 @@ export class StoragesService {
   ): Promise<ReadStorageBriefDto[]> {
     //TODO:: disclosure scope 유저 login service에서 본인 판단 후 인자로 전달해줘야함.
     const isMe = false;
-    const disclosureScope = isMe
-      ? [DISCLOSURESCOPE.PUBLIC, DISCLOSURESCOPE.PRIVATE]
-      : [DISCLOSURESCOPE.PUBLIC];
-
     const queryResult =
-      await this.storageRepository.findManyStorageListByUserId(
-        userId,
-        disclosureScope,
-      );
+      await this.storageRepository.findManyStorageListByUserId(userId, isMe);
     const result: ReadStorageBriefDto[] = queryResult.map(
       (r) => new ReadStorageBriefDto(r),
     );
