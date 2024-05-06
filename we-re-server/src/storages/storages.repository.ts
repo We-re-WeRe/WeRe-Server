@@ -130,7 +130,7 @@ export class StorageRepository extends Repository<Storage> {
       .into(Storage)
       .values({
         ...tempCreateStorageDto,
-        user: () => createStorageDto.userId,
+        user: () => createStorageDto.getStringUserId(),
       })
       .execute();
   }
