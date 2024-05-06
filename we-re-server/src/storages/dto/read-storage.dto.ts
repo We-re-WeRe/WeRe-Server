@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDate,
-  IsEnum,
   IsInt,
   IsNotEmpty,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
 import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
@@ -61,9 +60,9 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   explain: string;
 
   @ApiProperty()
-  @IsEnum(DISCLOSURESCOPE)
+  @IsBoolean()
   @IsNotEmpty()
-  disclosureScope: DisclosureScope;
+  isPublic: boolean;
 
   @ApiProperty({ type: () => [ReadTagDto] })
   @ValidateNested()
@@ -78,7 +77,7 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   public rawToDto(raw: any): ReadStorageDetailDto {
     super.rawToDto(raw);
     this.explain = raw.storage_explain;
-    this.disclosureScope = raw.storage_disclosure_scope;
+    this.isPublic = raw.storage_is_public;
     this.user = new ReadUserBriefDto(raw);
     return this;
   }

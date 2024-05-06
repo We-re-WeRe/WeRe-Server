@@ -12,14 +12,6 @@ import { Tag } from './tag.entity';
 import { Like } from './like.entity';
 import { Webtoon } from './webtoon.entity';
 
-export const DISCLOSURESCOPE = {
-  PRIVATE: 'pri',
-  PUBLIC: 'pub',
-} as const;
-
-export type DisclosureScope =
-  (typeof DISCLOSURESCOPE)[keyof typeof DISCLOSURESCOPE];
-
 @Entity()
 export class Storage extends DefaultEntity {
   @Column({ type: 'varchar', length: 20 })
@@ -31,8 +23,8 @@ export class Storage extends DefaultEntity {
   @Column({ type: 'varchar' })
   explain: string;
 
-  @Column({ type: 'varchar', length: 3 })
-  disclosureScope: DisclosureScope;
+  @Column({ type: 'tinyint', width: 1 })
+  isPublic: boolean;
 
   @ManyToOne(() => User, {
     cascade: true,

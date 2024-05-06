@@ -1,15 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
-  IsEnum,
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
 
 export class UpdateStorageDto {
   @ApiProperty()
@@ -33,10 +30,9 @@ export class UpdateStorageDto {
   explain?: string;
 
   @ApiProperty()
-  @IsEnum(DISCLOSURESCOPE)
-  @Transform(({ value }) => DISCLOSURESCOPE[value.toUpperCase()])
+  @IsBoolean()
   @IsOptional()
-  disclosureScope?: DisclosureScope;
+  isPublic?: boolean;
 
   @ApiProperty({ type: () => [String] })
   @IsArray()

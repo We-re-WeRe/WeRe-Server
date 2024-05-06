@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -9,8 +10,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
-import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 
 export class CreateStorageDto {
   @ApiProperty()
@@ -29,10 +28,9 @@ export class CreateStorageDto {
   explain: string;
 
   @ApiProperty()
-  @IsEnum(DISCLOSURESCOPE)
-  @Transform(({ value }) => DISCLOSURESCOPE[value.toUpperCase()])
+  @IsBoolean()
   @IsNotEmpty()
-  disclosureScope: DisclosureScope;
+  isPublic: boolean;
 
   @ApiProperty()
   @IsInt()
