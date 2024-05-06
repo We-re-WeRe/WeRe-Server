@@ -78,8 +78,8 @@ export class ReviewsService {
   async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
     const alreadyReview = await this.reviewRepository.findOne({
       where: {
-        user: { id: +createReviewDto.userId },
-        webtoon: { id: +createReviewDto.webtoonId },
+        user: { id: createReviewDto.userId },
+        webtoon: { id: createReviewDto.webtoonId },
       },
     });
     if (alreadyReview) {
@@ -87,9 +87,9 @@ export class ReviewsService {
         'This User already has a Review for this Webtoon.',
       );
     }
-    const { tags, ...tempCreateReviewDto } = createReviewDto;
+    const { tags } = createReviewDto;
     const queryResult = await this.reviewRepository.createReview(
-      tempCreateReviewDto,
+      createReviewDto,
     );
     const id = queryResult.identifiers[0].id;
     if (!id) {

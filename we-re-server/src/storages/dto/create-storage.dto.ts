@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -34,12 +35,16 @@ export class CreateStorageDto {
   disclosureScope: DisclosureScope;
 
   @ApiProperty()
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
   tags?: string[];
+
+  public getStringUserId() {
+    return `${this.userId}`;
+  }
 }

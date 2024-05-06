@@ -19,17 +19,25 @@ export class CreateReviewDto {
   starPoint: number;
 
   @ApiProperty()
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 
   @ApiProperty()
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  webtoonId: string;
+  webtoonId: number;
 
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
   tags?: string[];
+
+  public getStringUserId(): string {
+    return `${this.userId}`;
+  }
+
+  public getStringWebtoonId(): string {
+    return `${this.webtoonId}`;
+  }
 }
