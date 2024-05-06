@@ -46,6 +46,7 @@ export class ReadReviewDto {
 
   public rawToDto(raw: any) {
     this.id = raw.review_id;
+    this.createdAt = raw.review_created_at;
     this.contents = raw.review_contents;
     this.starPoint = raw.review_star_point;
     this.totalLikes = raw.totalLikes;
