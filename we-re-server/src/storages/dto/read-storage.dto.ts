@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDate,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -18,6 +19,11 @@ export class ReadStorageBriefDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
+
+  @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
+  createdAt: Date;
 
   @ApiProperty()
   @IsString()
