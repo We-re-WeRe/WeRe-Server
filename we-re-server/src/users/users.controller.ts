@@ -66,6 +66,11 @@ export class UsersController {
     }
   }
 
+  @ApiOperation({ summary: 'check this nickname is used.' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: Boolean,
+  })
   @Get('check/nickname/:nickname')
   async checkNicknameIsUsed(
     @Param('nickname') nickname: string,
