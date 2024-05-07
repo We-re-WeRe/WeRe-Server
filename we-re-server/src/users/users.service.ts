@@ -8,7 +8,10 @@ import {
   ReadUserDto,
 } from './dto/read-user.dto';
 import { FollowDto } from './dto/follow.dto';
-import { CustomNotFoundException } from 'src/utils/custom_exceptions';
+import {
+  CustomDataBaseException,
+  CustomNotFoundException,
+} from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UsersService {
@@ -42,6 +45,27 @@ export class UsersService {
     if (!queryResult) throw new CustomNotFoundException('userId');
     const result: ReadUserBriefDto = new ReadUserBriefDto(queryResult);
     return result;
+  }
+
+  /**
+   * checking service nickname is duplicated.
+   * @param nickname
+   * @returns
+   */
+  async checkNicknameIsUsed(nickname: string): Promise<boolean> {
+    const queryResult = await this.userRepository.getIdByNickname(nickname);
+    return !!queryResult;
+  }
+  /**
+   * create user info service.
+   * @param createUserDto
+   * @returns
+   */
+  async createUserInfo(createUserDto: CreateUserDto): Promise<number> {
+    const queryResult = await this.userRepository.createUserInfo(createUserDto);
+    const id = queryResult.identifiers[0].id;
+    if (!!!id) throw new CustomDataBaseException('create user is not worked');
+    return id;
   }
 
   /**

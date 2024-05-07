@@ -66,6 +66,33 @@ export class UsersController {
     }
   }
 
+  @Get('check/nickname/:nickname')
+  async checkNicknameIsUsed(
+    @Param('nickname') nickname: string,
+  ): Promise<boolean> {
+    try {
+      const result = this.usersService.checkNicknameIsUsed(nickname);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'create User information and Return User id' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: Number,
+  })
+  @Post()
+  async createUserInfo(@Body() createUserDto: CreateUserDto): Promise<number> {
+    try {
+      const result = await this.usersService.createUserInfo(createUserDto);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @ApiOperation({ summary: 'User followed target id' })
   @ApiCreatedResponse({
     description: 'Request Success',
@@ -108,6 +135,7 @@ export class UsersController {
       throw error;
     }
   }
+
   @ApiOperation({ summary: 'User unfollowed target id' })
   @ApiNoContentResponse({
     description: 'Request Success',
