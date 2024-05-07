@@ -11,11 +11,14 @@ export type Sex = (typeof SEX)[keyof typeof SEX];
 
 @Entity()
 export class User extends DefaultEntity {
-  @Column({ type: 'varchar' })
-  imageURL: string;
+  @Column({ type: 'varchar', nullable: true })
+  imageURL?: string;
 
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ type: 'varchar', length: 20 })
   nickname: string;
+
+  @Column({ type: 'varchar', length: 20 })
+  name: string;
 
   @Column({ type: 'char', length: 1 })
   sex: Sex;

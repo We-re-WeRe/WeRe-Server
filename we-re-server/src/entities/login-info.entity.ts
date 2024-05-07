@@ -10,14 +10,14 @@ export class LoginInfo extends DefaultEntity {
   @Column({ type: 'varchar', length: 16 })
   password: string;
 
-  @Column({ type: 'varchar' })
-  kakao: string;
+  @Column({ type: 'varchar', nullable: true })
+  kakao?: string;
 
-  @Column({ type: 'varchar' })
-  naver: string;
+  @Column({ type: 'varchar', nullable: true })
+  naver?: string;
 
-  @Column({ type: 'varchar' })
-  google: string;
+  @Column({ type: 'varchar', nullable: true })
+  google?: string;
 
   @OneToOne(() => User)
   user: User;
