@@ -19,6 +19,7 @@ import { WebtoonsModule } from './webtoons/webtoons.module';
 import { LikesModule } from './likes/likes.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { TagsModule } from './tags/tags.module';
+import { LogInModule } from './log-in/log-in.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { TagsModule } from './tags/tags.module';
     WebtoonsModule,
     LikesModule,
     TagsModule,
+    LogInModule,
   ],
   controllers: [AppController],
   providers: [AppService],
