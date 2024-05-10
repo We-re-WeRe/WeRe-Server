@@ -1,6 +1,15 @@
-import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import DefaultEntity from './default.entity';
 import { Point } from './point.entity';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { LoginInfo } from './login-info.entity';
 
 export const SEX = {
   MALE: 'M',
@@ -46,4 +55,15 @@ export class User extends DefaultEntity {
 
   @OneToMany(() => Point, (points) => points.user)
   points: Point[];
+
+  @OneToOne(() => LoginInfo, { cascade: true })
+  loginInfo: LoginInfo;
+
+  public create(createUserDto: CreateUserDto) {
+    this.nickname = createUserDto.nickname;
+    this.name = createUserDto.name;
+    this.sex = createUserDto.sex;
+    this.birth = createUserDto.birth;
+    return this;
+  }
 }
