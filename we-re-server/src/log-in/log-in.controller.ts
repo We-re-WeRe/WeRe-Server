@@ -12,6 +12,7 @@ import { LogInService } from './log-in.service';
 import { CreateLocalLoginInfoDto } from './dto/create-log-in.dto';
 import { UpdateLogInDto } from './dto/update-log-in.dto';
 import { LocalLoginInfoDto } from './dto/log-in.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Controller('log-in')
 export class LogInController {
@@ -23,8 +24,17 @@ export class LogInController {
   ): Promise<boolean> {
     return await this.logInService.checkIsDuplicatedName(account);
   }
+
   @Post()
   async login(@Body() localLoginInfoDto: LocalLoginInfoDto) {
-    return;
+    try {
+      const result = await this.logInService.login(localLoginInfoDto);
+      if (!result) {
+        throw new CustomNotFoundException('log-in information');
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 }
