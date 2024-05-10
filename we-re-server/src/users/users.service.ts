@@ -12,6 +12,8 @@ import {
   CustomDataBaseException,
   CustomNotFoundException,
 } from 'src/utils/custom_exceptions';
+import { User } from 'src/entities/user.entity';
+import { LoginInfo } from 'src/entities/login-info.entity';
 
 @Injectable()
 export class UsersService {
@@ -61,9 +63,14 @@ export class UsersService {
    * @param createUserDto
    * @returns
    */
-  async createUserInfo(createUserDto: CreateUserDto): Promise<number> {
-    const queryResult = await this.userRepository.createUserInfo(createUserDto);
-    const id = queryResult.identifiers[0].id;
+  async createUserAndLoginInfo(createUserDto: CreateUserDto): Promise<number> {
+    const user = new User();
+    user.create(createUserDto);
+    const { loginInfo: createLoginInfo } = createUserDto;
+    user.loginInfo = new LoginInfo();
+    user.loginInfo.create(createLoginInfo);
+    const queryResult = await this.userRepository.createUserAndLoginInfo(user);
+    const id = queryResult.id;
     if (!!!id) throw new CustomDataBaseException('create user is not worked');
     return id;
   }

@@ -8,8 +8,10 @@ import {
   IsNotEmpty,
   IsString,
   Validate,
+  ValidateNested,
 } from 'class-validator';
 import { SEX, Sex } from 'src/entities/user.entity';
+import { CreateLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -35,4 +37,9 @@ export class CreateUserDto {
   @IsDate()
   @IsNotEmpty()
   birth: Date;
+
+  @ApiProperty()
+  @ValidateNested()
+  @IsNotEmpty()
+  loginInfo: CreateLoginInfoDto;
 }

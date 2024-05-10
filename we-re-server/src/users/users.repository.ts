@@ -51,15 +51,11 @@ export class UserRepository extends Repository<User> {
 
   /**
    * create user info
-   * @param createUserDto
+   * @param user
    * @returns
    */
-  public async createUserInfo(createUserDto: CreateUserDto) {
-    return await this.createQueryBuilder()
-      .insert()
-      .into(User)
-      .values(createUserDto)
-      .execute();
+  public async createUserAndLoginInfo(user: User) {
+    return await this.dataSource.manager.save(user);
   }
 
   public async createFollowRelation(followDto: FollowDto) {
