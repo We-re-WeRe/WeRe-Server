@@ -1,7 +1,7 @@
 import { Entity, Column, OneToOne } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { User } from './user.entity';
-import { CreateLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
+import { CreateLocalLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
 
 @Entity()
 export class LoginInfo extends DefaultEntity {
@@ -23,8 +23,8 @@ export class LoginInfo extends DefaultEntity {
   @OneToOne(() => User, { cascade: true })
   user: User;
 
-  public create(createLoginInfoDto: CreateLoginInfoDto) {
-    this.account = createLoginInfoDto.account;
-    this.password = createLoginInfoDto.password;
+  public create(createLocalLoginInfoDto: CreateLocalLoginInfoDto) {
+    this.account = createLocalLoginInfoDto.account;
+    this.password = createLocalLoginInfoDto.password;
   }
 }

@@ -1,14 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { LocalLoginInfoDto } from './log-in.dto';
 
-export class CreateLoginInfoDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  account: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-}
+export class CreateLocalLoginInfoDto extends LocalLoginInfoDto {}

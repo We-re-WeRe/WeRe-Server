@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { SEX, Sex } from 'src/entities/user.entity';
-import { CreateLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
+import { CreateLocalLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -41,5 +41,5 @@ export class CreateUserDto {
   @ApiProperty()
   @ValidateNested()
   @IsNotEmpty()
-  loginInfo: CreateLoginInfoDto;
+  loginInfo: CreateLocalLoginInfoDto;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LoginInfo } from 'src/entities/login-info.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CreateLoginInfoDto } from './dto/create-log-in.dto';
+import { CreateLocalLoginInfoDto } from './dto/create-log-in.dto';
 
 @Injectable()
 export class LogInRepository extends Repository<LoginInfo> {
