@@ -25,4 +25,8 @@ export class LogInRepository extends Repository<LoginInfo> {
       .select(['login.id'])
       .getOne();
   }
+
+  public async createUserAndLoginInfo(loginInfo: LoginInfo) {
+    return await this.dataSource.manager.save(loginInfo);
+  }
 }

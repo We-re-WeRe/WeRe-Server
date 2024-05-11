@@ -37,9 +37,4 @@ export class CreateUserDto {
   @IsDate()
   @IsNotEmpty()
   birth: Date;
-
-  @ApiProperty()
-  @ValidateNested()
-  @IsNotEmpty()
-  loginInfo: CreateLocalLoginInfoDto;
 }

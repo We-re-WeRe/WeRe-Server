@@ -91,9 +91,7 @@ export class UsersController {
   @Post()
   async createUserInfo(@Body() createUserDto: CreateUserDto): Promise<number> {
     try {
-      const result = await this.usersService.createUserAndLoginInfo(
-        createUserDto,
-      );
+      const result = await this.usersService.createUserInfo(createUserDto);
       return result;
     } catch (error) {
       throw error;

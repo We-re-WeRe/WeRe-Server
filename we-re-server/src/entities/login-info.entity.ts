@@ -26,5 +26,7 @@ export class LoginInfo extends DefaultEntity {
   public create(createLocalLoginInfoDto: CreateLocalLoginInfoDto) {
     this.account = createLocalLoginInfoDto.account;
     this.password = createLocalLoginInfoDto.password;
+    this.user = new User();
+    this.user.create(createLocalLoginInfoDto.user);
   }
 }
