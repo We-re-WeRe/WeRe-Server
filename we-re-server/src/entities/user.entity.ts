@@ -9,7 +9,6 @@ import {
 import DefaultEntity from './default.entity';
 import { Point } from './point.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { LoginInfo } from './login-info.entity';
 
 export const SEX = {
   MALE: 'M',
@@ -55,9 +54,6 @@ export class User extends DefaultEntity {
 
   @OneToMany(() => Point, (points) => points.user)
   points: Point[];
-
-  @OneToOne(() => LoginInfo, { cascade: true })
-  loginInfo: LoginInfo;
 
   public create(createUserDto: CreateUserDto) {
     this.nickname = createUserDto.nickname;

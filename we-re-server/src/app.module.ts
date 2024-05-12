@@ -10,7 +10,7 @@ import { Storage } from './entities/storage.entity';
 import { Point } from './entities/point.entity';
 import { Tag } from './entities/tag.entity';
 import { Like } from './entities/like.entity';
-import { LoginInfo } from './entities/login-info.entity';
+import { Auth } from './entities/auth.entity';
 import { UsersModule } from './users/users.module';
 import { PointsModule } from './points/points.module';
 import { ReviewsModule } from './reviews/reviews.module';
@@ -19,7 +19,7 @@ import { WebtoonsModule } from './webtoons/webtoons.module';
 import { LikesModule } from './likes/likes.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { TagsModule } from './tags/tags.module';
-import { LogInModule } from './log-in/log-in.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { LogInModule } from './log-in/log-in.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Review, Webtoon, Storage, Point, Tag, Like, LoginInfo],
+      entities: [User, Review, Webtoon, Storage, Point, Tag, Like, Auth],
       synchronize: process.env.NODE_ENV !== 'production',
       namingStrategy: new SnakeNamingStrategy(),
     }),
@@ -44,7 +44,7 @@ import { LogInModule } from './log-in/log-in.module';
     WebtoonsModule,
     LikesModule,
     TagsModule,
-    LogInModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,10 +1,10 @@
 import { Entity, Column, OneToOne } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { User } from './user.entity';
-import { CreateLocalLoginInfoDto } from 'src/log-in/dto/create-log-in.dto';
+import { CreateLocalAuthDto } from 'src/auth/dto/create-auth.dto';
 
 @Entity()
-export class LoginInfo extends DefaultEntity {
+export class Auth extends DefaultEntity {
   @Column({ type: 'varchar', length: 20, unique: true })
   account: string;
 
@@ -23,10 +23,10 @@ export class LoginInfo extends DefaultEntity {
   @OneToOne(() => User, { cascade: true })
   user: User;
 
-  public create(createLocalLoginInfoDto: CreateLocalLoginInfoDto) {
-    this.account = createLocalLoginInfoDto.account;
-    this.password = createLocalLoginInfoDto.password;
+  public create(createLocalAuthDto: CreateLocalAuthDto) {
+    this.account = createLocalAuthDto.account;
+    this.password = createLocalAuthDto.password;
     this.user = new User();
-    this.user.create(createLocalLoginInfoDto.user);
+    this.user.create(createLocalAuthDto.user);
   }
 }
