@@ -17,12 +17,9 @@ export class AuthRepository extends Repository<Auth> {
       .getOne();
   }
 
-  public async login(localAuthDto: LocalAuthDto) {
-    const { account, password } = localAuthDto;
+  public async login(account: string) {
     return await this.createQueryBuilder('auth')
       .where('auth.account=:account', { account })
-      .andWhere('auth.password=:password', { password })
-      .select(['auth.id'])
       .getOne();
   }
 

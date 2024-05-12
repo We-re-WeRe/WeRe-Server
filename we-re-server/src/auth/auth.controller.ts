@@ -27,7 +27,7 @@ export class AuthController {
     return await this.authService.checkIsDuplicatedName(account);
   }
 
-  @Post()
+  @Post('local/login')
   async login(@Body() localAuthDto: LocalAuthDto) {
     try {
       const result = await this.authService.login(localAuthDto);

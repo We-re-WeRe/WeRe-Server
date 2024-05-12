@@ -3,11 +3,19 @@ import { CreateLocalAuthDto } from './dto/create-auth.dto';
 import { AuthRepository } from './auth.repository';
 import { LocalAuthDto } from './dto/auth.dto';
 import { Auth } from 'src/entities/auth.entity';
-import { CustomDataBaseException } from 'src/utils/custom_exceptions';
+import {
+  CustomDataBaseException,
+  CustomNotFoundException,
+  CustomUnauthorziedException,
+} from 'src/utils/custom_exceptions';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    private readonly authRepository: AuthRepository,
+    private readonly jwtService: JwtService,
+  ) {}
   /**
    * check account is already in DB.
    * @param account
@@ -23,9 +31,18 @@ export class AuthService {
    * @param localAuthDto
    * @returns
    */
-  async login(localAuthDto: LocalAuthDto): Promise<number | null> {
-    const queryResult = await this.authRepository.login(localAuthDto);
-    return queryResult?.id;
+  async login(localAuthDto: LocalAuthDto): Promise<string | null> {
+    const { account, password } = localAuthDto;
+    const queryResult = await this.authRepository.login(account);
+    if (!!!queryResult) {
+      throw new CustomNotFoundException('account');
+    }
+    if (queryResult?.password !== password) {
+      throw new CustomUnauthorziedException('Password is wrong.');
+    }
+    const payload = { userId: queryResult.id };
+    const result = await this.jwtService.signAsync(payload);
+    return result;
   }
 
   /**
