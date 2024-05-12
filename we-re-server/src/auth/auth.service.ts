@@ -9,6 +9,7 @@ import {
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import { JwtService } from '@nestjs/jwt';
+import { ReadJWTDto } from './dto/jwt.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,9 +32,9 @@ export class AuthService {
    * @param localAuthDto
    * @returns
    */
-  async login(localAuthDto: LocalAuthDto): Promise<string | null> {
+  async localLogin(localAuthDto: LocalAuthDto): Promise<ReadJWTDto> {
     const { account, password } = localAuthDto;
-    const queryResult = await this.authRepository.login(account);
+    const queryResult = await this.authRepository.localLogin(account);
     if (!!!queryResult) {
       throw new CustomNotFoundException('account');
     }
@@ -41,7 +42,8 @@ export class AuthService {
       throw new CustomUnauthorziedException('Password is wrong.');
     }
     const payload = { userId: queryResult.id };
-    const result = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
+    const result = new ReadJWTDto(accessToken, '');
     return result;
   }
 

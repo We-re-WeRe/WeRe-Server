@@ -28,9 +28,9 @@ export class AuthController {
   }
 
   @Post('local/login')
-  async login(@Body() localAuthDto: LocalAuthDto) {
+  async localLogin(@Body() localAuthDto: LocalAuthDto) {
     try {
-      const result = await this.authService.login(localAuthDto);
+      const result = await this.authService.localLogin(localAuthDto);
       if (!result) {
         throw new CustomNotFoundException('log-in information');
       }

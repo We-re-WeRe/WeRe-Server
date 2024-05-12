@@ -17,7 +17,7 @@ export class AuthRepository extends Repository<Auth> {
       .getOne();
   }
 
-  public async login(account: string) {
+  public async localLogin(account: string) {
     return await this.createQueryBuilder('auth')
       .where('auth.account=:account', { account })
       .getOne();
