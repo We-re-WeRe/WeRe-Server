@@ -41,9 +41,8 @@ export class AuthService {
     if (queryResult?.password !== password) {
       throw new CustomUnauthorziedException('Password is wrong.');
     }
-    const payload = { userId: queryResult.id };
-    const accessToken = await this.jwtService.signAsync(payload);
-    const result = new ReadJWTDto(accessToken, '');
+    const userId = queryResult.user.id;
+    const result = this.issueJWTToken(userId);
     return result;
   }
 
@@ -54,14 +53,26 @@ export class AuthService {
    */
   async createUserAndLoginInfo(
     createLocalLoginInfoDto: CreateLocalAuthDto,
-  ): Promise<number> {
+  ): Promise<ReadJWTDto> {
     const auth = new Auth();
     auth.create(createLocalLoginInfoDto);
     const queryResult = await this.authRepository.createUserAndAuth(auth);
-    Logger.log(JSON.stringify(queryResult));
     const userId = queryResult.user.id;
     if (!!!userId)
       throw new CustomDataBaseException('create user is not worked');
-    return userId;
+    const result = this.issueJWTToken(userId);
+    return result;
+  }
+
+  /**
+   * Issue JWT token to authorize. Refresh token is always issued when access token is issued.
+   * @param userId
+   * @returns read jwt dto
+   */
+  async issueJWTToken(userId: number): Promise<ReadJWTDto> {
+    const payload = { userId };
+    const accessToken = await this.jwtService.signAsync(payload);
+    const result = new ReadJWTDto(accessToken, '');
+    return result;
   }
 }

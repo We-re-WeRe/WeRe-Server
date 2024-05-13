@@ -20,6 +20,7 @@ export class AuthRepository extends Repository<Auth> {
   public async localLogin(account: string) {
     return await this.createQueryBuilder('auth')
       .where('auth.account=:account', { account })
+      .leftJoinAndSelect('auth.user', 'user')
       .getOne();
   }
 

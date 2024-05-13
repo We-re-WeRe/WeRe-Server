@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { User } from './user.entity';
 import { CreateLocalAuthDto } from 'src/auth/dto/create-auth.dto';
@@ -21,6 +21,7 @@ export class Auth extends DefaultEntity {
   google?: string;
 
   @OneToOne(() => User, { cascade: true })
+  @JoinColumn()
   user: User;
 
   public create(createLocalAuthDto: CreateLocalAuthDto) {
