@@ -16,3 +16,10 @@ export class ReadJWTDto {
   @IsNotEmpty()
   refreshToken: string;
 }
+
+export class Payload {
+  constructor(userId: number) {
+    this.userId = userId;
+  }
+  userId: number;
+}

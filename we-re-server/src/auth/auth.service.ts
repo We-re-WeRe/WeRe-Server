@@ -9,13 +9,15 @@ import {
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import { JwtService } from '@nestjs/jwt';
-import { ReadJWTDto } from './dto/jwt.dto';
+import { Payload, ReadJWTDto } from './dto/jwt.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
   /**
    * check account is already in DB.
@@ -42,7 +44,7 @@ export class AuthService {
       throw new CustomUnauthorziedException('Password is wrong.');
     }
     const userId = queryResult.user.id;
-    const result = this.issueJWTToken(userId);
+    const result = this.getJWTDto(userId);
     return result;
   }
 
@@ -60,7 +62,7 @@ export class AuthService {
     const userId = queryResult.user.id;
     if (!!!userId)
       throw new CustomDataBaseException('create user is not worked');
-    const result = this.issueJWTToken(userId);
+    const result = this.getJWTDto(userId);
     return result;
   }
 
@@ -69,10 +71,25 @@ export class AuthService {
    * @param userId
    * @returns read jwt dto
    */
-  async issueJWTToken(userId: number): Promise<ReadJWTDto> {
-    const payload = { userId };
-    const accessToken = await this.jwtService.signAsync(payload);
-    const result = new ReadJWTDto(accessToken, '');
+  async getJWTDto(userId: number): Promise<ReadJWTDto> {
+    const payload = new Payload(userId);
+    const accessToken = await this.issueAccessToken(payload);
+    const refreshToken = await this.issueRefreshToken(payload);
+    const result = new ReadJWTDto(accessToken, refreshToken);
     return result;
+  }
+
+  async issueAccessToken(payload: Payload): Promise<string> {
+    return await this.jwtService.signAsync({ ...payload });
+  }
+
+  async issueRefreshToken(payload: Payload): Promise<string> {
+    return await this.jwtService.signAsync(
+      { ...payload },
+      {
+        secret: this.configService.get<string>('REFRESH_SECRET_KEY'),
+        expiresIn: this.configService.get<string>('REFRESH_EXPIRATION_TIME'),
+      },
+    );
   }
 }
