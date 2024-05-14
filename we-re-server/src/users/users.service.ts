@@ -9,6 +9,7 @@ import {
 } from './dto/read-user.dto';
 import { FollowDto } from './dto/follow.dto';
 import {
+  CustomDataAlreadyExistException,
   CustomDataBaseException,
   CustomNotFoundException,
 } from 'src/utils/custom_exceptions';
@@ -54,6 +55,9 @@ export class UsersService {
    */
   async checkNicknameIsUsed(nickname: string): Promise<boolean> {
     const queryResult = await this.userRepository.getIdByNickname(nickname);
+    if (!!queryResult) {
+      throw new CustomDataAlreadyExistException('this Nickname is already in.');
+    }
     return !!queryResult;
   }
   /**

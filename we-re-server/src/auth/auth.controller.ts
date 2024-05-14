@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
@@ -15,9 +16,16 @@ import { LocalAuthDto } from './dto/auth.dto';
 import {
   CustomDataAlreadyExistException,
   CustomNotFoundException,
+  CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from 'src/users/users.service';
+import { ReadJWTDto } from './dto/jwt.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -27,6 +35,11 @@ export class AuthController {
     private readonly userService: UsersService,
   ) {}
 
+  @ApiOperation({ summary: 'check account is duplicated' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: Boolean,
+  })
   @Get('check/duplicated-account')
   async checkIsDuplicatedAccount(
     @Query('account') account: string,
@@ -34,32 +47,36 @@ export class AuthController {
     return await this.authService.checkIsDuplicatedAccount(account);
   }
 
+  @ApiOperation({ summary: 'login' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadJWTDto,
+  })
   @Post('local/log-in')
   async localLogin(@Body() localAuthDto: LocalAuthDto) {
     try {
       const result = await this.authService.localLogin(localAuthDto);
-      if (!result) {
-        throw new CustomNotFoundException('log-in information');
-      }
       return result;
     } catch (error) {
       throw error;
     }
   }
 
+  @ApiOperation({ summary: 'sign on' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadJWTDto,
+  })
   @Post('sign-on')
   async signOn(@Body() createLocalAuthDto: CreateLocalAuthDto) {
     try {
-      if (this.authService.checkIsDuplicatedAccount(createLocalAuthDto.account))
-        throw new CustomDataAlreadyExistException(
-          'this Account is already in.',
-        );
-      if (
-        this.userService.checkNicknameIsUsed(createLocalAuthDto.user.nickname)
-      )
-        throw new CustomDataAlreadyExistException(
-          'this Nickname is already in.',
-        );
+      await this.authService.checkIsDuplicatedAccount(
+        createLocalAuthDto.account,
+      );
+
+      await this.userService.checkNicknameIsUsed(
+        createLocalAuthDto.user.nickname,
+      );
       const result = await this.authService.createUserAndLoginInfo(
         createLocalAuthDto,
       );

@@ -4,6 +4,7 @@ import { AuthRepository } from './auth.repository';
 import { LocalAuthDto } from './dto/auth.dto';
 import { Auth } from 'src/entities/auth.entity';
 import {
+  CustomDataAlreadyExistException,
   CustomDataBaseException,
   CustomNotFoundException,
   CustomUnauthorziedException,
@@ -26,6 +27,9 @@ export class AuthService {
    */
   async checkIsDuplicatedAccount(account: string): Promise<boolean> {
     const queryResult = await this.authRepository.getIdByAccount(account);
+    if (!!queryResult) {
+      throw new CustomDataAlreadyExistException('this Account is already in.');
+    }
     return !!queryResult;
   }
 
