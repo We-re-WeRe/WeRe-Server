@@ -80,16 +80,23 @@ export class AuthService {
   }
 
   async issueAccessToken(payload: Payload): Promise<string> {
-    return await this.jwtService.signAsync({ ...payload });
+    const accessToken = await this.jwtService.signAsync({ ...payload });
+    return accessToken;
   }
 
   async issueRefreshToken(payload: Payload): Promise<string> {
-    return await this.jwtService.signAsync(
+    const refreshToken = await this.jwtService.signAsync(
       { ...payload },
       {
         secret: this.configService.get<string>('REFRESH_SECRET_KEY'),
         expiresIn: this.configService.get<string>('REFRESH_EXPIRATION_TIME'),
       },
     );
+    const queryResult = await this.authRepository.updateRefreshToken(
+      payload.userId,
+      refreshToken,
+    );
+    if (!queryResult.affected) throw new CustomNotFoundException('userId');
+    return refreshToken;
   }
 }

@@ -27,4 +27,12 @@ export class AuthRepository extends Repository<Auth> {
   public async createUserAndAuth(auth: Auth) {
     return await this.dataSource.manager.save(auth);
   }
+
+  public async updateRefreshToken(userId: number, refreshToken: string) {
+    return await this.createQueryBuilder()
+      .update(Auth)
+      .set({ refreshToken })
+      .where('user = :userId', { userId })
+      .execute();
+  }
 }

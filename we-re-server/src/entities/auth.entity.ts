@@ -12,6 +12,9 @@ export class Auth extends DefaultEntity {
   password: string;
 
   @Column({ type: 'varchar', nullable: true })
+  refreshToken?: string;
+
+  @Column({ type: 'varchar', nullable: true })
   kakao?: string;
 
   @Column({ type: 'varchar', nullable: true })
