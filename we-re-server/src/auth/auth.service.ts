@@ -24,7 +24,7 @@ export class AuthService {
    * @param account
    * @returns
    */
-  async checkIsDuplicatedName(account: string): Promise<boolean> {
+  async checkIsDuplicatedAccount(account: string): Promise<boolean> {
     const queryResult = await this.authRepository.getIdByAccount(account);
     return !!queryResult;
   }
