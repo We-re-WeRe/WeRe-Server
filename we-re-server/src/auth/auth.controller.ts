@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Logger,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
@@ -26,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from 'src/users/users.service';
 import { ReadJWTDto } from './dto/jwt.dto';
+import { Response } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -53,9 +55,13 @@ export class AuthController {
     type: ReadJWTDto,
   })
   @Post('local/log-in')
-  async localLogin(@Body() localAuthDto: LocalAuthDto) {
+  async localLogin(
+    @Body() localAuthDto: LocalAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
       const result = await this.authService.localLogin(localAuthDto);
+      this.authService.setHeaderAndCookieInResponse(res, result);
       return result;
     } catch (error) {
       throw error;
@@ -68,7 +74,10 @@ export class AuthController {
     type: ReadJWTDto,
   })
   @Post('sign-on')
-  async signOn(@Body() createLocalAuthDto: CreateLocalAuthDto) {
+  async signOn(
+    @Body() createLocalAuthDto: CreateLocalAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
       await this.authService.checkIsDuplicatedAccount(
         createLocalAuthDto.account,
@@ -80,6 +89,7 @@ export class AuthController {
       const result = await this.authService.createUserAndLoginInfo(
         createLocalAuthDto,
       );
+      this.authService.setHeaderAndCookieInResponse(res, result);
       return result;
     } catch (error) {
       throw error;

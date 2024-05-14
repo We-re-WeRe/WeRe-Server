@@ -12,6 +12,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Payload, ReadJWTDto } from './dto/jwt.dto';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -102,5 +103,16 @@ export class AuthService {
     );
     if (!queryResult.affected) throw new CustomNotFoundException('userId');
     return refreshToken;
+  }
+
+  setHeaderAndCookieInResponse(res: Response, jwtDto: ReadJWTDto): void {
+    const { accessToken, refreshToken } = jwtDto;
+    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+    });
   }
 }
