@@ -55,14 +55,34 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
-  @Post('log-in/local')
+  @Post('login/local')
   async localLogin(
     @Body() localAuthDto: LocalAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
       const result = await this.authService.localLogin(localAuthDto);
-      this.setHeaderAndCookieInResponse(res, result);
+      this.setTokenInResponseAndHeader(res, result);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'log out' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: ReadJWTDto,
+  })
+  @Patch('logout')
+  async logout(
+    @Query('userId') userId: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    // should be changed using userId to use accesstoken
+    try {
+      const result = await this.authService.logout(userId);
+      this.removeTokenInCookie(res);
       return result;
     } catch (error) {
       throw error;
@@ -86,7 +106,7 @@ export class AuthController {
     try {
       const { userId } = await this.authService.validateRefreshToken(token);
       const result = await this.authService.getJWTDto(userId);
-      this.setHeaderAndCookieInResponse(res, result);
+      this.setTokenInResponseAndHeader(res, result);
       return result;
     } catch (error) {
       throw error;
@@ -98,7 +118,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
-  @Post('sign-on')
+  @Post('signon')
   async signOn(
     @Body() createLocalAuthDto: CreateLocalAuthDto,
     @Res({ passthrough: true }) res: Response,
@@ -114,7 +134,7 @@ export class AuthController {
       const result = await this.authService.createUserAndLoginInfo(
         createLocalAuthDto,
       );
-      this.setHeaderAndCookieInResponse(res, result);
+      this.setTokenInResponseAndHeader(res, result);
       return result;
     } catch (error) {
       throw error;
@@ -122,13 +142,32 @@ export class AuthController {
   }
 
   /**
-   * set header and cookie for browser.
+   * set tokens in response and header.
+   * @param res
+   * @param jwtDto
+   */
+  setTokenInResponseAndHeader(res: Response, jwtDto: ReadJWTDto): void {
+    this.addTokenInHeader(res, jwtDto);
+    this.addTokenInCookie(res, jwtDto);
+  }
+
+  /**
+   * set header
    * @param res Response
    * @param jwtDto
    */
-  setHeaderAndCookieInResponse(res: Response, jwtDto: ReadJWTDto): void {
+  addTokenInHeader(res: Response, jwtDto: ReadJWTDto): void {
     const { accessToken, refreshToken } = jwtDto;
     res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+  }
+
+  /**
+   * add token in cookie at response
+   * @param res
+   * @param jwtDto
+   */
+  addTokenInCookie(res: Response, jwtDto: ReadJWTDto): void {
+    const { accessToken, refreshToken } = jwtDto;
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
     });
@@ -136,6 +175,16 @@ export class AuthController {
       httpOnly: true,
     });
   }
+
+  /**
+   * remove token in cookie at response
+   * @param res
+   */
+  removeTokenInCookie(res: Response): void {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+  }
+
   /**
    * extract token from header
    * @param request

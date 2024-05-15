@@ -42,4 +42,12 @@ export class AuthRepository extends Repository<Auth> {
       .where('user = :userId', { userId })
       .execute();
   }
+
+  public async deleteRefreshToken(userId: number) {
+    return await this.createQueryBuilder()
+      .update(Auth)
+      .set({ refreshToken: null })
+      .where('user=:userId', { userId })
+      .execute();
+  }
 }

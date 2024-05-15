@@ -71,6 +71,12 @@ export class AuthService {
     return result;
   }
 
+  async logout(userId: number): Promise<void> {
+    const queryResult = await this.authRepository.deleteRefreshToken(userId);
+    if (!queryResult.affected) throw new CustomNotFoundException('userId');
+    return;
+  }
+
   /**
    * Issue JWT token to authorize. Refresh token is always issued when access token is issued.
    * @param userId
