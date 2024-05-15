@@ -9,6 +9,7 @@ import {
   Query,
   Logger,
   Res,
+  Headers,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
@@ -54,14 +55,38 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
-  @Post('local/log-in')
+  @Post('log-in/local')
   async localLogin(
     @Body() localAuthDto: LocalAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
       const result = await this.authService.localLogin(localAuthDto);
-      this.authService.setHeaderAndCookieInResponse(res, result);
+      this.setHeaderAndCookieInResponse(res, result);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'refresh token' })
+  @ApiCreatedResponse({
+    description: 'Request Success',
+    type: ReadJWTDto,
+  })
+  @Post('refresh')
+  async refreshJwt(
+    @Headers() headers,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = this.extractTokenFromHeader(headers);
+    if (!token) {
+      throw new CustomUnauthorziedException('log in again');
+    }
+    try {
+      const { userId } = await this.authService.validateRefreshToken(token);
+      const result = await this.authService.getJWTDto(userId);
+      this.setHeaderAndCookieInResponse(res, result);
       return result;
     } catch (error) {
       throw error;
@@ -89,10 +114,35 @@ export class AuthController {
       const result = await this.authService.createUserAndLoginInfo(
         createLocalAuthDto,
       );
-      this.authService.setHeaderAndCookieInResponse(res, result);
+      this.setHeaderAndCookieInResponse(res, result);
       return result;
     } catch (error) {
       throw error;
     }
+  }
+
+  /**
+   * set header and cookie for browser.
+   * @param res Response
+   * @param jwtDto
+   */
+  setHeaderAndCookieInResponse(res: Response, jwtDto: ReadJWTDto): void {
+    const { accessToken, refreshToken } = jwtDto;
+    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+    });
+  }
+  /**
+   * extract token from header
+   * @param request
+   * @returns
+   */
+  private extractTokenFromHeader(headers: any): string | undefined {
+    const [type, token] = headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }

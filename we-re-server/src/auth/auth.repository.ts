@@ -10,6 +10,13 @@ export class AuthRepository extends Repository<Auth> {
     super(Auth, dataSource.createEntityManager());
   }
 
+  public async getRefreshTokenByUserId(userId: number): Promise<Auth> {
+    return await this.createQueryBuilder('auth')
+      .where('auth.user=:userId', { userId })
+      .select(['auth.refreshToken'])
+      .getOne();
+  }
+
   public async getIdByAccount(account: string) {
     return await this.createQueryBuilder('auth')
       .where('auth.account=:account', { account })

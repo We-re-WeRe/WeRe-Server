@@ -12,7 +12,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Payload, ReadJWTDto } from './dto/jwt.dto';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +20,25 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  /**
+   * create user info service. and return user id
+   * @param createUserDto
+   * @returns
+   */
+  async createUserAndLoginInfo(
+    createLocalLoginInfoDto: CreateLocalAuthDto,
+  ): Promise<ReadJWTDto> {
+    const auth = new Auth();
+    auth.create(createLocalLoginInfoDto);
+    const queryResult = await this.authRepository.createUserAndAuth(auth);
+    const userId = queryResult.user.id;
+    if (!!!userId)
+      throw new CustomDataBaseException('create user is not worked');
+    const result = this.getJWTDto(userId);
+    return result;
+  }
+
   /**
    * check account is already in DB.
    * @param account
@@ -54,24 +72,6 @@ export class AuthService {
   }
 
   /**
-   * create user info service. and return user id
-   * @param createUserDto
-   * @returns
-   */
-  async createUserAndLoginInfo(
-    createLocalLoginInfoDto: CreateLocalAuthDto,
-  ): Promise<ReadJWTDto> {
-    const auth = new Auth();
-    auth.create(createLocalLoginInfoDto);
-    const queryResult = await this.authRepository.createUserAndAuth(auth);
-    const userId = queryResult.user.id;
-    if (!!!userId)
-      throw new CustomDataBaseException('create user is not worked');
-    const result = this.getJWTDto(userId);
-    return result;
-  }
-
-  /**
    * Issue JWT token to authorize. Refresh token is always issued when access token is issued.
    * @param userId
    * @returns read jwt dto
@@ -84,11 +84,21 @@ export class AuthService {
     return result;
   }
 
+  /**
+   * Issue new access token.
+   * @param payload
+   * @returns
+   */
   async issueAccessToken(payload: Payload): Promise<string> {
     const accessToken = await this.jwtService.signAsync({ ...payload });
     return accessToken;
   }
 
+  /**
+   * Issue new refresh token.
+   * @param payload
+   * @returns
+   */
   async issueRefreshToken(payload: Payload): Promise<string> {
     const refreshToken = await this.jwtService.signAsync(
       { ...payload },
@@ -105,14 +115,34 @@ export class AuthService {
     return refreshToken;
   }
 
-  setHeaderAndCookieInResponse(res: Response, jwtDto: ReadJWTDto): void {
-    const { accessToken, refreshToken } = jwtDto;
-    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-    });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-    });
+  /**
+   * extract payload from refreshToken.
+   * @param refreshToken
+   * @returns
+   */
+  async getPayloadFromRefreshToken(refreshToken: string): Promise<Payload> {
+    try {
+      const payload = await this.jwtService.verifyAsync<Payload>(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_SECRET_KEY'),
+      });
+      return payload;
+    } catch (error) {
+      throw new CustomUnauthorziedException('log in again.');
+    }
+  }
+
+  /**
+   * Valiate refresh token is valid. if not, sent unauthorizedexception to request login again.
+   * @param refreshToken
+   * @returns Payload
+   */
+  async validateRefreshToken(refreshToken: string): Promise<Payload> {
+    const payload = await this.getPayloadFromRefreshToken(refreshToken);
+    const auth = await this.authRepository.getRefreshTokenByUserId(
+      payload.userId,
+    );
+    if (refreshToken !== auth.refreshToken)
+      throw new CustomUnauthorziedException('log in again.');
+    return payload;
   }
 }
