@@ -75,7 +75,6 @@ export class AuthController {
     @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
-    // should be changed using userId to use accesstoken
     try {
       const result = await this.authService.logout(userId);
       this.removeTokenInCookie(res);
