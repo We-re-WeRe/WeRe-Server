@@ -122,33 +122,15 @@ export class AuthService {
   }
 
   /**
-   * extract payload from refreshToken.
-   * @param refreshToken
-   * @returns
+   * get refresh token by user id.
+   * @param userId
+   * @returns refresh token
    */
-  async getPayloadFromRefreshToken(refreshToken: string): Promise<Payload> {
-    try {
-      const payload = await this.jwtService.verifyAsync<Payload>(refreshToken, {
-        secret: this.configService.get<string>('REFRESH_SECRET_KEY'),
-      });
-      return payload;
-    } catch (error) {
-      throw new CustomUnauthorziedException('log in again.');
-    }
-  }
-
-  /**
-   * Valiate refresh token is valid. if not, sent unauthorizedexception to request login again.
-   * @param refreshToken
-   * @returns Payload
-   */
-  async validateRefreshToken(refreshToken: string): Promise<Payload> {
-    const payload = await this.getPayloadFromRefreshToken(refreshToken);
-    const auth = await this.authRepository.getRefreshTokenByUserId(
-      payload.userId,
+  async getRefreshTokenByUserId(userId: number): Promise<string> {
+    const { refreshToken } = await this.authRepository.getRefreshTokenByUserId(
+      userId,
     );
-    if (refreshToken !== auth.refreshToken)
-      throw new CustomUnauthorziedException('log in again.');
-    return payload;
+    Logger.log(refreshToken);
+    return refreshToken;
   }
 }

@@ -22,8 +22,7 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { ReadJWTDto } from './dto/jwt.dto';
 import { Response } from 'express';
-import { RefreshTokenGuard } from './auth.guard';
-import { UserId } from 'src/utils/custom_decorators';
+import { Public, RefreshRequired, UserId } from 'src/utils/custom_decorators';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -38,6 +37,7 @@ export class AuthController {
     description: 'Request Success',
     type: Boolean,
   })
+  @Public()
   @Get('check/duplicated-account')
   async checkIsDuplicatedAccount(
     @Query('account') account: string,
@@ -50,6 +50,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @Public()
   @Post('login/local')
   async localLogin(
     @Body() localAuthDto: LocalAuthDto,
@@ -69,7 +70,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
-  @UseGuards(RefreshTokenGuard)
+  @RefreshRequired()
   @Patch('logout')
   async logout(
     @UserId() userId: number,
@@ -89,17 +90,13 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @RefreshRequired()
   @Post('refresh')
   async refreshJwt(
-    @Headers() headers,
+    @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = this.extractTokenFromHeader(headers);
-    if (!token) {
-      throw new CustomUnauthorziedException('log in again');
-    }
     try {
-      const { userId } = await this.authService.validateRefreshToken(token);
       const result = await this.authService.getJWTDto(userId);
       this.setTokenInResponseAndHeader(res, result);
       return result;
@@ -113,6 +110,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @Public()
   @Post('signon')
   async signOn(
     @Body() createLocalAuthDto: CreateLocalAuthDto,
