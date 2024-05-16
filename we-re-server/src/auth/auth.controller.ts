@@ -4,22 +4,15 @@ import {
   Post,
   Body,
   Patch,
-  Param,
-  Delete,
   Query,
-  Logger,
   Res,
   Headers,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
-import { UpdateLogInDto } from './dto/update-auth.dto';
 import { LocalAuthDto } from './dto/auth.dto';
-import {
-  CustomDataAlreadyExistException,
-  CustomNotFoundException,
-  CustomUnauthorziedException,
-} from 'src/utils/custom_exceptions';
+import { CustomUnauthorziedException } from 'src/utils/custom_exceptions';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -29,6 +22,8 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { ReadJWTDto } from './dto/jwt.dto';
 import { Response } from 'express';
+import { RefreshTokenGuard } from './auth.guard';
+import { UserId } from 'src/utils/custom_decorators';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -74,9 +69,10 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @UseGuards(RefreshTokenGuard)
   @Patch('logout')
   async logout(
-    @Query('userId') userId: number,
+    @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
     // should be changed using userId to use accesstoken
