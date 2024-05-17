@@ -15,6 +15,7 @@ import { LocalAuthDto } from './dto/auth.dto';
 import { CustomUnauthorziedException } from 'src/utils/custom_exceptions';
 import {
   ApiCreatedResponse,
+  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -65,7 +66,9 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: 'log out' })
+  @ApiOperation({
+    summary: 'log out. authorization in header should be Refresh Token',
+  })
   @ApiOkResponse({
     description: 'Request Success',
     type: ReadJWTDto,
@@ -85,7 +88,9 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: 'refresh token' })
+  @ApiOperation({
+    summary: 'refresh token. authorization in header should be Refresh Token',
+  })
   @ApiCreatedResponse({
     description: 'Request Success',
     type: ReadJWTDto,
@@ -176,15 +181,5 @@ export class AuthController {
   removeTokenInCookie(res: Response): void {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-  }
-
-  /**
-   * extract token from header
-   * @param request
-   * @returns
-   */
-  private extractTokenFromHeader(headers: any): string | undefined {
-    const [type, token] = headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

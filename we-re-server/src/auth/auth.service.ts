@@ -130,7 +130,6 @@ export class AuthService {
     const { refreshToken } = await this.authRepository.getRefreshTokenByUserId(
       userId,
     );
-    Logger.log(refreshToken);
     return refreshToken;
   }
 }

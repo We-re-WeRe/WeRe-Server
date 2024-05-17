@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import {
   IS_PUBLIC_KEY,
   IS_REFRESH_REQUIRED,
@@ -22,7 +22,7 @@ const SECRET_KEY_TYPE = {
 };
 
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -35,8 +35,23 @@ export class AccessTokenGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) return true;
+    const request = context.switchToHttp().getRequest();
+    request['userId'] = -1;
+    const token = this.extractTokenFromHeader(request);
+    if (!token) {
+      if (isPublic) return true;
+      else throw new CustomUnauthorziedException('Token is unvalid.');
+    }
+    const payload = await this.getPayloadFromToken(token, isPublic, context);
+    if (payload) request['userId'] = payload.userId;
+    return true;
+  }
 
+  public async getPayloadFromToken(
+    token: string,
+    isPublic: boolean,
+    context: ExecutionContext,
+  ) {
     const isRefreshRequired = this.reflector.getAllAndOverride<boolean>(
       IS_REFRESH_REQUIRED,
       [context.getHandler(), context.getClass()],
@@ -44,11 +59,6 @@ export class AccessTokenGuard implements CanActivate {
     const secretKeyType = isRefreshRequired
       ? SECRET_KEY_TYPE.REFRESH
       : SECRET_KEY_TYPE.ACCESS;
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new CustomUnauthorziedException('Token is unvalid.');
-    }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>(secretKeyType),
@@ -59,11 +69,15 @@ export class AccessTokenGuard implements CanActivate {
         if (token !== savedRefreshToken)
           throw new CustomUnauthorziedException('Token is unvalid');
       }
-      request['userId'] = payload.userId;
+      return payload;
     } catch {
-      throw new CustomUnauthorziedException('Token is unvalid.');
+      if (isPublic) {
+        const res = context.switchToHttp().getResponse<Response>();
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+        return undefined;
+      } else throw new CustomUnauthorziedException('Token is unvalid.');
     }
-    return true;
   }
 
   public extractTokenFromHeader(request: Request): string | undefined {
