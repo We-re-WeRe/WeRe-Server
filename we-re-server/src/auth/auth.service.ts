@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
 import { AuthRepository } from './auth.repository';
 import { LocalAuthDto } from './dto/auth.dto';
