@@ -7,12 +7,6 @@ import { REASON, Reason } from 'src/entities/point.entity';
 export class CreatePointDto {
   @ApiProperty()
   @Expose()
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
-
-  @ApiProperty()
-  @Expose()
   @IsNotEmpty()
   @IsEnum(REASON)
   reason: Reason;
@@ -23,9 +17,6 @@ export class CreatePointDto {
   @IsOptional()
   mount?: number;
 
-  public get UserIdString(): string {
-    return `${this.userId}`;
-  }
   public get Reason(): Reason {
     return this.reason;
   }

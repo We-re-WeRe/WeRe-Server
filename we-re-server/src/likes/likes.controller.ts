@@ -3,17 +3,13 @@ import {
   Body,
   Controller,
   Delete,
-  Logger,
   Param,
   Post,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { ReadLikeInfoDto } from './dto/read-like.dto';
-import {
-  CustomBadTypeRequestException,
-  CustomUnauthorziedException,
-} from 'src/utils/custom_exceptions';
+import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
 import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 
 @ApiTags('Likes')
