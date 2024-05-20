@@ -8,7 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  Logger,
+  Query,
 } from '@nestjs/common';
 import { WebtoonsService } from './webtoons.service';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
@@ -30,13 +30,13 @@ import {
 } from '@nestjs/swagger';
 import {
   CustomBadTypeRequestException,
-  CustomNotFoundException,
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import {
   stringToDays,
   stringToProvidingCompany,
 } from 'src/entities/webtoon.entity';
+import { Public, UserId } from 'src/utils/custom_decorators';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -53,9 +53,11 @@ export class WebtoonsController {
     description: 'Request Success',
     type: ReadWebtoonDetailDto,
   })
-  @Get('detail/:id')
+  @Public()
+  @Get('detail')
   async findOneDetailById(
-    @Param('id') id: number,
+    @UserId() userId: number,
+    @Query('id') id: number,
   ): Promise<ReadWebtoonDetailDto> {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
@@ -77,13 +79,11 @@ export class WebtoonsController {
     description: 'Request Success',
     type: [ReadWebtoonThumbnailDto],
   })
-  @Get('list/liked/user/:userId')
+  @Get('list/liked')
   async findManyLikedThumbnailByUserId(
-    @Param('userId') userId: number,
+    @UserId() userId: number,
   ): Promise<ReadWebtoonThumbnailDto[]> {
     try {
-      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
-      // TODO:: 본인인지 체크 필요.
       const { webtoonIds: ids } =
         await this.likeService.findManyWebtoonIdsByUserId(userId);
       return this.webtoonsService.findManyThumbnailByIds(ids);
@@ -99,6 +99,7 @@ export class WebtoonsController {
     description: 'Request Success',
     type: [ReadWebtoonThumbnailDto],
   })
+  @Public()
   @Get('list/new')
   findManyNewThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
     try {
@@ -115,6 +116,7 @@ export class WebtoonsController {
     description: 'Request Success',
     type: [ReadWebtoonThumbnailDto],
   })
+  @Public()
   @Get('list/hot')
   findManyHotThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
     try {
@@ -131,9 +133,10 @@ export class WebtoonsController {
     description: 'Request Success',
     type: [ReadWebtoonBriefDto],
   })
-  @Get('list/storage/:storageId')
+  @Public()
+  @Get('list/related-storage')
   async findManyBreifInfoWithReviewByStorageId(
-    @Param('storageId') storageId: number,
+    @Query('storageId') storageId: number,
   ): Promise<ReadWebtoonBriefDto[]> {
     try {
       if (!storageId)
@@ -159,10 +162,11 @@ export class WebtoonsController {
     description: 'Request Success',
     type: [ReadWebtoonThumbnailDto],
   })
-  @Get('list/filter/day/:day/providing-company/:providingCompany')
+  @Public()
+  @Get('list/filtered-by')
   findManyFilteredThumbnail(
-    @Param('day') day: string,
-    @Param('providingCompany') providingCompany: string,
+    @Query('day') day: string,
+    @Query('providingCompany') providingCompany: string,
   ): Promise<ReadWebtoonThumbnailDto[]> {
     try {
       if (!stringToDays(day)) {
@@ -188,10 +192,12 @@ export class WebtoonsController {
     description: 'Request Success',
     type: ReadWebtoonDetailDto,
   })
+  @Public()
   @Post()
   async createWebtoon(
     @Body() createWebtoonDto: CreateWebtoonDto,
   ): Promise<ReadWebtoonDetailDto> {
+    // 아무나 upload 못하게 해야할듯. webtoon 추가를 그냥 python에서 하든동.
     try {
       return await this.webtoonsService.createWebtoon(createWebtoonDto);
     } catch (error) {
@@ -204,9 +210,10 @@ export class WebtoonsController {
     description: 'Request Success',
     type: ReadWebtoonDetailDto,
   })
-  @Patch(':id')
+  @Public()
+  @Patch()
   async updateWebtoon(
-    @Param('id') id: number,
+    @Query('id') id: number,
     @Body() updateWebtoonDto: UpdateWebtoonDto,
   ): Promise<ReadWebtoonDetailDto> {
     try {
@@ -222,8 +229,8 @@ export class WebtoonsController {
   @ApiOperation({ summary: 'delete Webtoon' })
   @ApiNoContentResponse({ description: 'Request Success' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':id')
-  async deleteWebtoon(@Param('id') id: number): Promise<void> {
+  @Delete()
+  async deleteWebtoon(@Query('id') id: number): Promise<void> {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       return await this.webtoonsService.deleteWebtoon(id);
