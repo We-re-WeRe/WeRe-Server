@@ -28,9 +28,9 @@ export class TagsService {
   async getAddAndRemoveTagDto(
     addAndRemoveTagRequestDto: AddAndRemoveTagRequestDto,
   ): Promise<AddAndRemoveTagDto> {
-    const { tagType, targetId, contentsArray } = addAndRemoveTagRequestDto;
+    const { targetType, targetId, contentsArray } = addAndRemoveTagRequestDto;
     const addAndRemoveTagDto = new AddAndRemoveTagDto();
-    const alreadyTags = await this.findTagsByTargetId(tagType, targetId);
+    const alreadyTags = await this.findTagsByTargetId(targetType, targetId);
     const notDeleteIds = new Map<number, number>();
     for (const newContents of contentsArray) {
       let FLAG = true;
@@ -81,7 +81,7 @@ export class TagsService {
     }
     for (i; i < contentsArrayLength; i++) {
       const createTagDto = new CreateTagDto(
-        addAndRemoveTagRequestDto.tagType,
+        addAndRemoveTagRequestDto.targetType,
         addAndRemoveTagRequestDto.targetId,
         contentsArray[i],
       );
@@ -91,7 +91,7 @@ export class TagsService {
       await this.deleteTag(deleteIds[i]);
     }
     const result = this.findTagsByTargetId(
-      addAndRemoveTagRequestDto.tagType,
+      addAndRemoveTagRequestDto.targetType,
       addAndRemoveTagRequestDto.targetId,
     );
     return result;
