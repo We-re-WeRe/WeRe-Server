@@ -3,6 +3,7 @@ import { User } from 'src/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FollowDto } from './dto/follow.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -22,7 +23,7 @@ export class UserRepository extends Repository<User> {
 
   public async findOneProfileImageById(id: number) {
     return await this.createQueryBuilder('user')
-      .select(['user.id', 'user.imageURL'])
+      .select(['user.id', 'user.imageURL', 'user.nickname'])
       .where('id=:id', { id })
       .getRawOne();
   }
