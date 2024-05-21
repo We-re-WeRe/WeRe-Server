@@ -2,13 +2,14 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import {
   IS_PUBLIC_KEY,
   IS_REFRESH_REQUIRED,
 } from 'src/utils/custom_decorators';
 import { CustomUnauthorziedException } from 'src/utils/custom_exceptions';
 import { AuthService } from './auth.service';
+import { Payload } from './dto/jwt.dto';
 
 const SECRET_KEY_TYPE = {
   REFRESH: 'REFRESH_SECRET_KEY',
@@ -30,52 +31,82 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     const request = context.switchToHttp().getRequest();
-    request['userId'] = 0;
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       if (isPublic) return true;
       else throw new CustomUnauthorziedException('Token is unvalid.');
     }
-    const payload = await this.getPayloadFromToken(token, isPublic, context);
-    if (payload) request['userId'] = payload.userId;
+    const payload = await this.getPayloadFromToken(token, context);
+    request['userId'] = payload.userId;
     return true;
   }
 
+  /**
+   * get Payload from token.
+   * @param token
+   * @param isPublic
+   * @param context
+   * @returns
+   */
   public async getPayloadFromToken(
     token: string,
-    isPublic: boolean,
     context: ExecutionContext,
-  ) {
+  ): Promise<Payload> {
     const isRefreshRequired = this.reflector.getAllAndOverride<boolean>(
       IS_REFRESH_REQUIRED,
       [context.getHandler(), context.getClass()],
     );
-    const secretKeyType = isRefreshRequired
-      ? SECRET_KEY_TYPE.REFRESH
-      : SECRET_KEY_TYPE.ACCESS;
+    const secretKeyType = this.getSecretKeyType(isRefreshRequired);
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<Payload>(token, {
         secret: this.configService.get<string>(secretKeyType),
       });
-      if (isRefreshRequired) {
-        const savedRefreshToken =
-          await this.authService.getRefreshTokenByUserId(payload.userId);
-        if (token !== savedRefreshToken)
-          throw new CustomUnauthorziedException('Token is unvalid');
-      }
+      if (isRefreshRequired)
+        await this.checkRefreshTokenWithDatabase(token, payload.userId);
       return payload;
     } catch {
-      if (isPublic) {
-        const res = context.switchToHttp().getResponse<Response>();
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
-        return undefined;
-      } else throw new CustomUnauthorziedException('Token is unvalid.');
+      throw new CustomUnauthorziedException('Token is unvalid.');
     }
   }
 
-  public extractTokenFromHeader(request: Request): string | undefined {
+  /**
+   * extract token from header
+   * @param request
+   * @returns
+   */
+  private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  /**
+   * get secretKeyType with isRefreshRequired boolean
+   * @param isRefreshRequired
+   * @returns
+   */
+  private getSecretKeyType(isRefreshRequired: boolean): string {
+    const secretKeyType = isRefreshRequired
+      ? SECRET_KEY_TYPE.REFRESH
+      : SECRET_KEY_TYPE.ACCESS;
+    return secretKeyType;
+  }
+
+  /**
+   * check refresh token is valid by comparing with Database saved refresh token.
+   * @param token
+   * @param userId
+   * @returns
+   */
+  private async checkRefreshTokenWithDatabase(
+    token: string,
+    userId: number,
+  ): Promise<boolean> {
+    const savedRefreshToken = await this.authService.getRefreshTokenByUserId(
+      userId,
+    );
+    if (token !== savedRefreshToken)
+      throw new CustomUnauthorziedException('Token is unvalid');
+
+    return true;
   }
 }
