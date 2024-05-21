@@ -66,22 +66,8 @@ export class UsersController {
   ): Promise<ReadUserDetailDto> {
     try {
       if (!targetId)
-        throw new CustomBadTypeRequestException('targetId', targetId);
+        return await this.usersService.findOneDetailById(userId, userId);
       else return await this.usersService.findOneDetailById(userId, targetId);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @ApiOperation({ summary: 'get my detail' })
-  @ApiOkResponse({
-    description: 'Request Success',
-    type: ReadUserDetailDto,
-  })
-  @Get('my-page')
-  async findMyDetailById(@UserId() userId: number): Promise<ReadUserDetailDto> {
-    try {
-      return await this.usersService.findOneDetailById(userId, userId);
     } catch (error) {
       throw error;
     }
