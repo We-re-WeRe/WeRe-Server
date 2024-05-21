@@ -3,6 +3,7 @@ import { Storage } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class StorageRepository extends Repository<Storage> {
@@ -20,10 +21,17 @@ export class StorageRepository extends Repository<Storage> {
         'storage.name',
         'storage.explain',
         'storage.isPublic',
-        'storage.user_id',
+        'storage.user',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('storage.id')
+      .getRawOne();
+  }
+
+  public async findOneById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .select(['storage.id', 'storage.user'])
       .getRawOne();
   }
 
@@ -117,24 +125,27 @@ export class StorageRepository extends Repository<Storage> {
       .where('storage.id=:id', { id: webtoonInStorageDto.id })
       .leftJoinAndSelect(
         'storage.webtoons',
-        'webtoons',
-        'webtoons.id=:webtoonId',
+        'webtoon',
+        'webtoon.id=:webtoonId',
         {
           webtoonId: webtoonInStorageDto.webtoonId,
         },
       )
-      .select(['storage.id', 'webtoons.id'])
+      .select(['storage.id', 'storage.user', 'webtoon.id'])
       .getRawOne();
   }
 
-  public async createStorage(createStorageDto: CreateStorageDto) {
+  public async createStorage(
+    userId: number,
+    createStorageDto: CreateStorageDto,
+  ) {
     const { tags, ...tempCreateStorageDto } = createStorageDto;
     return await this.createQueryBuilder()
       .insert()
       .into(Storage)
       .values({
         ...tempCreateStorageDto,
-        user: () => createStorageDto.getStringUserId(),
+        user: () => userId.toString(),
       })
       .execute();
   }
@@ -143,7 +154,10 @@ export class StorageRepository extends Repository<Storage> {
     return await this.createQueryBuilder()
       .relation(Storage, 'webtoons')
       .of(webtoonInStorageDto.id)
-      .add(webtoonInStorageDto.webtoonId);
+      .add(webtoonInStorageDto.webtoonId)
+      .catch(() => {
+        throw new CustomNotFoundException('webtoonId');
+      });
   }
 
   public async removeWebtoonAtStorage(

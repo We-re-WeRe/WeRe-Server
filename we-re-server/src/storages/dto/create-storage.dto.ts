@@ -32,17 +32,8 @@ export class CreateStorageDto {
   @IsNotEmpty()
   isPublic: boolean;
 
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
-
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
   tags?: string[];
-
-  public getStringUserId() {
-    return `${this.userId}`;
-  }
 }

@@ -10,7 +10,7 @@ export class AddAndRemoveTagRequestDto {
   ) {
     this.targetType = targetType;
     this.targetId = targetId;
-    this.contentsArray = contentsArray;
+    this.contentsArray = contentsArray ?? [];
   }
   @ApiProperty()
   @IsEnum(TARGET_TYPES)
