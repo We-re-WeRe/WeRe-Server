@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewRepository } from './reviews.repository';
@@ -7,11 +7,11 @@ import {
   ReadReviewAndWebtoonDto,
   ReadReviewDto,
 } from './dto/read-review.dto';
-import { Review } from 'src/entities/review.entity';
 import {
   CustomDataAlreadyExistException,
   CustomDataBaseException,
   CustomNotFoundException,
+  CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import { TagsService } from 'src/tags/tags.service';
 import { TARGET_TYPES } from 'src/utils/types_and_enums';
@@ -32,6 +32,7 @@ export class ReviewsService {
   async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
     const queryResult = await this.reviewRepository.findManyByUserId(userId);
     const result = queryResult.map((r) => new ReadReviewAndWebtoonDto(r));
+    // TODO:: map으로 일일이 하는게 빠를까 id리스트 가져와서 그거로 tag 찾고 일일이 맵핑해주는게 조을까
     await Promise.all(
       result.map(
         async (r) =>
@@ -75,10 +76,13 @@ export class ReviewsService {
    * @param createReviewDto user id and webtoon id
    * @returns {Promise<Review>}
    */
-  async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
+  async createReview(
+    userId: number,
+    createReviewDto: CreateReviewDto,
+  ): Promise<ReadReviewDto> {
     const alreadyReview = await this.reviewRepository.findOne({
       where: {
-        user: { id: createReviewDto.userId },
+        user: { id: userId },
         webtoon: { id: createReviewDto.webtoonId },
       },
     });
@@ -87,24 +91,27 @@ export class ReviewsService {
         'This User already has a Review for this Webtoon.',
       );
     }
-    const { tags } = createReviewDto;
     const queryResult = await this.reviewRepository.createReview(
+      userId,
       createReviewDto,
     );
     const id = queryResult.identifiers[0].id;
     if (!id) {
       throw new CustomDataBaseException('create is not worked.');
     }
-    const result = await this.reviewRepository.findOneBy({ id });
-    if (!!tags) {
-      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
-        TARGET_TYPES.REVIEW,
-        id,
-        tags,
-      );
-      await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
-    }
-    return result;
+    const result = await this.reviewRepository.findOneById(id);
+    const readReviewDto = new ReadReviewDto(result);
+    const { tags } = createReviewDto;
+    const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+      TARGET_TYPES.REVIEW,
+      id,
+      tags,
+    );
+    readReviewDto.tags = await this.tagsService.addAndRemoveTag(
+      addAndRemoveTagRequestDto,
+    );
+
+    return readReviewDto;
   }
 
   /**
@@ -112,34 +119,45 @@ export class ReviewsService {
    * @param updateReviewDto id and fields
    * @returns {Promise<Review>}
    */
-  async updateReview(updateReviewDto: UpdateReviewDto): Promise<Review> {
-    const { tags, ...tempUpdateReviewDto } = updateReviewDto;
+  async updateReview(
+    userId: number,
+    updateReviewDto: UpdateReviewDto,
+  ): Promise<ReadReviewDto> {
+    const { tags, id, ...tempUpdateReviewDto } = updateReviewDto;
+    await this.checkReviewOwner(id, userId);
     const queryResult = await this.reviewRepository.update(
-      tempUpdateReviewDto.id,
+      id,
       tempUpdateReviewDto,
     );
     if (!queryResult.affected) {
       throw new CustomNotFoundException('id');
     }
-    const result = await this.reviewRepository.findOneBy({
-      id: tempUpdateReviewDto.id,
-    });
-    if (!!tags) {
-      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
-        TARGET_TYPES.REVIEW,
-        result.id,
-        tags,
-      );
-      await this.tagsService.addAndRemoveTag(addAndRemoveTagRequestDto);
-    }
-    return result;
+    const result = await this.reviewRepository.findOneById(id);
+    const readReviewDto = new ReadReviewDto(result);
+    const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+      TARGET_TYPES.REVIEW,
+      result.id,
+      tags,
+    );
+    readReviewDto.tags = await this.tagsService.addAndRemoveTag(
+      addAndRemoveTagRequestDto,
+    );
+
+    return readReviewDto;
   }
 
-  async deleteReview(id: number): Promise<void> {
+  async deleteReview(id: number, userId: number): Promise<void> {
+    await this.checkReviewOwner(id, userId);
     const queryResult = await this.reviewRepository.delete(id);
     if (!queryResult) {
       throw new CustomNotFoundException('id');
     }
     return;
+  }
+
+  async checkReviewOwner(id: number, userId: number): Promise<void> {
+    const queryResult = await this.reviewRepository.findOneById(id);
+    if (queryResult.user_id == userId)
+      throw new CustomUnauthorziedException("you can't change review");
   }
 }

@@ -4,10 +4,10 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   HttpStatus,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -21,10 +21,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Review } from 'src/entities/review.entity';
-import {
-  CustomBadTypeRequestException,
-  CustomUnauthorziedException,
-} from 'src/utils/custom_exceptions';
+import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
+import { Public, UserId } from 'src/utils/custom_decorators';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -36,9 +34,10 @@ export class ReviewsController {
     description: 'Request Success',
     type: [ReadReviewAndWebtoonDto],
   })
-  @Get('list/user/:userId')
+  @Public()
+  @Get('list/user')
   async findManyByUserId(
-    @Param('userId') userId: number,
+    @Query('userId') userId: number,
   ): Promise<ReadReviewAndWebtoonDto[]> {
     try {
       if (!userId) throw new CustomBadTypeRequestException('userId', userId);
@@ -54,9 +53,12 @@ export class ReviewsController {
     type: Review,
   })
   @Post()
-  createReview(@Body() createReviewDto: CreateReviewDto): Promise<Review> {
+  createReview(
+    @UserId() userId: number,
+    @Body() createReviewDto: CreateReviewDto,
+  ): Promise<ReadReviewDto> {
     try {
-      return this.reviewsService.createReview(createReviewDto);
+      return this.reviewsService.createReview(userId, createReviewDto);
     } catch (error) {
       throw error;
     }
@@ -67,17 +69,13 @@ export class ReviewsController {
     description: 'Request Success',
     type: Review,
   })
-  @Patch(':id')
+  @Patch()
   updateReview(
-    @Param('id') id: number,
+    @UserId() userId: number,
     @Body() updateReviewDto: UpdateReviewDto,
-  ): Promise<Review> {
-    // param id와 dto 내 id 체크로 자격 여부 판단하는거도 ㄱㅊ할듯
+  ): Promise<ReadReviewDto> {
     try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      if (id !== updateReviewDto.id)
-        throw new CustomUnauthorziedException(`id is wrong.`);
-      return this.reviewsService.updateReview(updateReviewDto);
+      return this.reviewsService.updateReview(userId, updateReviewDto);
     } catch (error) {
       throw error;
     }
@@ -86,12 +84,14 @@ export class ReviewsController {
   @ApiOperation({ summary: 'delete Review' })
   @ApiNoContentResponse({ description: 'Request Success' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':id')
-  deleteReview(@Param('id') id: number): Promise<void> {
-    // 삭제 잘 되었다는 status code 반환~
+  @Delete()
+  deleteReview(
+    @UserId() userId: number,
+    @Query('id') id: number,
+  ): Promise<void> {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
-      return this.reviewsService.deleteReview(id);
+      return this.reviewsService.deleteReview(id, userId);
     } catch (error) {
       throw error;
     }
