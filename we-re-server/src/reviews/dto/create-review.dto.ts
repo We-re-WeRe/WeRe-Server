@@ -21,21 +21,12 @@ export class CreateReviewDto {
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
-  userId: number;
-
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   webtoonId: number;
 
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @IsOptional()
   tags?: string[];
-
-  public getStringUserId(): string {
-    return `${this.userId}`;
-  }
 
   public getStringWebtoonId(): string {
     return `${this.webtoonId}`;

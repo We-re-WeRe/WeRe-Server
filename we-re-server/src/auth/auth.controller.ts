@@ -1,18 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Query,
-  Res,
-  Headers,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
 import { LocalAuthDto } from './dto/auth.dto';
-import { CustomUnauthorziedException } from 'src/utils/custom_exceptions';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -22,8 +11,7 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { ReadJWTDto } from './dto/jwt.dto';
 import { Response } from 'express';
-import { RefreshTokenGuard } from './auth.guard';
-import { UserId } from 'src/utils/custom_decorators';
+import { Public, RefreshRequired, UserId } from 'src/utils/custom_decorators';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -38,6 +26,7 @@ export class AuthController {
     description: 'Request Success',
     type: Boolean,
   })
+  @Public()
   @Get('check/duplicated-account')
   async checkIsDuplicatedAccount(
     @Query('account') account: string,
@@ -50,6 +39,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @Public()
   @Post('login/local')
   async localLogin(
     @Body() localAuthDto: LocalAuthDto,
@@ -64,12 +54,14 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: 'log out' })
+  @ApiOperation({
+    summary: 'log out. authorization in header should be Refresh Token',
+  })
   @ApiOkResponse({
     description: 'Request Success',
     type: ReadJWTDto,
   })
-  @UseGuards(RefreshTokenGuard)
+  @RefreshRequired()
   @Patch('logout')
   async logout(
     @UserId() userId: number,
@@ -84,22 +76,20 @@ export class AuthController {
     }
   }
 
-  @ApiOperation({ summary: 'refresh token' })
+  @ApiOperation({
+    summary: 'refresh token. authorization in header should be Refresh Token',
+  })
   @ApiCreatedResponse({
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @RefreshRequired()
   @Post('refresh')
   async refreshJwt(
-    @Headers() headers,
+    @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = this.extractTokenFromHeader(headers);
-    if (!token) {
-      throw new CustomUnauthorziedException('log in again');
-    }
     try {
-      const { userId } = await this.authService.validateRefreshToken(token);
       const result = await this.authService.getJWTDto(userId);
       this.setTokenInResponseAndHeader(res, result);
       return result;
@@ -113,6 +103,7 @@ export class AuthController {
     description: 'Request Success',
     type: ReadJWTDto,
   })
+  @Public()
   @Post('signon')
   async signOn(
     @Body() createLocalAuthDto: CreateLocalAuthDto,
@@ -178,15 +169,5 @@ export class AuthController {
   removeTokenInCookie(res: Response): void {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-  }
-
-  /**
-   * extract token from header
-   * @param request
-   * @returns
-   */
-  private extractTokenFromHeader(headers: any): string | undefined {
-    const [type, token] = headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

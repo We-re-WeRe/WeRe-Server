@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Auth } from 'src/entities/auth.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CreateLocalAuthDto } from './dto/create-auth.dto';
-import { LocalAuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthRepository extends Repository<Auth> {

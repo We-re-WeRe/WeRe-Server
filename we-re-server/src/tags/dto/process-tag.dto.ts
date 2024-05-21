@@ -3,15 +3,19 @@ import { IsArray, IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
 
 export class AddAndRemoveTagRequestDto {
-  constructor(tagType: TargetTypes, targetId: number, contentsArray: string[]) {
-    this.tagType = tagType;
+  constructor(
+    targetType: TargetTypes,
+    targetId: number,
+    contentsArray: string[],
+  ) {
+    this.targetType = targetType;
     this.targetId = targetId;
-    this.contentsArray = contentsArray;
+    this.contentsArray = contentsArray ?? [];
   }
   @ApiProperty()
   @IsEnum(TARGET_TYPES)
   @IsNotEmpty()
-  tagType: TargetTypes;
+  targetType: TargetTypes;
 
   @ApiProperty()
   @IsInt()

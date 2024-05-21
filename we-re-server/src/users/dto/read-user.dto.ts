@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class ReadUserDto {
   constructor(raw?: any) {
@@ -35,9 +35,10 @@ export class ReadUserDto {
 }
 
 export class ReadUserDetailDto extends ReadUserDto {
-  constructor(raw: any) {
+  constructor(userId: number, raw: any) {
     super();
     this.rawToDto(raw);
+    this.isMine = userId === this.getId();
   }
   @ApiProperty()
   @IsString()
@@ -47,6 +48,11 @@ export class ReadUserDetailDto extends ReadUserDto {
   @IsInt()
   @IsNotEmpty()
   totalFollowers: number;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isMine: boolean;
 
   public rawToDto(raw: any): ReadUserDetailDto {
     super.rawToDto(raw);

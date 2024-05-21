@@ -49,7 +49,7 @@ export class ReadReviewDto {
     this.createdAt = raw.review_created_at;
     this.contents = raw.review_contents;
     this.starPoint = raw.review_star_point;
-    this.totalLikes = raw.totalLikes;
+    this.totalLikes = raw.totalLikes ?? 0;
     return this;
   }
 }

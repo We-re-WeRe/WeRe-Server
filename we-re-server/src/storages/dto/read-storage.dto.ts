@@ -64,6 +64,11 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   @IsNotEmpty()
   isPublic: boolean;
 
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isMine: boolean;
+
   @ApiProperty({ type: () => [ReadTagDto] })
   @ValidateNested()
   @IsNotEmpty()
@@ -80,5 +85,9 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
     this.isPublic = raw.storage_is_public;
     this.user = new ReadUserBriefDto(raw);
     return this;
+  }
+
+  public setIsMine(userId: number): void {
+    this.isMine = userId === this.user.getId();
   }
 }

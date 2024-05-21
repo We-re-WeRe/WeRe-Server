@@ -45,11 +45,14 @@ export class PointsService {
     const result: ReadPointSumDto = new ReadPointSumDto(queryResult, user.id);
     return result;
   }
-  async createPoint(createdPointDto: CreatePointDto) {
+  async createPoint(userId: number, createdPointDto: CreatePointDto) {
     // dto 값 정합성 체크.
     if (!createdPointDto.mount)
       createdPointDto.mount = getPointMountByReason(createdPointDto.reason);
-    const queryResult = await this.pointRepository.createPoint(createdPointDto);
+    const queryResult = await this.pointRepository.createPoint(
+      userId,
+      createdPointDto,
+    );
     const id = queryResult.identifiers[0].id;
     if (!id) {
       throw new CustomDataBaseException('create is not worked.');
