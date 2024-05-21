@@ -8,18 +8,27 @@ import {
   ReadUserDto,
 } from './dto/read-user.dto';
 import { FollowDto } from './dto/follow.dto';
-import { CustomNotFoundException } from 'src/utils/custom_exceptions';
+import {
+  CustomDataAlreadyExistException,
+  CustomDataBaseException,
+  CustomNotFoundException,
+} from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async findOneDetailById(id: number): Promise<ReadUserDetailDto> {
+  async findOneDetailById(
+    userId: number,
+    targetId: number,
+  ): Promise<ReadUserDetailDto> {
     try {
-      const queryResult = await this.userRepository.findOneDetailById(id);
-      Logger.log(JSON.stringify(queryResult));
-      if (!queryResult) throw new CustomNotFoundException('id');
-      const result: ReadUserDetailDto = new ReadUserDetailDto(queryResult);
+      const queryResult = await this.userRepository.findOneDetailById(targetId);
+      if (!queryResult) throw new CustomNotFoundException('targetId');
+      const result: ReadUserDetailDto = new ReadUserDetailDto(
+        userId,
+        queryResult,
+      );
       return result;
     } catch (error) {
       throw error;
@@ -29,6 +38,7 @@ export class UsersService {
   async findOneProfileImageById(id: number): Promise<ReadUserDto> {
     const queryResult = await this.userRepository.findOneProfileImageById(id);
     if (!queryResult) throw new CustomNotFoundException('id');
+    Logger.log(JSON.stringify(queryResult));
     const result: ReadUserDto = new ReadUserDto(queryResult);
     return result;
   }
@@ -45,11 +55,39 @@ export class UsersService {
   }
 
   /**
+   * checking service nickname is duplicated.
+   * @param nickname
+   * @returns
+   */
+  async checkNicknameIsUsed(nickname: string): Promise<boolean> {
+    const queryResult = await this.userRepository.getIdByNickname(nickname);
+    if (!!queryResult) {
+      throw new CustomDataAlreadyExistException('this Nickname is already in.');
+    }
+    return !!queryResult;
+  }
+  /**
+   * create user info service.
+   * @param createUserDto
+   * @returns
+   */
+  async createUserInfo(createUserDto: CreateUserDto): Promise<number> {
+    const queryResult = await this.userRepository.createUserInfo(createUserDto);
+    const id = queryResult.identifiers[0].id;
+    if (!!!id) throw new CustomDataBaseException('create user is not worked');
+    return id;
+  }
+
+  /**
    * Create new follow join.
    * @param followDto follower's id and target id
    * @returns {void}
    */
   async createFollowRelation(followDto: FollowDto): Promise<void> {
+    const queryResult = await this.userRepository.findOneBy({
+      id: followDto.targetId,
+    });
+    if (!queryResult) throw new CustomNotFoundException('targetId');
     return await this.userRepository.createFollowRelation(followDto);
   }
 
@@ -88,9 +126,11 @@ export class UsersService {
    * @returns {void}
    */
   async deleteFollowRelation(followDto: FollowDto): Promise<void> {
-    const queryResult = await this.userRepository.deleteFollowRelation(
-      followDto,
-    );
+    const queryResult = await this.userRepository.findOneBy({
+      id: followDto.targetId,
+    });
+    if (!queryResult) throw new CustomNotFoundException('targetId');
+    await this.userRepository.deleteFollowRelation(followDto);
     return;
   }
 }

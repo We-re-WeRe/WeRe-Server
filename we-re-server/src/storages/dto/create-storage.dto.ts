@@ -1,7 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateStorageDto {
   @ApiProperty()
@@ -20,13 +28,12 @@ export class CreateStorageDto {
   explain: string;
 
   @ApiProperty()
-  @IsEnum(DISCLOSURESCOPE)
-  @Transform(({ value }) => DISCLOSURESCOPE[value.toUpperCase()])
+  @IsBoolean()
   @IsNotEmpty()
-  disclosureScope: DisclosureScope;
+  isPublic: boolean;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
+  @ApiProperty({ type: () => [String] })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 }

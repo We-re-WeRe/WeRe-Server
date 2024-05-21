@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEnum,
+  IsBoolean,
+  IsDate,
   IsInt,
   IsNotEmpty,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { DISCLOSURESCOPE, DisclosureScope } from 'src/entities/storage.entity';
+import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
 export class ReadStorageBriefDto {
@@ -17,6 +18,11 @@ export class ReadStorageBriefDto {
   @IsInt()
   @IsNotEmpty()
   id: number;
+
+  @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
+  createdAt: Date;
 
   @ApiProperty()
   @IsString()
@@ -35,6 +41,7 @@ export class ReadStorageBriefDto {
 
   public rawToDto(raw: any): ReadStorageBriefDto {
     this.id = raw.storage_id;
+    this.createdAt = raw.storage_created_at;
     this.imageURL = raw.storage_image_url;
     this.name = raw.storage_name;
     this.totalLikes = raw.totalLikes;
@@ -53,9 +60,19 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   explain: string;
 
   @ApiProperty()
-  @IsEnum(DISCLOSURESCOPE)
+  @IsBoolean()
   @IsNotEmpty()
-  disclosureScope: DisclosureScope;
+  isPublic: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isMine: boolean;
+
+  @ApiProperty({ type: () => [ReadTagDto] })
+  @ValidateNested()
+  @IsNotEmpty()
+  tags: ReadTagDto[];
 
   @ApiProperty({ type: () => ReadUserBriefDto })
   @ValidateNested()
@@ -65,8 +82,12 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
   public rawToDto(raw: any): ReadStorageDetailDto {
     super.rawToDto(raw);
     this.explain = raw.storage_explain;
-    this.disclosureScope = raw.storage_disclosure_scope;
+    this.isPublic = raw.storage_is_public;
     this.user = new ReadUserBriefDto(raw);
     return this;
+  }
+
+  public setIsMine(userId: number): void {
+    this.isMine = userId === this.user.getId();
   }
 }

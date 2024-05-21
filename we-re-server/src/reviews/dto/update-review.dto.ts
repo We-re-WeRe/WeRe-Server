@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateReviewDto {
   @ApiProperty()
@@ -16,4 +22,9 @@ export class UpdateReviewDto {
   @IsInt()
   @IsOptional()
   starPoint?: number;
+
+  @ApiProperty({ type: () => [String] })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 }

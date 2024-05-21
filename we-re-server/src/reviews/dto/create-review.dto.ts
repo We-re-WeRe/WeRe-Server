@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateReviewDto {
   @ApiProperty()
@@ -13,12 +19,16 @@ export class CreateReviewDto {
   starPoint: number;
 
   @ApiProperty()
-  @IsString()
+  @IsInt()
   @IsNotEmpty()
-  userId: string;
+  webtoonId: number;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  webtoonId: string;
+  @ApiProperty({ type: () => [String] })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
+
+  public getStringWebtoonId(): string {
+    return `${this.webtoonId}`;
+  }
 }

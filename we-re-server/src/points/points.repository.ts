@@ -30,12 +30,12 @@ export class PointRepository extends Repository<Point> {
       .getRawOne();
   }
 
-  public async createPoint(createPointDto: CreatePointDto) {
+  public async createPoint(userId: number, createPointDto: CreatePointDto) {
     return await this.createQueryBuilder()
       .insert()
       .into(Point)
       .values({
-        user: () => createPointDto.UserIdString,
+        user: () => `${userId}`,
         reason: createPointDto.Reason,
         mount: createPointDto.Mount,
       })

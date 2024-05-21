@@ -8,6 +8,18 @@ export class ReviewRepository extends Repository<Review> {
   constructor(private readonly datasource: DataSource) {
     super(Review, datasource.createEntityManager());
   }
+  public async findOneById(id: number) {
+    return await this.createQueryBuilder('review')
+      .where('review.id=:id', { id })
+      .select([
+        'review.id',
+        'review.contents',
+        'review.starPoint',
+        'review.createdAt',
+        'review.user',
+      ])
+      .getRawOne();
+  }
   public async findManyByUserId(userId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
       .where('review.user=:userId', { userId })
@@ -16,6 +28,7 @@ export class ReviewRepository extends Repository<Review> {
         'review.id',
         'review.contents',
         'review.starPoint',
+        'review.createdAt',
         'webtoon.id',
         'webtoon.title',
         'webtoon.imageURL',
@@ -34,6 +47,7 @@ export class ReviewRepository extends Repository<Review> {
         'review.id',
         'review.contents',
         'review.starPoint',
+        'review.createdAt',
         'user.id',
         'user.nickname',
         'user.imageURL',
@@ -42,13 +56,13 @@ export class ReviewRepository extends Repository<Review> {
       .getRawMany();
   }
 
-  public async createReview(createReviewDto: CreateReviewDto) {
+  public async createReview(userId: number, createReviewDto: CreateReviewDto) {
     return await this.createQueryBuilder()
       .insert()
       .into(Review)
       .values({
-        user: () => createReviewDto.userId,
-        webtoon: () => createReviewDto.webtoonId,
+        user: () => userId.toString(),
+        webtoon: () => createReviewDto.getStringWebtoonId(),
         contents: createReviewDto.contents,
         starPoint: createReviewDto.starPoint,
       })

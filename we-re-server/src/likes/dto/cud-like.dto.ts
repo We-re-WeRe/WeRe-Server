@@ -1,31 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
 
-const types = ['review', 'webtoon', 'storage'];
-export class LikeRequestDto {
-  constructor(likeType: string, targetId: number) {
-    this.likeType = likeType;
+export class AddAndRemoveLikeDto {
+  constructor(userId: number, targetType: TargetTypes, targetId: number) {
+    this.userId = userId;
+    this.targetType = targetType;
     this.targetId = targetId;
   }
   @ApiProperty()
-  @IsString()
+  @IsInt()
+  @IsOptional()
+  userId?: number;
+
+  @ApiProperty()
+  @IsEnum(TARGET_TYPES)
   @IsNotEmpty()
-  @IsIn(types)
-  likeType: string;
+  targetType: TargetTypes;
 
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
   targetId: number;
-}
 
-export class AddAndRemoveLikeDto extends LikeRequestDto {
-  constructor(userId: number, likeType: string, targetId: number) {
-    super(likeType, targetId);
+  public setUserId(userId: number) {
     this.userId = userId;
   }
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  userId: number;
 }

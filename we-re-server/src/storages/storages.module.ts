@@ -2,12 +2,12 @@ import { Module } from '@nestjs/common';
 import { StoragesService } from './storages.service';
 import { StoragesController } from './storages.controller';
 import { StorageRepository } from './storages.repository';
-import { UsersService } from 'src/users/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { LikesModule } from 'src/likes/likes.module';
+import { TagsModule } from 'src/tags/tags.module';
 
 @Module({
-  imports: [UsersModule, LikesModule],
+  imports: [UsersModule, LikesModule, TagsModule],
   controllers: [StoragesController],
   providers: [StoragesService, StorageRepository],
   exports: [StoragesService],

@@ -32,6 +32,7 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .groupBy('webtoon.id')
       .addSelect('COUNT(DISTINCT(likes.id))', 'totalLikes')
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
+      .addSelect('COUNT(reviews.id)', 'reviewCount')
       .getRawOne();
   }
 

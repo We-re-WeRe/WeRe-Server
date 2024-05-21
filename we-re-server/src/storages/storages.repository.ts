@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Storage,
-  DISCLOSURESCOPE,
-  DisclosureScope,
-} from 'src/entities/storage.entity';
+import { Storage } from 'src/entities/storage.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class StorageRepository extends Repository<Storage> {
@@ -19,24 +16,35 @@ export class StorageRepository extends Repository<Storage> {
       .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
+        'storage.createdAt',
         'storage.imageURL',
         'storage.name',
         'storage.explain',
-        'storage.disclosureScope',
-        'storage.user_id',
+        'storage.isPublic',
+        'storage.user',
       ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .groupBy('storage.id')
       .getRawOne();
   }
 
+  public async findOneById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .select(['storage.id', 'storage.user'])
+      .getRawOne();
+  }
+
   public async findManyPublicStorageList() {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.createdAt',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
@@ -45,29 +53,35 @@ export class StorageRepository extends Repository<Storage> {
 
   public async findManyPublicStorageListByIds(ids: number[]) {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .andWhere('storage.id IN (:...ids)', { ids })
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.createdAt',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
       .getRawMany();
   }
 
-  public async findManyStorageListByUserId(
-    userId: number,
-    disclosureScope: DisclosureScope[],
-  ) {
-    return await this.createQueryBuilder('storage')
-      .where('storage.user=:userId', { userId })
-      .andWhere('storage.disclosureScope IN (:...disclosureScope)', {
-        disclosureScope,
-      })
+  public async findManyStorageListByUserId(userId: number, isMe: boolean) {
+    const qb = this.createQueryBuilder('storage').where(
+      'storage.user=:userId',
+      { userId },
+    );
+    if (!isMe) qb.andWhere('storage.isPublic=true');
+    return await qb
       .leftJoinAndSelect('storage.likes', 'likes')
-      .select(['storage.id', 'storage.imageURL', 'storage.name'])
+      .select([
+        'storage.id',
+        'storage.createdAt',
+        'storage.imageURL',
+        'storage.name',
+      ])
       .addSelect('COUNT(likes.id)', 'totalLikes')
       .orderBy('totalLikes', 'DESC')
       .groupBy('storage.id')
@@ -76,9 +90,7 @@ export class StorageRepository extends Repository<Storage> {
 
   public async findManyPublicListByWebtoonId(webtoonId: number) {
     return await this.createQueryBuilder('storage')
-      .where('storage.disclosureScope=:disclosureScope', {
-        disclosureScope: DISCLOSURESCOPE.PUBLIC,
-      })
+      .where('storage.isPublic=true')
       .leftJoinAndSelect('storage.likes', 'likes')
       .leftJoinAndSelect(
         'storage.webtoons',
@@ -113,23 +125,27 @@ export class StorageRepository extends Repository<Storage> {
       .where('storage.id=:id', { id: webtoonInStorageDto.id })
       .leftJoinAndSelect(
         'storage.webtoons',
-        'webtoons',
-        'webtoons.id=:webtoonId',
+        'webtoon',
+        'webtoon.id=:webtoonId',
         {
           webtoonId: webtoonInStorageDto.webtoonId,
         },
       )
-      .select(['storage.id', 'webtoons.id'])
+      .select(['storage.id', 'storage.user', 'webtoon.id'])
       .getRawOne();
   }
 
-  public async createStorage(createStorageDto: CreateStorageDto) {
+  public async createStorage(
+    userId: number,
+    createStorageDto: CreateStorageDto,
+  ) {
+    const { tags, ...tempCreateStorageDto } = createStorageDto;
     return await this.createQueryBuilder()
       .insert()
       .into(Storage)
       .values({
-        ...createStorageDto,
-        user: () => createStorageDto.userId,
+        ...tempCreateStorageDto,
+        user: () => userId.toString(),
       })
       .execute();
   }
@@ -138,7 +154,10 @@ export class StorageRepository extends Repository<Storage> {
     return await this.createQueryBuilder()
       .relation(Storage, 'webtoons')
       .of(webtoonInStorageDto.id)
-      .add(webtoonInStorageDto.webtoonId);
+      .add(webtoonInStorageDto.webtoonId)
+      .catch(() => {
+        throw new CustomNotFoundException('webtoonId');
+      });
   }
 
   public async removeWebtoonAtStorage(

@@ -1,19 +1,8 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Logger,
-  Param,
-  Post,
-} from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, Patch, Query } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { ReadLikeInfoDto } from './dto/read-like.dto';
-import {
-  CustomBadTypeRequestException,
-  CustomUnauthorziedException,
-} from 'src/utils/custom_exceptions';
+import { UserId } from 'src/utils/custom_decorators';
 import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 
 @ApiTags('Likes')
@@ -22,26 +11,17 @@ export class LikesController {
   constructor(private readonly likeService: LikesService) {}
 
   @ApiOperation({ summary: 'update webtoon like' })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Request Success',
     type: ReadLikeInfoDto,
   })
-  @Post('type/:likeType/targetId/:targetId')
-  async addWebtoonLike(
-    @Param('likeType') likeType: 'webtoon' | 'review' | 'storage',
-    @Param('targetId') targetId: number,
-    @Body() addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  @Patch()
+  async addLike(
+    @UserId() userId: number,
+    @Query() addAndRemoveLikeDto: AddAndRemoveLikeDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      if (!likeType)
-        throw new CustomBadTypeRequestException('likeType', likeType);
-      if (!targetId)
-        throw new CustomBadTypeRequestException('targetId', targetId);
-      if (
-        targetId !== addAndRemoveLikeDto.targetId ||
-        likeType !== addAndRemoveLikeDto.likeType
-      )
-        throw new BadRequestException(`Param is different with Body's.`);
+      addAndRemoveLikeDto.setUserId(userId);
       const result = await this.likeService.addLike(addAndRemoveLikeDto);
       return result;
     } catch (error) {
@@ -50,26 +30,17 @@ export class LikesController {
   }
 
   @ApiOperation({ summary: 'delete like' })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     description: 'Request Success',
     type: ReadLikeInfoDto,
   })
-  @Delete('type/:likeType/targetId/:targetId')
+  @Delete()
   async deleteLike(
-    @Param('likeType') likeType: 'webtoon' | 'review' | 'storage',
-    @Param('targetId') targetId: number,
-    @Body() addAndRemoveLikeDto: AddAndRemoveLikeDto,
+    @UserId() userId: number,
+    @Query() addAndRemoveLikeDto: AddAndRemoveLikeDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      if (!likeType)
-        throw new CustomBadTypeRequestException('likeType', likeType);
-      if (!targetId)
-        throw new CustomBadTypeRequestException('targetId', targetId);
-      if (
-        targetId !== addAndRemoveLikeDto.targetId ||
-        likeType !== addAndRemoveLikeDto.likeType
-      )
-        throw new BadRequestException(`Param is different with Body's.`);
+      addAndRemoveLikeDto.setUserId(userId);
       const result = await this.likeService.softRemoveLike(addAndRemoveLikeDto);
       return result;
     } catch (error) {

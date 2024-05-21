@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FollowDto } from './dto/follow.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -21,7 +23,7 @@ export class UserRepository extends Repository<User> {
 
   public async findOneProfileImageById(id: number) {
     return await this.createQueryBuilder('user')
-      .select(['user.id', 'user.imageURL'])
+      .select(['user.id', 'user.imageURL', 'user.nickname'])
       .where('id=:id', { id })
       .getRawOne();
   }
@@ -39,6 +41,26 @@ export class UserRepository extends Repository<User> {
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .groupBy('user.id')
       .getRawOne();
+  }
+
+  public async getIdByNickname(nickname: string) {
+    return await this.createQueryBuilder('user')
+      .where('user.nickname=:nickname', { nickname })
+      .select(['user.id'])
+      .getOne();
+  }
+
+  /**
+   * create user info
+   * @param createUserDto
+   * @returns
+   */
+  public async createUserInfo(createUserDto: CreateUserDto) {
+    return await this.createQueryBuilder()
+      .insert()
+      .into(User)
+      .values(createUserDto)
+      .execute();
   }
 
   public async createFollowRelation(followDto: FollowDto) {

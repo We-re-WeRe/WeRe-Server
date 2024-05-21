@@ -145,6 +145,11 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
+  reviewCount: number;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
   totalLikes: number;
 
   @ApiProperty()
@@ -171,6 +176,7 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
     this.explain = raw.webtoon_explain;
     this.viewCount = raw.webtoon_view_count;
     this.totalLikes = raw.totalLikes;
+    this.reviewCount = raw.reviewCount;
     this.totalStarPoint = raw.totalStarPoint;
     return this;
   }
