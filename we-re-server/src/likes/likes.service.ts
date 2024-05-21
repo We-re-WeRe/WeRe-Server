@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
 import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
 import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
