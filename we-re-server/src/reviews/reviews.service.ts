@@ -14,7 +14,7 @@ import {
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import { LikesService } from 'src/likes/likes.service';
-import { AddAndRemoveLikeDto } from 'src/likes/dto/cud-like.dto';
+import { LikeRequestDto } from 'src/likes/dto/cud-like.dto';
 import { TagsService } from 'src/tags/tags.service';
 import { TARGET_TYPES } from 'src/utils/types_and_enums';
 import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
@@ -29,15 +29,18 @@ export class ReviewsService {
 
   /**
    * get user's reviews with webtoon info.
-   * @param userId
+   * @param ownerId
    * @returns {Promise<[ReadReviewAndWebtoonDto]>}
    */
-  async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
-    const queryResult = await this.reviewRepository.findManyByUserId(userId);
+  async findManyByOwnerId(
+    userId: number,
+    ownerId: number,
+  ): Promise<ReadReviewAndWebtoonDto[]> {
+    const queryResult = await this.reviewRepository.findManyByOwnerId(ownerId);
     const result = await Promise.all(
       queryResult.map(async (r) => {
         const temp = new ReadReviewAndWebtoonDto(r);
-        const addAndRemoveLikeDto = new AddAndRemoveLikeDto(
+        const addAndRemoveLikeDto = new LikeRequestDto(
           userId,
           TARGET_TYPES.REVIEW,
           temp.id,
@@ -47,6 +50,7 @@ export class ReviewsService {
           TARGET_TYPES.REVIEW,
           temp.id,
         );
+        temp.setIsMine(userId, ownerId);
         return temp;
       }),
     );

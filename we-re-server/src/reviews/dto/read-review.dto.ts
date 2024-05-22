@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDate,
   IsInt,
   IsNotEmpty,
@@ -35,6 +36,11 @@ export class ReadReviewDto {
   @IsNotEmpty()
   starPoint: number;
 
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isMine: boolean;
+
   @ApiProperty({ type: () => ReadLikeInfoDto })
   @ValidateNested()
   @IsNotEmpty()
@@ -51,6 +57,10 @@ export class ReadReviewDto {
     this.contents = raw.review_contents;
     this.starPoint = raw.review_star_point;
     return this;
+  }
+
+  public setIsMine(userId: number, ownerId: number) {
+    this.isMine = userId === ownerId;
   }
 }
 

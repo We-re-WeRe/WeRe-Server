@@ -20,9 +20,9 @@ export class ReviewRepository extends Repository<Review> {
       ])
       .getRawOne();
   }
-  public async findManyByUserId(userId: number): Promise<Review[]> {
+  public async findManyByOwnerId(ownerId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
-      .where('review.user=:userId', { userId })
+      .where('review.user=:ownerId', { ownerId })
       .leftJoinAndSelect('review.webtoon', 'webtoon')
       .select([
         'review.id',
