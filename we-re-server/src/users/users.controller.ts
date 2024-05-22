@@ -66,8 +66,9 @@ export class UsersController {
   ): Promise<ReadUserDetailDto> {
     try {
       if (!targetId)
-        return await this.usersService.findOneDetailById(userId, userId);
-      else return await this.usersService.findOneDetailById(userId, targetId);
+        if (userId) targetId = userId;
+        else throw new CustomBadTypeRequestException('targetId', targetId);
+      return await this.usersService.findOneDetailById(userId, targetId);
     } catch (error) {
       throw error;
     }
