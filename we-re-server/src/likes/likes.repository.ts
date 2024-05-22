@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Like } from 'src/entities/like.entity';
 import { DataSource, Repository } from 'typeorm';
-import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
+import { LikeRequestDto } from './dto/cud-like.dto';
 
 @Injectable()
 export class LikesRepository extends Repository<Like> {
@@ -33,8 +33,8 @@ export class LikesRepository extends Repository<Like> {
       .getRawMany();
   }
 
-  public async findIsLiked(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
-    const { userId, targetType, targetId } = addAndRemoveLikeDto;
+  public async findIsLiked(likeRequestDto: LikeRequestDto) {
+    const { userId, targetType, targetId } = likeRequestDto;
     return this.createQueryBuilder('likes')
       .where('likes.user=:userId', { userId })
       .andWhere(`likes.${targetType}=:targetId`, { targetId })
@@ -42,16 +42,16 @@ export class LikesRepository extends Repository<Like> {
       .getOne();
   }
 
-  public async getLikeCount(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
-    const { targetType, targetId } = addAndRemoveLikeDto;
+  public async getLikeCount(likeRequestDto: LikeRequestDto) {
+    const { targetType, targetId } = likeRequestDto;
     return this.createQueryBuilder('likes')
       .where(`likes.${targetType}=:targetId`, { targetId })
       .select('COUNT(likes.id) as count')
       .getRawOne();
   }
 
-  public async createLike(addAndRemoveLikeDto: AddAndRemoveLikeDto) {
-    const { userId, targetType, targetId } = addAndRemoveLikeDto;
+  public async createLike(likeRequestDto: LikeRequestDto) {
+    const { userId, targetType, targetId } = likeRequestDto;
     const values = {
       user: () => `${userId}`,
     };

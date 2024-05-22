@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { ReadLikeInfoDto } from './dto/read-like.dto';
 import { UserId } from 'src/utils/custom_decorators';
-import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
+import { LikeRequestDto } from './dto/cud-like.dto';
 
 @ApiTags('Likes')
 @Controller('likes')
@@ -18,11 +18,11 @@ export class LikesController {
   @Patch()
   async addLike(
     @UserId() userId: number,
-    @Query() addAndRemoveLikeDto: AddAndRemoveLikeDto,
+    @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      addAndRemoveLikeDto.setUserId(userId);
-      const result = await this.likeService.addLike(addAndRemoveLikeDto);
+      likeRequestDto.setUserId(userId);
+      const result = await this.likeService.addLike(likeRequestDto);
       return result;
     } catch (error) {
       throw error;
@@ -37,11 +37,11 @@ export class LikesController {
   @Delete()
   async deleteLike(
     @UserId() userId: number,
-    @Query() addAndRemoveLikeDto: AddAndRemoveLikeDto,
+    @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      addAndRemoveLikeDto.setUserId(userId);
-      const result = await this.likeService.softRemoveLike(addAndRemoveLikeDto);
+      likeRequestDto.setUserId(userId);
+      const result = await this.likeService.softRemoveLike(likeRequestDto);
       return result;
     } catch (error) {
       throw error;
