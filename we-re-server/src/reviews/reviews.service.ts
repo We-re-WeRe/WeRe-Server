@@ -45,7 +45,9 @@ export class ReviewsService {
           TARGET_TYPES.REVIEW,
           temp.id,
         );
-        temp.like = await this.likesService.getLikeCount(addAndRemoveLikeDto);
+        temp.like = await this.likesService.getReadLikeInfoDto(
+          addAndRemoveLikeDto,
+        );
         temp.tags = await this.tagsService.findTagsByTargetId(
           TARGET_TYPES.REVIEW,
           temp.id,

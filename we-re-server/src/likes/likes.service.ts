@@ -53,14 +53,27 @@ export class LikesService {
   }
 
   /**
-   * get like count and return do i like and count.
+   * get like count and return count.
    * @param likeRequestDto webtoon, review, storage extends this object.
    * @returns {Promise<boolean>}
    */
-  async getLikeCount(likeRequestDto: LikeRequestDto): Promise<ReadLikeInfoDto> {
-    const { isLike } = await this.findIsLiked(likeRequestDto);
+  async getLikeCount(likeRequestDto: LikeRequestDto): Promise<number> {
     const queryResult = await this.likeRepository.getLikeCount(likeRequestDto);
-    const result = new ReadLikeInfoDto(isLike, queryResult);
+    const result: number = queryResult.count;
+    return result;
+  }
+
+  /**
+   * call functions to get read like info dto.
+   * @param likeRequestDto
+   * @returns
+   */
+  async getReadLikeInfoDto(
+    likeRequestDto: LikeRequestDto,
+  ): Promise<ReadLikeInfoDto> {
+    const { isLike } = await this.findIsLiked(likeRequestDto);
+    const count = await this.getLikeCount(likeRequestDto);
+    const result = new ReadLikeInfoDto(isLike, count);
     return result;
   }
 
@@ -87,7 +100,7 @@ export class LikesService {
       if (!isWorked)
         throw new CustomDataBaseException('update like is not worked');
     }
-    return await this.getLikeCount(likeRequestDto);
+    return await this.getReadLikeInfoDto(likeRequestDto);
   }
 
   /**
@@ -108,6 +121,6 @@ export class LikesService {
       if (!isWorked)
         throw new CustomDataBaseException('update like is not worked');
     }
-    return await this.getLikeCount(likeRequestDto);
+    return await this.getReadLikeInfoDto(likeRequestDto);
   }
 }
