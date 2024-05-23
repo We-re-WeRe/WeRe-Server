@@ -63,6 +63,7 @@ export class WebtoonsController {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       const result = await this.webtoonsService.findOneDetailById(id);
       result.storages = await this.storageService.findManyPublicListByWebtoonId(
+        userId,
         id,
       );
       result.reviews = await this.reviewService.findManyByWebtoonId(id);

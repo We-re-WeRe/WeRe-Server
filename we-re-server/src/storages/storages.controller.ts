@@ -4,9 +4,7 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
-  Logger,
   HttpStatus,
   HttpCode,
   Query,
@@ -29,10 +27,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { WebtoonInStorageDto } from './dto/webtoon-in-storage.dto';
-import {
-  CustomBadTypeRequestException,
-  CustomUnauthorziedException,
-} from 'src/utils/custom_exceptions';
+import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
 import { TagsService } from 'src/tags/tags.service';
 import { TARGET_TYPES } from 'src/utils/types_and_enums';
 import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
@@ -43,8 +38,8 @@ import { Public, UserId } from 'src/utils/custom_decorators';
 export class StoragesController {
   constructor(
     private readonly storagesService: StoragesService,
-    private readonly likesService: LikesService,
     private readonly userService: UsersService,
+    private readonly likesService: LikesService,
     private readonly tagsService: TagsService,
   ) {}
 
@@ -61,17 +56,10 @@ export class StoragesController {
   ): Promise<ReadStorageDetailDto> {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
-      const result = await this.storagesService.findOneDetailById(id);
-      const readTagDtoArray = await this.tagsService.findTagsByTargetId(
-        TARGET_TYPES.STORAGE,
-        id,
-      );
-      result.tags = readTagDtoArray;
-      const readUserBriefDto = await this.userService.findOneBriefById(
+      const result = await this.storagesService.findOneDetailById(id, userId);
+      result.user = await this.userService.findOneBriefById(
         result.user.getId(),
       );
-      result.user = readUserBriefDto;
-      result.setIsMine(userId);
       return result;
     } catch (error) {
       throw error;
@@ -85,9 +73,14 @@ export class StoragesController {
   })
   @Public()
   @Get('list')
-  async findManyPublicStorageList(): Promise<ReadStorageBriefDto[]> {
+  async findManyPublicStorageList(
+    @UserId() userId: number,
+  ): Promise<ReadStorageBriefDto[]> {
     try {
-      return await this.storagesService.findManyPublicStorageList();
+      const result = await this.storagesService.findManyPublicStorageList(
+        userId,
+      );
+      return result;
     } catch (error) {
       throw error;
     }
@@ -101,11 +94,19 @@ export class StoragesController {
   @Public()
   @Get('list/user')
   async findManyStorageListByUserId(
+    @UserId() userId: number,
     @Query('userId') ownerId: number,
   ): Promise<ReadStorageBriefDto[]> {
     try {
-      if (!ownerId) throw new CustomBadTypeRequestException('ownerId', ownerId);
-      return await this.storagesService.findManyStorageListByUserId(ownerId);
+      if (!ownerId)
+        if (!userId)
+          throw new CustomBadTypeRequestException('ownerId', ownerId);
+        else ownerId = userId;
+      const result = await this.storagesService.findManyStorageListByUserId(
+        userId,
+        ownerId,
+      );
+      return result;
     } catch (error) {
       throw error;
     }
@@ -123,7 +124,11 @@ export class StoragesController {
     try {
       const { storageIds: ids } =
         await this.likesService.findManyStorageIdsByUserId(userId);
-      return await this.storagesService.findManyPublicStorageListByIds(ids);
+      const result = await this.storagesService.findManyPublicStorageListByIds(
+        userId,
+        ids,
+      );
+      return result;
     } catch (error) {
       throw error;
     }

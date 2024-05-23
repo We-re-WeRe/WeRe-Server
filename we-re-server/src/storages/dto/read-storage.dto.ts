@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
@@ -34,17 +35,16 @@ export class ReadStorageBriefDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
-  @IsInt()
+  @ApiProperty({ type: () => ReadLikeInfoDto })
+  @ValidateNested()
   @IsNotEmpty()
-  totalLikes: number;
+  like: ReadLikeInfoDto;
 
   public rawToDto(raw: any): ReadStorageBriefDto {
     this.id = raw.storage_id;
     this.createdAt = raw.storage_created_at;
     this.imageURL = raw.storage_image_url;
     this.name = raw.storage_name;
-    this.totalLikes = raw.totalLikes;
     return this;
   }
 }
