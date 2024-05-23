@@ -13,7 +13,7 @@ export class LikesRepository extends Repository<Like> {
     return this.createQueryBuilder('likes')
       .where('likes.user=:userId', { userId })
       .andWhere('likes.storage IS NOT NULL')
-      .select(['likes.storage'])
+      .select(['likes.storage as storageId'])
       .getRawMany();
   }
 
@@ -21,7 +21,7 @@ export class LikesRepository extends Repository<Like> {
     return this.createQueryBuilder('likes')
       .where('likes.user=:userId', { userId })
       .andWhere('likes.webtoon IS NOT NULL')
-      .select(['likes.webtoon'])
+      .select(['likes.webtoon as webtoonId'])
       .getRawMany();
   }
 
@@ -29,7 +29,7 @@ export class LikesRepository extends Repository<Like> {
     return this.createQueryBuilder('likes')
       .where('likes.userId=:userId', { userId })
       .andWhere('likes.review IS NOT NULL')
-      .select(['likes.review'])
+      .select(['likes.review as reviewId'])
       .getRawMany();
   }
 
