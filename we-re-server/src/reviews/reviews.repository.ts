@@ -20,6 +20,20 @@ export class ReviewRepository extends Repository<Review> {
       ])
       .getRawOne();
   }
+
+  public async findOneByOwnerAndWebtoonId(ownerId: number, webtoonId: number) {
+    return await this.createQueryBuilder('review')
+      .where('review.user=:ownerId', { ownerId })
+      .andWhere('review.webtoon=:webtoonId', { webtoonId })
+      .select([
+        'review.id',
+        'review.contents',
+        'review.starPoint',
+        'review.createdAt',
+      ])
+      .getRawOne();
+  }
+
   public async findManyByOwnerId(ownerId: number): Promise<Review[]> {
     return await this.createQueryBuilder('review')
       .where('review.user=:ownerId', { ownerId })

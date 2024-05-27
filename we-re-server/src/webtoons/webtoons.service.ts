@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
 import { UpdateWebtoonDto } from './dto/update-webtoon.dto';
 import { WebtoonRepository } from './webtoons.repository';
@@ -123,7 +123,11 @@ export class WebtoonsService {
     const result = await Promise.all(
       queryResult.map(async (r) => {
         const temp = new ReadWebtoonBriefDto(r);
-        // temp.review = await this.reviewsService.findManyByWebtoonId(ownerId,);
+        temp.review = await this.reviewsService.findOneByOwnerAndWebtoonId(
+          userId,
+          ownerId,
+          temp.id,
+        );
         temp.like = await this.getLikeInfo(userId, temp.id);
         return temp;
       }),

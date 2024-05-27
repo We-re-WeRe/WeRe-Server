@@ -70,22 +70,30 @@ export class ReviewsService {
     );
     return result;
   }
+  /**
+   * get review dto with owner and webtoon id
+   * @param userId
+   * @param ownerId
+   * @param webtoonId
+   * @returns
+   */
+  async findOneByOwnerAndWebtoonId(
+    userId: number,
+    ownerId: number,
+    webtoonId: number,
+  ): Promise<ReadReviewDto> {
+    const queryResult = await this.reviewRepository.findOneByOwnerAndWebtoonId(
+      userId,
+      webtoonId,
+    );
+    const result = new ReadReviewDto(queryResult);
+    if (queryResult) {
+      await this.allocateTagAndLikesInReviewDto(result, userId);
+      result.setIsMine(userId, ownerId);
+    }
 
-  // // async findOneByOwnerAndWebtoonId(ownerId:number,webtoonId:number){
-  // //   const queryResult = await this.reviewRepository.findManyByWebtoonId(
-  // //     webtoonId,
-  // //   );
-  // //   const result = await Promise.all(
-  // //     queryResult.map(async (r) => {
-  // //       const temp = new ReadReviewAndUserDto(queryResult);
-  // //       await this.allocateTagAndLikesInReviewDto(temp, userId);
-  // //       temp.setIsMine(userId, temp.user.id);
-  // //       return temp;
-  // //     }),
-  // //   );
-  // //   return result;
-
-  // }
+    return result;
+  }
 
   /**
    * create new review and return new review.

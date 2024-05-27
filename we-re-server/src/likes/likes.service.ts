@@ -42,11 +42,14 @@ export class LikesService {
   async findIsLiked(
     likeRequestDto: LikeRequestDto,
   ): Promise<ReadIsLikeInfoDto> {
-    const queryResult = await this.likeRepository.findIsLiked(likeRequestDto);
     let isLike = false;
-    const id = queryResult ? queryResult.id : -1;
-    if (queryResult) {
-      isLike = !!!queryResult.deletedAt;
+    let id = 0;
+    if (likeRequestDto.userId) {
+      const queryResult = await this.likeRepository.findIsLiked(likeRequestDto);
+      if (queryResult) {
+        isLike = !!!queryResult.deletedAt;
+        id = queryResult.id;
+      }
     }
     const result = new ReadIsLikeInfoDto(isLike, id);
     return result;
@@ -74,6 +77,7 @@ export class LikesService {
     const { isLike } = await this.findIsLiked(likeRequestDto);
     const count = await this.getLikeCount(likeRequestDto);
     const result = new ReadLikeInfoDto(isLike, count);
+    Logger.log(JSON.stringify(result));
     return result;
   }
 
