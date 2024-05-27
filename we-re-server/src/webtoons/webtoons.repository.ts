@@ -14,7 +14,6 @@ export class WebtoonRepository extends Repository<Webtoon> {
     // 서브쿼리로 변경해야할듯? 데이터 양이 많아지면 시간 잡아먹는 괴물이 될 것 같다.
     return await this.createQueryBuilder('webtoon')
       .where('webtoon.id=:id', { id })
-      .leftJoinAndSelect('webtoon.likes', 'likes')
       .leftJoinAndSelect('webtoon.reviews', 'reviews')
       .select([
         'webtoon.id',
@@ -30,7 +29,6 @@ export class WebtoonRepository extends Repository<Webtoon> {
         'webtoon.viewCount',
       ])
       .groupBy('webtoon.id')
-      .addSelect('COUNT(DISTINCT(likes.id))', 'totalLikes')
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
       .addSelect('COUNT(reviews.id)', 'reviewCount')
       .getRawOne();
@@ -108,41 +106,17 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .getRawMany();
   }
 
-  public async findManyBreifInfoWithReviewByIds(ids: number[], userId: number) {
+  public async findManyBreifInfoByIds(ids: number[]) {
     return await this.createQueryBuilder('webtoon')
       .where('webtoon.id IN (:...ids)', { ids })
-      .leftJoinAndSelect('webtoon.likes', 'likes')
-      .leftJoinAndSelect(
-        (qb) =>
-          qb
-            .select([
-              'review.id',
-              'review.starPoint',
-              'review.contents',
-              'review.webtoon',
-            ])
-            .from(Review, 'review')
-            .leftJoin('review.likes', 'reviewLikes')
-            .where('review.user = :userId', { userId })
-            .addSelect('COUNT(reviewLikes.id)', 'totalLikes')
-            .groupBy('review.id'),
-        'reviews',
-        'reviews.webtoon_id = webtoon.id',
-      )
       .select([
         'webtoon.id',
         'webtoon.title',
         'webtoon.imageURL',
         'webtoon.author',
         'webtoon.painter',
-        'reviews.review_id',
-        'reviews.review_star_point',
-        'reviews.review_contents',
-        'reviews.totalLikes as totalLikes',
       ])
-      .addSelect('COUNT(likes.id)', 'totalWebtoonLikes')
       .groupBy('webtoon.id')
-      .addGroupBy('reviews.review_id')
       .getRawMany();
   }
 

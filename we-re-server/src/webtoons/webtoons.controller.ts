@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   HttpCode,
   HttpStatus,
@@ -61,12 +60,12 @@ export class WebtoonsController {
   ): Promise<ReadWebtoonDetailDto> {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
-      const result = await this.webtoonsService.findOneDetailById(id);
+      const result = await this.webtoonsService.findOneDetailById(id, userId);
       result.storages = await this.storageService.findManyPublicListByWebtoonId(
         userId,
         id,
       );
-      result.reviews = await this.reviewService.findManyByWebtoonId(id);
+      result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
       return result;
     } catch (error) {
       throw error;
@@ -135,18 +134,20 @@ export class WebtoonsController {
     type: [ReadWebtoonBriefDto],
   })
   @Public()
-  @Get('list/related-storage')
+  @Get('list/storage')
   async findManyBreifInfoWithReviewByStorageId(
+    @UserId() userId: number,
     @Query('storageId') storageId: number,
   ): Promise<ReadWebtoonBriefDto[]> {
     try {
       if (!storageId)
         throw new CustomBadTypeRequestException('storageId', storageId);
-      const { webtoonIds: ids, userId } =
+      const { webtoonIds: ids, userId: ownerId } =
         await this.storageService.findWebtoonIdListById(storageId);
       const result =
-        await this.webtoonsService.findManyBreifInfoWithReviewByUserId(
+        await this.webtoonsService.findManyBreifInfoWithReviewByOwnerId(
           ids,
+          ownerId,
           userId,
         );
       return result;
@@ -195,12 +196,11 @@ export class WebtoonsController {
   })
   @Public()
   @Post()
-  async createWebtoon(
-    @Body() createWebtoonDto: CreateWebtoonDto,
-  ): Promise<ReadWebtoonDetailDto> {
+  async createWebtoon(@Body() createWebtoonDto: CreateWebtoonDto) {
     // 아무나 upload 못하게 해야할듯. webtoon 추가를 그냥 python에서 하든동.
     try {
-      return await this.webtoonsService.createWebtoon(createWebtoonDto);
+      await this.webtoonsService.createWebtoon(createWebtoonDto);
+      return;
     } catch (error) {
       throw error;
     }
@@ -216,12 +216,13 @@ export class WebtoonsController {
   async updateWebtoon(
     @Query('id') id: number,
     @Body() updateWebtoonDto: UpdateWebtoonDto,
-  ): Promise<ReadWebtoonDetailDto> {
+  ) {
     try {
       if (!id) throw new CustomBadTypeRequestException('id', id);
       if (id !== updateWebtoonDto.id)
         throw new CustomUnauthorziedException(`id is wrong.`);
-      return await this.webtoonsService.updateWebtoon(updateWebtoonDto);
+      await this.webtoonsService.updateWebtoon(updateWebtoonDto);
+      return;
     } catch (error) {
       throw error;
     }

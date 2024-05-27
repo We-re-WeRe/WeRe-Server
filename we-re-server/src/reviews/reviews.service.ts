@@ -40,18 +40,7 @@ export class ReviewsService {
     const result = await Promise.all(
       queryResult.map(async (r) => {
         const temp = new ReadReviewAndWebtoonDto(r);
-        const addAndRemoveLikeDto = new LikeRequestDto(
-          userId,
-          TARGET_TYPES.REVIEW,
-          temp.id,
-        );
-        temp.like = await this.likesService.getReadLikeInfoDto(
-          addAndRemoveLikeDto,
-        );
-        temp.tags = await this.tagsService.findTagsByTargetId(
-          TARGET_TYPES.REVIEW,
-          temp.id,
-        );
+        await this.allocateTagAndLikesInReviewDto(temp, userId);
         temp.setIsMine(userId, ownerId);
         return temp;
       }),
@@ -65,25 +54,38 @@ export class ReviewsService {
    * @returns {Promise<[ReadReviewAndUserDto]>}
    */
   async findManyByWebtoonId(
+    userId: number,
     webtoonId: number,
   ): Promise<ReadReviewAndUserDto[]> {
     const queryResult = await this.reviewRepository.findManyByWebtoonId(
       webtoonId,
     );
-    const result: ReadReviewAndUserDto[] = queryResult.map(
-      (r) => new ReadReviewAndUserDto(r),
-    );
-    await Promise.all(
-      result.map(
-        async (r) =>
-          (r.tags = await this.tagsService.findTagsByTargetId(
-            TARGET_TYPES.REVIEW,
-            r.id,
-          )),
-      ),
+    const result = await Promise.all(
+      queryResult.map(async (r) => {
+        const temp = new ReadReviewAndUserDto(r);
+        await this.allocateTagAndLikesInReviewDto(temp, userId);
+        temp.setIsMine(userId, temp.user.id);
+        return temp;
+      }),
     );
     return result;
   }
+
+  // // async findOneByOwnerAndWebtoonId(ownerId:number,webtoonId:number){
+  // //   const queryResult = await this.reviewRepository.findManyByWebtoonId(
+  // //     webtoonId,
+  // //   );
+  // //   const result = await Promise.all(
+  // //     queryResult.map(async (r) => {
+  // //       const temp = new ReadReviewAndUserDto(queryResult);
+  // //       await this.allocateTagAndLikesInReviewDto(temp, userId);
+  // //       temp.setIsMine(userId, temp.user.id);
+  // //       return temp;
+  // //     }),
+  // //   );
+  // //   return result;
+
+  // }
 
   /**
    * create new review and return new review.
@@ -173,5 +175,23 @@ export class ReviewsService {
     const queryResult = await this.reviewRepository.findOneById(id);
     if (queryResult.user_id == userId)
       throw new CustomUnauthorziedException("you can't change review");
+  }
+
+  private async allocateTagAndLikesInReviewDto(
+    readReviewDto: ReadReviewDto,
+    userId: number,
+  ) {
+    const addAndRemoveLikeDto = new LikeRequestDto(
+      userId,
+      TARGET_TYPES.REVIEW,
+      readReviewDto.id,
+    );
+    readReviewDto.like = await this.likesService.getReadLikeInfoDto(
+      addAndRemoveLikeDto,
+    );
+    readReviewDto.tags = await this.tagsService.findTagsByTargetId(
+      TARGET_TYPES.REVIEW,
+      readReviewDto.id,
+    );
   }
 }
