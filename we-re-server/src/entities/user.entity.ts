@@ -40,8 +40,8 @@ export class User extends DefaultEntity {
   @ManyToMany(() => User, (user) => user.following)
   @JoinTable({
     name: 'follow_join_table',
-    joinColumn: { name: 'following_id' },
-    inverseJoinColumn: { name: 'followers_id' },
+    joinColumn: { name: 'follower_id' },
+    inverseJoinColumn: { name: 'following_id' },
   })
   followers: User[];
 
