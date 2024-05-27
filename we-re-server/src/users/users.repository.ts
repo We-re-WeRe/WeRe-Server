@@ -13,7 +13,7 @@ export class UserRepository extends Repository<User> {
   public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
-      .leftJoinAndSelect('user.following', 'followers')
+      .leftJoinAndSelect('user.followers', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.introduceMe'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .groupBy('user.id')
@@ -35,7 +35,7 @@ export class UserRepository extends Repository<User> {
   public async findOneBriefById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
-      .leftJoinAndSelect('user.following', 'followers')
+      .leftJoinAndSelect('user.followers', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.id'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .groupBy('user.id')
@@ -49,11 +49,12 @@ export class UserRepository extends Repository<User> {
       .getOne();
   }
 
-  public async findOneByIdAndtargetId(userId: number, targetId: number) {
+  public async findOneByIdAndtargetId(followDto: FollowDto) {
+    const { id: userId, targetId } = followDto;
     return await this.createQueryBuilder('user')
-      .where('user.id=:targetId', { targetId })
-      .innerJoin('user.following', 'following', 'following.id=:userId', {
-        userId,
+      .where('user.id=:userId', { userId })
+      .innerJoin('user.following', 'following', 'following.id=:targetId', {
+        targetId,
       })
       .getExists();
   }

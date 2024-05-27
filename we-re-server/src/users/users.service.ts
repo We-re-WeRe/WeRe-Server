@@ -28,18 +28,13 @@ export class UsersService {
       userId,
       queryResult,
     );
-    result.setIsFollowing(await this.checkUserIsFollowing(userId, targetId));
+    const followDto = new FollowDto(userId, targetId);
+    result.setIsFollowing(await this.checkUserIsFollowing(followDto));
     return result;
   }
 
-  async checkUserIsFollowing(
-    userId: number,
-    targetId: number,
-  ): Promise<boolean> {
-    const result = await this.userRepository.findOneByIdAndtargetId(
-      userId,
-      targetId,
-    );
+  async checkUserIsFollowing(followDto: FollowDto): Promise<boolean> {
+    const result = await this.userRepository.findOneByIdAndtargetId(followDto);
     return result;
   }
 

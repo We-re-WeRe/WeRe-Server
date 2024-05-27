@@ -38,17 +38,17 @@ export class User extends DefaultEntity {
   introduceMe?: string;
 
   @ManyToMany(() => User, (user) => user.following)
-  @JoinTable({
-    name: 'follow_join_table',
-    joinColumn: { name: 'follower_id' },
-    inverseJoinColumn: { name: 'following_id' },
-  })
   followers: User[];
 
   @ManyToMany(() => User, (user) => user.followers, {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'follow_join_table',
+    joinColumn: { name: 'follower_id' },
+    inverseJoinColumn: { name: 'following_id' },
   })
   following: User[];
 

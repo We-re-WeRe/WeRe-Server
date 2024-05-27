@@ -26,6 +26,7 @@ import {
 import { FollowDto } from './dto/follow.dto';
 import {
   CustomBadTypeRequestException,
+  CustomDataAlreadyExistException,
   CustomNotFoundException,
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
@@ -101,11 +102,12 @@ export class UsersController {
     @UserId() userId: number,
     @Query('targetId') targetId: number,
   ): Promise<ReadUserDetailDto> {
-    // 중복 키 에러 체크 필요.
     try {
       if (userId === targetId)
         throw new BadRequestException("can't follow self");
       const followDto = new FollowDto(userId, targetId);
+      if (await this.usersService.checkUserIsFollowing(followDto))
+        throw new CustomDataAlreadyExistException();
       await this.usersService.createFollowRelation(followDto);
       const result = await this.usersService.findOneDetailById(
         userId,
