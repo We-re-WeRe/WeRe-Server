@@ -68,6 +68,15 @@ export class ReviewsService {
         return temp;
       }),
     );
+    await Promise.all(
+      result.map(
+        async (r) =>
+          (r.tags = await this.tagsService.findTagsByTargetId(
+            TARGET_TYPES.REVIEW,
+            r.id,
+          )),
+      ),
+    );
     return result;
   }
   /**

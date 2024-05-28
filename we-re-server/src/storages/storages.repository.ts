@@ -32,6 +32,13 @@ export class StorageRepository extends Repository<Storage> {
       .getRawOne();
   }
 
+  public async findOneById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .select(['storage.id', 'storage.user'])
+      .getRawOne();
+  }
+
   public async findManyPublicStorageList() {
     return await this.createQueryBuilder('storage')
       .where('storage.isPublic=true')
