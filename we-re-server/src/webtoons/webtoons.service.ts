@@ -40,7 +40,6 @@ export class WebtoonsService {
     userId: number,
   ): Promise<ReadWebtoonDetailDto> {
     const queryResult = await this.webtoonRepository.findOneDetailById(id);
-    Logger.log(JSON.stringify(queryResult));
     if (!queryResult) throw new CustomNotFoundException('id');
     const result = new ReadWebtoonDetailDto(queryResult);
     result.like = await this.getLikeInfo(userId, id);

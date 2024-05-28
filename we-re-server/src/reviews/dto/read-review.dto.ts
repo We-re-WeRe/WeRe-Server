@@ -51,11 +51,6 @@ export class ReadReviewDto {
   @IsNotEmpty()
   tags: ReadTagDto[];
 
-  @ApiProperty({ type: () => [ReadTagDto] })
-  @ValidateNested()
-  @IsNotEmpty()
-  tags: ReadTagDto[];
-
   public rawToDto(raw: any) {
     this.id = raw.review_id;
     this.createdAt = raw.review_created_at;
