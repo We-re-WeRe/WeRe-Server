@@ -3,6 +3,7 @@ import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { StorageRepository } from './storages.repository';
 import {
+  ReadMyStorageBriefDto,
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
@@ -13,21 +14,40 @@ import {
   CustomNotFoundException,
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
+import { LikesService } from 'src/likes/likes.service';
+import { TARGET_TYPES } from 'src/utils/types_and_enums';
+import { LikeRequestDto } from 'src/likes/dto/cud-like.dto';
+import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class StoragesService {
-  constructor(private readonly storageRepository: StorageRepository) {}
+  constructor(
+    private readonly storageRepository: StorageRepository,
+    private readonly likesService: LikesService,
+    private readonly tagsService: TagsService,
+  ) {}
 
   /**
    * get Storage Detail for storage page.
    * @param id storage id
    * @returns storage detail and user brief info
    */
-  async findOneDetailById(id: number): Promise<ReadStorageDetailDto> {
-    // user id와 storage user id 비교해서 ispublic이랑 조건이 맞을 때만 반환해야게따
+  async findOneDetailById(
+    id: number,
+    userId: number,
+  ): Promise<ReadStorageDetailDto> {
     const queryResult = await this.storageRepository.findOneDetailById(id);
     if (!queryResult) throw new CustomNotFoundException('storageId');
     const result = new ReadStorageDetailDto(queryResult);
+    result.setIsMine(userId);
+    if (!result.isMine && !result.isPublic)
+      throw new CustomUnauthorziedException('you cant access private');
+    result.tags = await this.tagsService.findTagsByTargetId(
+      TARGET_TYPES.STORAGE,
+      id,
+    );
+    const likeRequestDto = new LikeRequestDto(userId, TARGET_TYPES.STORAGE, id);
+    result.like = await this.likesService.getReadLikeInfoDto(likeRequestDto);
     return result;
   }
 
@@ -35,12 +55,29 @@ export class StoragesService {
    * Service to get all publis storage list.
    * @returns {ReadStorageBriefDto[]}
    */
-  async findManyPublicStorageList(): Promise<ReadStorageBriefDto[]> {
+  async findManyPublicStorageList(
+    userId: number,
+  ): Promise<ReadStorageBriefDto[]> {
     const queryResult =
       await this.storageRepository.findManyPublicStorageList();
     const result: ReadStorageBriefDto[] = queryResult.map(
       (r) => new ReadStorageBriefDto(r),
     );
+    await this.allocateLikeInStorageDtoArray(result, userId);
+    return result;
+  }
+
+  async findManyMyStorageList(
+    userId: number,
+    webtoonId: number,
+  ): Promise<ReadMyStorageBriefDto[]> {
+    const queryResult = await this.storageRepository.findManyMyStorageList(
+      userId,
+    );
+    const result = queryResult.map((r) => {
+      const temp = new ReadMyStorageBriefDto(r, webtoonId);
+      return temp;
+    });
     return result;
   }
 
@@ -51,14 +88,15 @@ export class StoragesService {
    */
   async findManyStorageListByUserId(
     userId: number,
+    ownerId: number,
   ): Promise<ReadStorageBriefDto[]> {
-    //TODO:: disclosure scope 유저 login service에서 본인 판단 후 인자로 전달해줘야함.
-    const isMe = false;
+    const isMine = userId === ownerId;
     const queryResult =
-      await this.storageRepository.findManyStorageListByUserId(userId, isMe);
+      await this.storageRepository.findManyStorageListByUserId(ownerId, isMine);
     const result: ReadStorageBriefDto[] = queryResult.map(
       (r) => new ReadStorageBriefDto(r),
     );
+    await this.allocateLikeInStorageDtoArray(result, userId);
     return result;
   }
 
@@ -68,6 +106,7 @@ export class StoragesService {
    * @returns {ReadStorageBriefDto[]}
    */
   async findManyPublicListByWebtoonId(
+    userId: number,
     webtoonId: number,
   ): Promise<ReadStorageBriefDto[]> {
     const queryResult =
@@ -75,6 +114,7 @@ export class StoragesService {
     const result: ReadStorageBriefDto[] = queryResult.map(
       (r) => new ReadStorageBriefDto(r),
     );
+    await this.allocateLikeInStorageDtoArray(result, userId);
     return result;
   }
 
@@ -84,6 +124,7 @@ export class StoragesService {
    * @returns {ReadStorageBriefDto[]}
    */
   async findManyPublicStorageListByIds(
+    userId: number,
     ids: number[],
   ): Promise<ReadStorageBriefDto[]> {
     if (ids.length > 0) {
@@ -94,6 +135,7 @@ export class StoragesService {
       const result: ReadStorageBriefDto[] = queryResult.map(
         (r) => new ReadStorageBriefDto(r),
       );
+      await this.allocateLikeInStorageDtoArray(result, userId);
       return result;
     } else {
       return [];
@@ -136,7 +178,7 @@ export class StoragesService {
     if (!id) {
       throw new CustomDataBaseException('create is not worked.');
     }
-    const result = await this.findOneDetailById(id);
+    const result = await this.findOneDetailById(userId, id);
     return result;
   }
 
@@ -158,7 +200,10 @@ export class StoragesService {
     if (!queryResult.affected) {
       throw new CustomDataBaseException('something wrong in Database');
     }
-    const result = await this.findOneDetailById(tempUpdateStorageDto.id);
+    const result = await this.findOneDetailById(
+      userId,
+      tempUpdateStorageDto.id,
+    );
     return result;
   }
 
@@ -231,5 +276,21 @@ export class StoragesService {
       throw new CustomNotFoundException('id');
     }
     return;
+  }
+
+  private async allocateLikeInStorageDtoArray(
+    result: ReadStorageBriefDto[],
+    userId: number,
+  ) {
+    await Promise.all(
+      result.map(async (r) => {
+        const likeRequestDto = new LikeRequestDto(
+          userId,
+          TARGET_TYPES.STORAGE,
+          r.id,
+        );
+        r.like = await this.likesService.getReadLikeInfoDto(likeRequestDto);
+      }),
+    );
   }
 }

@@ -13,7 +13,6 @@ export class StorageRepository extends Repository<Storage> {
   public async findOneDetailById(id: number) {
     return await this.createQueryBuilder('storage')
       .where('storage.id=:id', { id })
-      .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
         'storage.createdAt',
@@ -23,8 +22,13 @@ export class StorageRepository extends Repository<Storage> {
         'storage.isPublic',
         'storage.user',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
-      .groupBy('storage.id')
+      .getRawOne();
+  }
+
+  public async findOneById(id: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.id=:id', { id })
+      .select(['storage.id', 'storage.user'])
       .getRawOne();
   }
 
@@ -38,16 +42,12 @@ export class StorageRepository extends Repository<Storage> {
   public async findManyPublicStorageList() {
     return await this.createQueryBuilder('storage')
       .where('storage.isPublic=true')
-      .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
         'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
-      .orderBy('totalLikes', 'DESC')
-      .groupBy('storage.id')
       .getRawMany();
   }
 
@@ -55,43 +55,43 @@ export class StorageRepository extends Repository<Storage> {
     return await this.createQueryBuilder('storage')
       .where('storage.isPublic=true')
       .andWhere('storage.id IN (:...ids)', { ids })
-      .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
         'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
-      .orderBy('totalLikes', 'DESC')
-      .groupBy('storage.id')
       .getRawMany();
   }
 
-  public async findManyStorageListByUserId(userId: number, isMe: boolean) {
+  public async findManyStorageListByUserId(userId: number, isMine: boolean) {
     const qb = this.createQueryBuilder('storage').where(
       'storage.user=:userId',
       { userId },
     );
-    if (!isMe) qb.andWhere('storage.isPublic=true');
+    if (!isMine) qb.andWhere('storage.isPublic=true');
     return await qb
-      .leftJoinAndSelect('storage.likes', 'likes')
       .select([
         'storage.id',
         'storage.createdAt',
         'storage.imageURL',
         'storage.name',
       ])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
-      .orderBy('totalLikes', 'DESC')
-      .groupBy('storage.id')
       .getRawMany();
+  }
+
+  public async findManyMyStorageList(userId: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.user=:userId', { userId })
+      .andWhere('storage.isPublic=true')
+      .leftJoinAndSelect('storage.webtoons', 'webtoons')
+      .select(['storage.id', 'storage.imageURL', 'storage.name', 'webtoons.id'])
+      .getMany();
   }
 
   public async findManyPublicListByWebtoonId(webtoonId: number) {
     return await this.createQueryBuilder('storage')
       .where('storage.isPublic=true')
-      .leftJoinAndSelect('storage.likes', 'likes')
       .leftJoinAndSelect(
         'storage.webtoons',
         'webtoons',
@@ -99,9 +99,6 @@ export class StorageRepository extends Repository<Storage> {
         { webtoonId },
       )
       .select(['storage.id', 'storage.imageURL', 'storage.name'])
-      .addSelect('COUNT(likes.id)', 'totalLikes')
-      .orderBy('totalLikes', 'DESC')
-      .groupBy('storage.id')
       .getRawMany();
   }
 

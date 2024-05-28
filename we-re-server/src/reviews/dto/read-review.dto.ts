@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDate,
   IsInt,
   IsNotEmpty,
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserDto } from 'src/users/dto/read-user.dto';
 import { ReadWebtoonDto } from 'src/webtoons/dto/read-webtoon.dto';
@@ -35,9 +37,19 @@ export class ReadReviewDto {
   starPoint: number;
 
   @ApiProperty()
-  @IsInt()
+  @IsBoolean()
   @IsNotEmpty()
-  totalLikes: number;
+  isMine: boolean;
+
+  @ApiProperty({ type: () => ReadLikeInfoDto })
+  @ValidateNested()
+  @IsNotEmpty()
+  like: ReadLikeInfoDto;
+
+  @ApiProperty({ type: () => [ReadTagDto] })
+  @ValidateNested()
+  @IsNotEmpty()
+  tags: ReadTagDto[];
 
   @ApiProperty({ type: () => [ReadTagDto] })
   @ValidateNested()
@@ -49,8 +61,11 @@ export class ReadReviewDto {
     this.createdAt = raw.review_created_at;
     this.contents = raw.review_contents;
     this.starPoint = raw.review_star_point;
-    this.totalLikes = raw.totalLikes ?? 0;
     return this;
+  }
+
+  public setIsMine(userId: number, ownerId: number) {
+    this.isMine = userId === ownerId;
   }
 }
 

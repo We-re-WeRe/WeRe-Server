@@ -7,6 +7,8 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Storage } from 'src/entities/storage.entity';
+import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
 import { ReadUserBriefDto } from 'src/users/dto/read-user.dto';
 
@@ -34,17 +36,16 @@ export class ReadStorageBriefDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
-  @IsInt()
+  @ApiProperty({ type: () => ReadLikeInfoDto })
+  @ValidateNested()
   @IsNotEmpty()
-  totalLikes: number;
+  like: ReadLikeInfoDto;
 
   public rawToDto(raw: any): ReadStorageBriefDto {
     this.id = raw.storage_id;
     this.createdAt = raw.storage_created_at;
     this.imageURL = raw.storage_image_url;
     this.name = raw.storage_name;
-    this.totalLikes = raw.totalLikes;
     return this;
   }
 }
@@ -89,5 +90,44 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
 
   public setIsMine(userId: number): void {
     this.isMine = userId === this.user.getId();
+  }
+}
+
+export class ReadMyStorageBriefDto {
+  constructor(storage: Storage, webtoonId: number) {
+    this.rawToDto(storage, webtoonId);
+  }
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  imageURL: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  webtoonCount: number;
+
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isWebtoonIn: boolean;
+
+  public rawToDto(storage: Storage, webtoonId: number): ReadMyStorageBriefDto {
+    this.id = storage.id;
+    this.imageURL = storage.imageURL;
+    this.name = storage.name;
+    this.webtoonCount = storage.webtoons.length;
+    this.isWebtoonIn = !!storage.webtoons.find((w) => w.id === webtoonId);
+    return this;
   }
 }

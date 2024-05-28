@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LikesRepository } from './likes.repository';
-import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
+import { LikeRequestDto } from './dto/cud-like.dto';
 import { ReadIsLikeInfoDto, ReadLikeInfoDto } from './dto/read-like.dto';
 import { CustomDataBaseException } from 'src/utils/custom_exceptions';
 
@@ -36,49 +36,58 @@ export class LikesService {
   }
   /**
    * check user's like for target.
-   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @param likeRequestDto webtoon, review, storage extends this object.
    * @returns {Promise<boolean>}
    */
   async findIsLiked(
-    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+    likeRequestDto: LikeRequestDto,
   ): Promise<ReadIsLikeInfoDto> {
-    const queryResult = await this.likeRepository.findIsLiked(
-      addAndRemoveLikeDto,
-    );
     let isLike = false;
-    const id = queryResult ? queryResult.id : -1;
-    if (queryResult) {
-      isLike = !!!queryResult.deletedAt;
+    let id = 0;
+    if (likeRequestDto.userId) {
+      const queryResult = await this.likeRepository.findIsLiked(likeRequestDto);
+      if (queryResult) {
+        isLike = !!!queryResult.deletedAt;
+        id = queryResult.id;
+      }
     }
     const result = new ReadIsLikeInfoDto(isLike, id);
     return result;
   }
 
   /**
-   * get like count and return do i like and count.
-   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * get like count and return count.
+   * @param likeRequestDto webtoon, review, storage extends this object.
    * @returns {Promise<boolean>}
    */
-  async getLikeCount(
-    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+  async getLikeCount(likeRequestDto: LikeRequestDto): Promise<number> {
+    const queryResult = await this.likeRepository.getLikeCount(likeRequestDto);
+    const result: number = queryResult.count;
+    return result;
+  }
+
+  /**
+   * call functions to get read like info dto.
+   * @param likeRequestDto
+   * @returns
+   */
+  async getReadLikeInfoDto(
+    likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
-    const { isLike } = await this.findIsLiked(addAndRemoveLikeDto);
-    const queryResult = await this.likeRepository.getLikeCount(
-      addAndRemoveLikeDto,
-    );
-    const result = new ReadLikeInfoDto(isLike, queryResult);
+    const { isLike } = await this.findIsLiked(likeRequestDto);
+    const count = await this.getLikeCount(likeRequestDto);
+    const result = new ReadLikeInfoDto(isLike, count);
+    Logger.log(JSON.stringify(result));
     return result;
   }
 
   /**
    * add like.
-   * @param addAndRemoveLikeDto webtoon, review, storage extends this object.
+   * @param likeRequestDto webtoon, review, storage extends this object.
    * @returns {Promise<ReadLikeInfoDto>}
    */
-  async addLike(
-    addAndRemoveLikeDto: AddAndRemoveLikeDto,
-  ): Promise<ReadLikeInfoDto> {
-    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+  async addLike(likeRequestDto: LikeRequestDto): Promise<ReadLikeInfoDto> {
+    const { id, isLike } = await this.findIsLiked(likeRequestDto);
     if (!isLike) {
       let isWorked = true;
       if (id > 0) {
@@ -88,25 +97,25 @@ export class LikesService {
         // if target id 가 없는 id일 경우 처리해줘야함.. 여기서 다른 service 받으면
         // circular dependency라.. 흠...
         const queryResult = await this.likeRepository.createLike(
-          addAndRemoveLikeDto,
+          likeRequestDto,
         );
         isWorked = !!queryResult.raw.affectedRows;
       }
       if (!isWorked)
         throw new CustomDataBaseException('update like is not worked');
     }
-    return await this.getLikeCount(addAndRemoveLikeDto);
+    return await this.getReadLikeInfoDto(likeRequestDto);
   }
 
   /**
    * soft delete related like.
-   * @param addAndRemoveLikeDto
+   * @param likeRequestDto
    * @returns {Promise<ReadLikeInfoDto>}
    */
   async softRemoveLike(
-    addAndRemoveLikeDto: AddAndRemoveLikeDto,
+    likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
-    const { id, isLike } = await this.findIsLiked(addAndRemoveLikeDto);
+    const { id, isLike } = await this.findIsLiked(likeRequestDto);
     if (isLike) {
       let isWorked = true;
       if (id > 0) {
@@ -116,6 +125,6 @@ export class LikesService {
       if (!isWorked)
         throw new CustomDataBaseException('update like is not worked');
     }
-    return await this.getLikeCount(addAndRemoveLikeDto);
+    return await this.getReadLikeInfoDto(likeRequestDto);
   }
 }

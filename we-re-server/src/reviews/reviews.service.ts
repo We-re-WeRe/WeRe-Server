@@ -13,6 +13,8 @@ import {
   CustomNotFoundException,
   CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
+import { LikesService } from 'src/likes/likes.service';
+import { LikeRequestDto } from 'src/likes/dto/cud-like.dto';
 import { TagsService } from 'src/tags/tags.service';
 import { TARGET_TYPES } from 'src/utils/types_and_enums';
 import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
@@ -21,18 +23,51 @@ import { AddAndRemoveTagRequestDto } from 'src/tags/dto/process-tag.dto';
 export class ReviewsService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
+    private readonly likesService: LikesService,
     private readonly tagsService: TagsService,
   ) {}
 
   /**
    * get user's reviews with webtoon info.
-   * @param userId
+   * @param ownerId
    * @returns {Promise<[ReadReviewAndWebtoonDto]>}
    */
-  async findManyByUserId(userId: number): Promise<ReadReviewAndWebtoonDto[]> {
-    const queryResult = await this.reviewRepository.findManyByUserId(userId);
-    const result = queryResult.map((r) => new ReadReviewAndWebtoonDto(r));
-    // TODO:: map으로 일일이 하는게 빠를까 id리스트 가져와서 그거로 tag 찾고 일일이 맵핑해주는게 조을까
+  async findManyByOwnerId(
+    userId: number,
+    ownerId: number,
+  ): Promise<ReadReviewAndWebtoonDto[]> {
+    const queryResult = await this.reviewRepository.findManyByOwnerId(ownerId);
+    const result = await Promise.all(
+      queryResult.map(async (r) => {
+        const temp = new ReadReviewAndWebtoonDto(r);
+        await this.allocateTagAndLikesInReviewDto(temp, userId);
+        temp.setIsMine(userId, ownerId);
+        return temp;
+      }),
+    );
+    return result;
+  }
+
+  /**
+   * get webtoon's reviews with user info.
+   * @param webtoonId
+   * @returns {Promise<[ReadReviewAndUserDto]>}
+   */
+  async findManyByWebtoonId(
+    userId: number,
+    webtoonId: number,
+  ): Promise<ReadReviewAndUserDto[]> {
+    const queryResult = await this.reviewRepository.findManyByWebtoonId(
+      webtoonId,
+    );
+    const result = await Promise.all(
+      queryResult.map(async (r) => {
+        const temp = new ReadReviewAndUserDto(r);
+        await this.allocateTagAndLikesInReviewDto(temp, userId);
+        temp.setIsMine(userId, temp.user.id);
+        return temp;
+      }),
+    );
     await Promise.all(
       result.map(
         async (r) =>
@@ -44,30 +79,28 @@ export class ReviewsService {
     );
     return result;
   }
-
   /**
-   * get webtoon's reviews with user info.
+   * get review dto with owner and webtoon id
+   * @param userId
+   * @param ownerId
    * @param webtoonId
-   * @returns {Promise<[ReadReviewAndUserDto]>}
+   * @returns
    */
-  async findManyByWebtoonId(
+  async findOneByOwnerAndWebtoonId(
+    userId: number,
+    ownerId: number,
     webtoonId: number,
-  ): Promise<ReadReviewAndUserDto[]> {
-    const queryResult = await this.reviewRepository.findManyByWebtoonId(
+  ): Promise<ReadReviewDto> {
+    const queryResult = await this.reviewRepository.findOneByOwnerAndWebtoonId(
+      userId,
       webtoonId,
     );
-    const result: ReadReviewAndUserDto[] = queryResult.map(
-      (r) => new ReadReviewAndUserDto(r),
-    );
-    await Promise.all(
-      result.map(
-        async (r) =>
-          (r.tags = await this.tagsService.findTagsByTargetId(
-            TARGET_TYPES.REVIEW,
-            r.id,
-          )),
-      ),
-    );
+    const result = new ReadReviewDto(queryResult);
+    if (queryResult) {
+      await this.allocateTagAndLikesInReviewDto(result, userId);
+      result.setIsMine(userId, ownerId);
+    }
+
     return result;
   }
 
@@ -159,5 +192,23 @@ export class ReviewsService {
     const queryResult = await this.reviewRepository.findOneById(id);
     if (queryResult.user_id == userId)
       throw new CustomUnauthorziedException("you can't change review");
+  }
+
+  private async allocateTagAndLikesInReviewDto(
+    readReviewDto: ReadReviewDto,
+    userId: number,
+  ) {
+    const addAndRemoveLikeDto = new LikeRequestDto(
+      userId,
+      TARGET_TYPES.REVIEW,
+      readReviewDto.id,
+    );
+    readReviewDto.like = await this.likesService.getReadLikeInfoDto(
+      addAndRemoveLikeDto,
+    );
+    readReviewDto.tags = await this.tagsService.findTagsByTargetId(
+      TARGET_TYPES.REVIEW,
+      readReviewDto.id,
+    );
   }
 }

@@ -54,11 +54,20 @@ export class ReadUserDetailDto extends ReadUserDto {
   @IsNotEmpty()
   isMine: boolean;
 
+  @ApiProperty()
+  @IsBoolean()
+  @IsNotEmpty()
+  isFollowing: boolean;
+
   public rawToDto(raw: any): ReadUserDetailDto {
     super.rawToDto(raw);
     this.introduceMe = raw.user_introduce_me;
     this.totalFollowers = raw.totalFollowers;
     return this;
+  }
+
+  public setIsFollowing(isFollowing: boolean) {
+    this.isFollowing = isFollowing;
   }
 }
 

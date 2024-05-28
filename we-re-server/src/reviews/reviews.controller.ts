@@ -37,11 +37,18 @@ export class ReviewsController {
   @Public()
   @Get('list/user')
   async findManyByUserId(
-    @Query('userId') userId: number,
+    @UserId() userId: number,
+    @Query('ownerId') ownerId: number,
   ): Promise<ReadReviewAndWebtoonDto[]> {
     try {
-      if (!userId) throw new CustomBadTypeRequestException('userId', userId);
-      return await this.reviewsService.findManyByUserId(userId);
+      if (!ownerId)
+        if (userId) ownerId = userId;
+        else throw new CustomBadTypeRequestException('ownerId', ownerId);
+      const result = await this.reviewsService.findManyByOwnerId(
+        userId,
+        ownerId,
+      );
+      return result;
     } catch (error) {
       throw error;
     }

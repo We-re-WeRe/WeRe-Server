@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsInt, IsNotEmpty } from 'class-validator';
 
 export class ReadLikeInfoDto {
-  constructor(isLike: boolean, raw: any) {
+  constructor(isLike: boolean, count: number) {
     this.isLike = isLike;
-    this.rawToDto(raw);
+    this.count = count;
   }
 
   @ApiProperty()
@@ -16,11 +16,6 @@ export class ReadLikeInfoDto {
   @IsInt()
   @IsNotEmpty()
   count: number;
-
-  public rawToDto(raw: any): ReadLikeInfoDto {
-    this.count = raw.count;
-    return this;
-  }
 }
 
 export class ReadIsLikeInfoDto {

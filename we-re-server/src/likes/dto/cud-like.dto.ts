@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
 
-export class AddAndRemoveLikeDto {
+export class LikeRequestDto {
   constructor(userId: number, targetType: TargetTypes, targetId: number) {
     this.userId = userId;
     this.targetType = targetType;
@@ -10,8 +10,8 @@ export class AddAndRemoveLikeDto {
   }
   @ApiProperty()
   @IsInt()
-  @IsNotEmpty()
-  userId: number;
+  @IsOptional()
+  userId?: number;
 
   @ApiProperty()
   @IsEnum(TARGET_TYPES)
@@ -22,4 +22,8 @@ export class AddAndRemoveLikeDto {
   @IsInt()
   @IsNotEmpty()
   targetId: number;
+
+  public setUserId(userId: number) {
+    this.userId = userId;
+  }
 }

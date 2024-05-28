@@ -22,17 +22,20 @@ export class UsersService {
     userId: number,
     targetId: number,
   ): Promise<ReadUserDetailDto> {
-    try {
-      const queryResult = await this.userRepository.findOneDetailById(targetId);
-      if (!queryResult) throw new CustomNotFoundException('targetId');
-      const result: ReadUserDetailDto = new ReadUserDetailDto(
-        userId,
-        queryResult,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const queryResult = await this.userRepository.findOneDetailById(targetId);
+    if (!queryResult) throw new CustomNotFoundException('targetId');
+    const result: ReadUserDetailDto = new ReadUserDetailDto(
+      userId,
+      queryResult,
+    );
+    const followDto = new FollowDto(userId, targetId);
+    result.setIsFollowing(await this.checkUserIsFollowing(followDto));
+    return result;
+  }
+
+  async checkUserIsFollowing(followDto: FollowDto): Promise<boolean> {
+    const result = await this.userRepository.findOneByIdAndtargetId(followDto);
+    return result;
   }
 
   async findOneProfileImageById(id: number): Promise<ReadUserDto> {

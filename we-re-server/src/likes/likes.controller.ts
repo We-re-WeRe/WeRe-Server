@@ -2,10 +2,8 @@ import { Controller, Delete, Patch, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { ReadLikeInfoDto } from './dto/read-like.dto';
-import { CustomBadTypeRequestException } from 'src/utils/custom_exceptions';
-import { TargetTypes } from 'src/utils/types_and_enums';
 import { UserId } from 'src/utils/custom_decorators';
-import { AddAndRemoveLikeDto } from './dto/cud-like.dto';
+import { LikeRequestDto } from './dto/cud-like.dto';
 
 @ApiTags('Likes')
 @Controller('likes')
@@ -20,20 +18,11 @@ export class LikesController {
   @Patch()
   async addLike(
     @UserId() userId: number,
-    @Query('targetType') targetType: TargetTypes,
-    @Query('targetId') targetId: number,
+    @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      if (!targetType)
-        throw new CustomBadTypeRequestException('targetType', targetType);
-      if (!targetId)
-        throw new CustomBadTypeRequestException('targetId', targetId);
-      const addAndRemoveLikeDto = new AddAndRemoveLikeDto(
-        userId,
-        targetType,
-        targetId,
-      );
-      const result = await this.likeService.addLike(addAndRemoveLikeDto);
+      likeRequestDto.setUserId(userId);
+      const result = await this.likeService.addLike(likeRequestDto);
       return result;
     } catch (error) {
       throw error;
@@ -48,20 +37,11 @@ export class LikesController {
   @Delete()
   async deleteLike(
     @UserId() userId: number,
-    @Query('targetType') targetType: TargetTypes,
-    @Query('targetId') targetId: number,
+    @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
     try {
-      if (!targetType)
-        throw new CustomBadTypeRequestException('targetType', targetType);
-      if (!targetId)
-        throw new CustomBadTypeRequestException('targetId', targetId);
-      const addAndRemoveLikeDto = new AddAndRemoveLikeDto(
-        userId,
-        targetType,
-        targetId,
-      );
-      const result = await this.likeService.softRemoveLike(addAndRemoveLikeDto);
+      likeRequestDto.setUserId(userId);
+      const result = await this.likeService.softRemoveLike(likeRequestDto);
       return result;
     } catch (error) {
       throw error;

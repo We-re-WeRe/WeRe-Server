@@ -3,7 +3,6 @@ import { User } from 'src/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FollowDto } from './dto/follow.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { CustomNotFoundException } from 'src/utils/custom_exceptions';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -36,7 +35,7 @@ export class UserRepository extends Repository<User> {
   public async findOneBriefById(id: number) {
     return await this.createQueryBuilder('user')
       .where('user.id=:id', { id })
-      .leftJoinAndSelect('user.following', 'followers')
+      .leftJoinAndSelect('user.followers', 'followers')
       .select(['user.id', 'user.imageURL', 'user.nickname', 'user.id'])
       .addSelect('COUNT(followers.id)', 'totalFollowers')
       .groupBy('user.id')
@@ -48,6 +47,16 @@ export class UserRepository extends Repository<User> {
       .where('user.nickname=:nickname', { nickname })
       .select(['user.id'])
       .getOne();
+  }
+
+  public async findOneByIdAndtargetId(followDto: FollowDto) {
+    const { id: userId, targetId } = followDto;
+    return await this.createQueryBuilder('user')
+      .where('user.id=:userId', { userId })
+      .innerJoin('user.following', 'following', 'following.id=:targetId', {
+        targetId,
+      })
+      .getExists();
   }
 
   /**

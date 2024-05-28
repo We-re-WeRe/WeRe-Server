@@ -13,6 +13,7 @@ import {
   PROVIDINGCOMPANY,
   ProvidingCompany,
 } from 'src/entities/webtoon.entity';
+import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import {
   ReadReviewAndUserDto,
   ReadReviewDto,
@@ -92,10 +93,10 @@ export class ReadWebtoonBriefDto extends ReadWebtoonDto {
     super();
     this.rawToDto(raw);
   }
-  @ApiProperty()
-  @IsInt()
+  @ApiProperty({ type: () => ReadLikeInfoDto })
+  @ValidateNested()
   @IsNotEmpty()
-  totalLikes: number;
+  like: ReadLikeInfoDto;
 
   @ApiProperty({ type: () => ReadReviewDto })
   @ValidateNested()
@@ -104,7 +105,6 @@ export class ReadWebtoonBriefDto extends ReadWebtoonDto {
 
   public rawToDto(raw: any): ReadWebtoonBriefDto {
     super.rawToDto(raw);
-    this.totalLikes = raw.totalWebtoonLikes;
     this.review = new ReadReviewDto(raw);
     return this;
   }
@@ -150,12 +150,12 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
-  totalLikes: number;
-
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   totalStarPoint: number;
+
+  @ApiProperty({ type: () => ReadLikeInfoDto })
+  @ValidateNested()
+  @IsNotEmpty()
+  like: ReadLikeInfoDto;
 
   @ApiProperty({ type: () => [ReadStorageBriefDto] })
   @ValidateNested()
@@ -175,7 +175,6 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
     this.genre = raw.webtoon_genre;
     this.explain = raw.webtoon_explain;
     this.viewCount = raw.webtoon_view_count;
-    this.totalLikes = raw.totalLikes;
     this.reviewCount = raw.reviewCount;
     this.totalStarPoint = raw.totalStarPoint;
     return this;
