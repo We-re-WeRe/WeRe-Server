@@ -124,6 +124,8 @@ export class StoragesController {
     @Query('webtoonId') webtoonId: number,
   ): Promise<ReadMyStorageBriefDto[]> {
     try {
+      if (!webtoonId)
+        throw new CustomBadTypeRequestException('webtoonId', webtoonId);
       const result = await this.storagesService.findManyMyStorageList(
         userId,
         webtoonId,
