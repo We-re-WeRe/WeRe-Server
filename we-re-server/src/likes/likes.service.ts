@@ -77,7 +77,6 @@ export class LikesService {
     const { isLike } = await this.findIsLiked(likeRequestDto);
     const count = await this.getLikeCount(likeRequestDto);
     const result = new ReadLikeInfoDto(isLike, count);
-    Logger.log(JSON.stringify(result));
     return result;
   }
 
