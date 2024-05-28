@@ -13,6 +13,7 @@ import { StoragesService } from './storages.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import {
+  ReadMyStorageBriefDto,
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
@@ -105,6 +106,27 @@ export class StoragesController {
       const result = await this.storagesService.findManyStorageListByUserId(
         userId,
         ownerId,
+      );
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiOperation({ summary: 'get all of the my Storages as list' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadStorageBriefDto],
+  })
+  @Get('list/mine')
+  async findManyMyStorageList(
+    @UserId() userId: number,
+    @Query('webtoonId') webtoonId: number,
+  ): Promise<ReadMyStorageBriefDto[]> {
+    try {
+      const result = await this.storagesService.findManyMyStorageList(
+        userId,
+        webtoonId,
       );
       return result;
     } catch (error) {

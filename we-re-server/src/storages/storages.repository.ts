@@ -73,6 +73,15 @@ export class StorageRepository extends Repository<Storage> {
       .getRawMany();
   }
 
+  public async findManyMyStorageList(userId: number) {
+    return await this.createQueryBuilder('storage')
+      .where('storage.user=:userId', { userId })
+      .andWhere('storage.isPublic=true')
+      .leftJoinAndSelect('storage.webtoons', 'webtoons')
+      .select(['storage.id', 'storage.imageURL', 'storage.name', 'webtoons.id'])
+      .getMany();
+  }
+
   public async findManyPublicListByWebtoonId(webtoonId: number) {
     return await this.createQueryBuilder('storage')
       .where('storage.isPublic=true')

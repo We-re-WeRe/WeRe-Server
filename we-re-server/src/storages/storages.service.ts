@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { StorageRepository } from './storages.repository';
 import {
+  ReadMyStorageBriefDto,
   ReadStorageBriefDto,
   ReadStorageDetailDto,
 } from './dto/read-storage.dto';
@@ -63,6 +64,20 @@ export class StoragesService {
       (r) => new ReadStorageBriefDto(r),
     );
     await this.allocateLikeInStorageDtoArray(result, userId);
+    return result;
+  }
+
+  async findManyMyStorageList(
+    userId: number,
+    webtoonId: number,
+  ): Promise<ReadMyStorageBriefDto[]> {
+    const queryResult = await this.storageRepository.findManyMyStorageList(
+      userId,
+    );
+    const result = queryResult.map((r) => {
+      const temp = new ReadMyStorageBriefDto(r, webtoonId);
+      return temp;
+    });
     return result;
   }
 

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Review } from 'src/entities/review.entity';
 import { Days, ProvidingCompany, Webtoon } from 'src/entities/webtoon.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
