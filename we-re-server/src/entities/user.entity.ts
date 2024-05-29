@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { Point } from './point.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -22,10 +15,10 @@ export class User extends DefaultEntity {
   @Column({ type: 'varchar', nullable: true })
   imageURL?: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, unique: true })
   nickname: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 10 })
   name: string;
 
   @Column({ type: 'char', length: 1 })
@@ -34,7 +27,7 @@ export class User extends DefaultEntity {
   @Column({ type: 'date' })
   birth: Date;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, length: 50 })
   introduceMe?: string;
 
   @ManyToMany(() => User, (user) => user.following)

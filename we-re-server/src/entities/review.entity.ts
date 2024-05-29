@@ -7,7 +7,7 @@ import { Tag } from './tag.entity';
 
 @Entity()
 export class Review extends DefaultEntity {
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 100 })
   contents: string;
 
   @Column({ type: 'int', unsigned: true })

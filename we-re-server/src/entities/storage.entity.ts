@@ -14,13 +14,13 @@ import { Webtoon } from './webtoon.entity';
 
 @Entity()
 export class Storage extends DefaultEntity {
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 30 })
   name: string;
 
-  @Column({ type: 'varchar' })
-  imageURL: string;
+  @Column({ type: 'varchar', nullable: true })
+  imageURL?: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 300 })
   explain: string;
 
   @Column({ type: 'tinyint', width: 1 })

@@ -16,10 +16,10 @@ export type Reason = (typeof REASON)[keyof typeof REASON];
 
 @Entity()
 export class Point extends DefaultEntity {
-  @Column({ type: 'int' })
+  @Column({ type: 'int', unsigned: true })
   mount: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 10 })
   reason: Reason;
 
   @ManyToOne(() => User, {

@@ -47,7 +47,7 @@ export class Webtoon extends DefaultEntity {
   @Column({ type: 'varchar', length: 3, nullable: true })
   day?: Days;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   genre?: string;
 
   @Column({ type: 'text', nullable: true })
