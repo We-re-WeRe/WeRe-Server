@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import DefaultEntity from './default.entity';
 import { Point } from './point.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
