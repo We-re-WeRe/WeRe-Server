@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ReadJWTDto {
   constructor(accessToken: string, refreshToken: string) {
@@ -7,13 +6,9 @@ export class ReadJWTDto {
     this.refreshToken = refreshToken;
   }
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   accessToken: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   refreshToken: string;
 }
 
