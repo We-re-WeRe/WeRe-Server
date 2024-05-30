@@ -1,12 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDate,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
 import { Storage } from 'src/entities/storage.entity';
 import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import { ReadTagDto } from 'src/tags/dto/read-tag.dto';
@@ -17,28 +9,18 @@ export class ReadStorageBriefDto {
     raw && this.rawToDto(raw);
   }
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   id: number;
 
   @ApiProperty()
-  @IsDate()
-  @IsNotEmpty()
   createdAt: Date;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   imageURL: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   name: string;
 
   @ApiProperty({ type: () => ReadLikeInfoDto })
-  @ValidateNested()
-  @IsNotEmpty()
   like: ReadLikeInfoDto;
 
   public rawToDto(raw: any): ReadStorageBriefDto {
@@ -56,28 +38,18 @@ export class ReadStorageDetailDto extends ReadStorageBriefDto {
     this.rawToDto(raw);
   }
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   explain: string;
 
   @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
   isPublic: boolean;
 
   @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
   isMine: boolean;
 
   @ApiProperty({ type: () => [ReadTagDto] })
-  @ValidateNested()
-  @IsNotEmpty()
   tags: ReadTagDto[];
 
   @ApiProperty({ type: () => ReadUserBriefDto })
-  @ValidateNested()
-  @IsNotEmpty()
   user: ReadUserBriefDto;
 
   public rawToDto(raw: any): ReadStorageDetailDto {
@@ -98,28 +70,18 @@ export class ReadMyStorageBriefDto {
     this.rawToDto(storage, webtoonId);
   }
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   id: number;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   imageURL: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   name: string;
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   webtoonCount: number;
 
   @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
   isWebtoonIn: boolean;
 
   public rawToDto(storage: Storage, webtoonId: number): ReadMyStorageBriefDto {

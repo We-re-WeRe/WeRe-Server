@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { StorageRepository } from './storages.repository';
@@ -178,7 +178,7 @@ export class StoragesService {
     if (!id) {
       throw new CustomDataBaseException('create is not worked.');
     }
-    const result = await this.findOneDetailById(userId, id);
+    const result = await this.findOneDetailById(id, userId);
     return result;
   }
 
@@ -201,12 +201,18 @@ export class StoragesService {
       throw new CustomDataBaseException('something wrong in Database');
     }
     const result = await this.findOneDetailById(
-      userId,
       tempUpdateStorageDto.id,
+      userId,
     );
     return result;
   }
 
+  /**
+   * check is in db and is mine.
+   * @param id
+   * @param userId
+   * @returns
+   */
   async checkStorageIsValid(id: number, userId: number) {
     const queryResult = await this.storageRepository.findOneById(id);
     if (!queryResult) throw new CustomNotFoundException('storageId');
@@ -214,6 +220,11 @@ export class StoragesService {
     return true;
   }
 
+  /**
+   * check owner.
+   * @param userId
+   * @param queryResult
+   */
   checkStorageOwner(userId: number, queryResult: any) {
     if (queryResult.user_id !== userId)
       throw new CustomUnauthorziedException("you can't change");
