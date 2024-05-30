@@ -1,18 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsEnum,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import {
-  DAYS,
-  Days,
-  PROVIDINGCOMPANY,
-  ProvidingCompany,
-} from 'src/entities/webtoon.entity';
+import { Days, ProvidingCompany } from 'src/entities/webtoon.entity';
 import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
 import {
   ReadReviewAndUserDto,
@@ -25,28 +12,18 @@ export class ReadWebtoonDto {
     raw && this.rawToDto(raw);
   }
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   id: number;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   title: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   imageURL: string;
 
   @ApiProperty({ type: () => [String] })
-  @IsArray()
-  @IsNotEmpty()
   author: string[];
 
   @ApiProperty({ type: () => [String] })
-  @IsArray()
-  @IsNotEmpty()
   painter: string[];
 
   public rawToDto(raw: any): ReadWebtoonDto {
@@ -71,13 +48,9 @@ export class ReadWebtoonThumbnailDto extends ReadWebtoonDto {
     this.rawToDto(raw);
   }
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   totalStarPoint: number;
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   reviewCount: number;
 
   public rawToDto(raw: any): ReadWebtoonThumbnailDto {
@@ -94,13 +67,9 @@ export class ReadWebtoonBriefDto extends ReadWebtoonDto {
     this.rawToDto(raw);
   }
   @ApiProperty({ type: () => ReadLikeInfoDto })
-  @ValidateNested()
-  @IsNotEmpty()
   like: ReadLikeInfoDto;
 
   @ApiProperty({ type: () => ReadReviewDto })
-  @ValidateNested()
-  @IsNotEmpty()
   review: ReadReviewDto;
 
   public rawToDto(raw: any): ReadWebtoonBriefDto {
@@ -116,55 +85,36 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
     this.rawToDto(raw);
   }
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   webtoonURL: string;
 
   @ApiProperty()
-  @IsEnum(PROVIDINGCOMPANY)
-  @IsNotEmpty()
   providingCompany: ProvidingCompany;
 
   @ApiProperty()
-  @IsEnum(DAYS)
   day?: Days;
 
   @ApiProperty()
-  @IsString()
   genre?: string;
 
   @ApiProperty()
-  @IsString()
   explain?: string;
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   viewCount: number;
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   reviewCount: number;
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
   totalStarPoint: number;
 
   @ApiProperty({ type: () => ReadLikeInfoDto })
-  @ValidateNested()
-  @IsNotEmpty()
   like: ReadLikeInfoDto;
 
   @ApiProperty({ type: () => [ReadStorageBriefDto] })
-  @ValidateNested()
-  @IsNotEmpty()
   storages: ReadStorageBriefDto[];
 
   @ApiProperty({ type: () => [ReadReviewAndUserDto] })
-  @IsArray()
-  @IsNotEmpty()
   reviews: ReadReviewAndUserDto[];
 
   public rawToDto(raw: any): ReadWebtoonDetailDto {

@@ -1,29 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
-  IsEnum,
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
+  IsUrl,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class CreateStorageDto {
   @ApiProperty()
   @IsString()
+  @MinLength(4)
+  @MaxLength(30)
   @IsNotEmpty()
   name: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  imageURL: string;
+  @IsUrl()
+  @IsOptional()
+  imageURL?: string;
 
   @ApiProperty()
   @IsString()
+  @MaxLength(300)
   @IsNotEmpty()
   explain: string;
 
@@ -34,6 +37,10 @@ export class CreateStorageDto {
 
   @ApiProperty({ type: () => [String] })
   @IsArray()
+  @ArrayMaxSize(5)
+  @MaxLength(10, {
+    each: true,
+  })
   @IsOptional()
   tags?: string[];
 }

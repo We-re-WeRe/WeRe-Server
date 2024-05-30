@@ -10,6 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:local": "export NODE_ENV=local && nest start --watch",
+    "start:window:local": "$env:NODE_ENV=local && nest start --watch",
     "start:dev": "export NODE_ENV=development && nest start --watch",
     "start:prod": "export NODE_ENV=production && node dist/main",
     "start:docker": "docker-compose -f ./docker-compose.yml up --build -d",

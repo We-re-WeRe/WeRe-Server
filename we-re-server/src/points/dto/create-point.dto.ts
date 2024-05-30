@@ -1,19 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNegative,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { REASON, Reason } from 'src/entities/point.entity';
 
-@Exclude()
 export class CreatePointDto {
   @ApiProperty()
-  @Expose()
   @IsNotEmpty()
   @IsEnum(REASON)
   reason: Reason;
 
   @ApiProperty()
-  @Expose()
   @IsInt()
+  @IsNegative()
   @IsOptional()
   mount?: number;
 
