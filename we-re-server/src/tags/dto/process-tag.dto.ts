@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  MaxLength,
+} from 'class-validator';
 import { TARGET_TYPES, TargetTypes } from 'src/utils/types_and_enums';
 
 export class AddAndRemoveTagRequestDto {
@@ -24,6 +31,10 @@ export class AddAndRemoveTagRequestDto {
 
   @ApiProperty()
   @IsArray()
+  @ArrayMaxSize(5)
+  @MaxLength(10, {
+    each: true,
+  })
   @IsNotEmpty()
   contentsArray: string[];
 }
@@ -33,14 +44,8 @@ export class AddAndRemoveTagDto {
     this.contentsArray = [];
     this.deleteIds = [];
   }
-  @ApiProperty()
-  @IsArray()
-  @IsNotEmpty()
   contentsArray: string[];
 
-  @ApiProperty()
-  @IsArray()
-  @IsNotEmpty()
   deleteIds: number[];
 
   public addDeleteId(deleteId: number) {
