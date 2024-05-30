@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 import {
   DAYS,
   Days,
@@ -11,6 +17,7 @@ import {
 export class CreateWebtoonDto {
   @ApiProperty()
   @IsInt()
+  @IsPositive()
   @IsNotEmpty()
   id: number;
 
