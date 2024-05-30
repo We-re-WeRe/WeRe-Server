@@ -1,25 +1,24 @@
-import { Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
-  IsInt,
   IsNotEmpty,
   IsString,
-  Validate,
-  ValidateNested,
+  MaxLength,
 } from 'class-validator';
 import { SEX, Sex } from 'src/entities/user.entity';
 
 export class CreateUserDto {
   @ApiProperty()
   @IsString()
+  @MaxLength(20)
   @IsNotEmpty()
   nickname: string;
 
   @ApiProperty()
   @IsString()
+  @MaxLength(10)
   @IsNotEmpty()
   name: string;
 
