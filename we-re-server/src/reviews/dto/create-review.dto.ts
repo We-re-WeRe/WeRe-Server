@@ -35,6 +35,9 @@ export class CreateReviewDto {
   @ApiProperty({ type: () => [String] })
   @IsArray()
   @ArrayMaxSize(5)
+  @MaxLength(10, {
+    each: true,
+  })
   @IsOptional()
   tags?: string[];
 
