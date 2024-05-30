@@ -7,11 +7,13 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // CORS 설정
   app.enableCors({
     origin: true,
     credentials: true,
     exposedHeaders: ['Authorization'],
   });
+
   // Swagger 설정.
   const config = new DocumentBuilder()
     .setTitle('We-Re API Document')
