@@ -16,6 +16,12 @@ const SECRET_KEY_TYPE = {
   ACCESS: 'ACCESS_SECRET_KEY',
 };
 
+/**
+ * 가드에서는 가드의 역할만 해주자!
+ * 인증의 결과로 가드 통과 여부만 처리.
+ * 토큰 재발급 필요 여부랑 완전 만료 여부만 처리.
+ *
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
