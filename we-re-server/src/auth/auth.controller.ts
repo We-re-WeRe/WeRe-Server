@@ -154,11 +154,19 @@ export class AuthController {
    */
   addTokenInCookie(res: Response, jwtDto: ReadJWTDto): void {
     const { accessToken, refreshToken } = jwtDto;
+    const oneSecondToMilli = 1000;
+    const oneDayToSecond = 24 * 60 * 60;
+
+    const accessTokenAge = 30 * oneSecondToMilli;
+    const refreshTokenAge = 7 * oneDayToSecond * oneSecondToMilli;
+
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
+      maxAge: accessTokenAge,
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
+      maxAge: refreshTokenAge,
     });
   }
 
