@@ -5,11 +5,17 @@ export class ReadJWTDto {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
   }
-  @ApiProperty()
   accessToken: string;
 
-  @ApiProperty()
   refreshToken: string;
+}
+
+export class ReadAccessTokenDto {
+  constructor(readJWTDto: ReadJWTDto) {
+    this.accessToken = readJWTDto.accessToken;
+  }
+  @ApiProperty()
+  accessToken: string;
 }
 
 export class Payload {
