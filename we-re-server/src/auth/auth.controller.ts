@@ -62,7 +62,7 @@ export class AuthController {
     description: 'Request Success',
   })
   @RefreshRequired()
-  @Patch('logout')
+  @Post('logout')
   async logout(
     @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
@@ -81,7 +81,7 @@ export class AuthController {
   })
   @ApiCreatedResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
+    type: ReadAccessTokenDto,
   })
   @RefreshRequired()
   @Post('refresh')
@@ -102,7 +102,7 @@ export class AuthController {
   @ApiOperation({ summary: 'sign on' })
   @ApiCreatedResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
+    type: ReadAccessTokenDto,
   })
   @Public()
   @Post('signon')
@@ -173,7 +173,6 @@ export class AuthController {
    * @param res
    */
   removeTokenInCookie(res: Response): void {
-    res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
   }
 }
