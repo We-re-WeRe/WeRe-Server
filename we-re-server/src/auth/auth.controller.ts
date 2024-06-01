@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLocalAuthDto } from './dto/create-auth.dto';
 import { LocalAuthDto } from './dto/auth.dto';
@@ -9,7 +9,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UsersService } from 'src/users/users.service';
-import { ReadJWTDto } from './dto/jwt.dto';
+import { ReadAccessTokenDto, ReadJWTDto } from './dto/jwt.dto';
 import { Response } from 'express';
 import { Public, RefreshRequired, UserId } from 'src/utils/custom_decorators';
 
@@ -37,7 +37,7 @@ export class AuthController {
   @ApiOperation({ summary: 'login' })
   @ApiOkResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
+    type: ReadAccessTokenDto,
   })
   @Public()
   @Post('login/local')
@@ -46,8 +46,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
-      const result = await this.authService.localLogin(localAuthDto);
-      this.setTokenInResponseAndHeader(res, result);
+      const readJWTDto = await this.authService.localLogin(localAuthDto);
+      this.setTokenInResponseAndHeader(res, readJWTDto);
+      const result = new ReadAccessTokenDto(readJWTDto);
       return result;
     } catch (error) {
       throw error;
@@ -59,10 +60,9 @@ export class AuthController {
   })
   @ApiOkResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
   })
   @RefreshRequired()
-  @Patch('logout')
+  @Post('logout')
   async logout(
     @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
@@ -81,7 +81,7 @@ export class AuthController {
   })
   @ApiCreatedResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
+    type: ReadAccessTokenDto,
   })
   @RefreshRequired()
   @Post('refresh')
@@ -90,8 +90,9 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
-      const result = await this.authService.getJWTDto(userId);
-      this.setTokenInResponseAndHeader(res, result);
+      const readJWTDto = await this.authService.getJWTDto(userId);
+      this.setTokenInResponseAndHeader(res, readJWTDto);
+      const result = new ReadAccessTokenDto(readJWTDto);
       return result;
     } catch (error) {
       throw error;
@@ -101,7 +102,7 @@ export class AuthController {
   @ApiOperation({ summary: 'sign on' })
   @ApiCreatedResponse({
     description: 'Request Success',
-    type: ReadJWTDto,
+    type: ReadAccessTokenDto,
   })
   @Public()
   @Post('signon')
@@ -117,10 +118,11 @@ export class AuthController {
       await this.userService.checkNicknameIsUsed(
         createLocalAuthDto.user.nickname,
       );
-      const result = await this.authService.createUserAndLoginInfo(
+      const readJWTDto = await this.authService.createUserAndLoginInfo(
         createLocalAuthDto,
       );
-      this.setTokenInResponseAndHeader(res, result);
+      this.setTokenInResponseAndHeader(res, readJWTDto);
+      const result = new ReadAccessTokenDto(readJWTDto);
       return result;
     } catch (error) {
       throw error;
@@ -132,9 +134,12 @@ export class AuthController {
    * @param res
    * @param jwtDto
    */
-  setTokenInResponseAndHeader(res: Response, jwtDto: ReadJWTDto): void {
-    this.addTokenInHeader(res, jwtDto);
-    this.addTokenInCookie(res, jwtDto);
+  setTokenInResponseAndHeader(
+    res: Response,
+    { accessToken, refreshToken }: ReadJWTDto,
+  ): void {
+    this.addAccessTokenInHeader(res, accessToken);
+    this.addRefreshTokenInCookie(res, refreshToken);
   }
 
   /**
@@ -142,9 +147,8 @@ export class AuthController {
    * @param res Response
    * @param jwtDto
    */
-  addTokenInHeader(res: Response, jwtDto: ReadJWTDto): void {
-    const { accessToken, refreshToken } = jwtDto;
-    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+  addAccessTokenInHeader(res: Response, accessToken: string): void {
+    res.setHeader('Authorization', 'Bearer ' + accessToken);
   }
 
   /**
@@ -152,13 +156,15 @@ export class AuthController {
    * @param res
    * @param jwtDto
    */
-  addTokenInCookie(res: Response, jwtDto: ReadJWTDto): void {
-    const { accessToken, refreshToken } = jwtDto;
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-    });
+  addRefreshTokenInCookie(res: Response, refreshToken: string): void {
+    const oneSecondToMilli = 1000;
+    const oneDayToSecond = 24 * 60 * 60;
+
+    const refreshTokenAge = 7 * oneDayToSecond * oneSecondToMilli;
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
+      maxAge: refreshTokenAge,
     });
   }
 
@@ -167,7 +173,6 @@ export class AuthController {
    * @param res
    */
   removeTokenInCookie(res: Response): void {
-    res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
   }
 }

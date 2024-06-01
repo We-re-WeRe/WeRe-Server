@@ -3,10 +3,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { version } from '../package.json';
 import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  // somewhere in your initialization file
+  app.use(cookieParser());
   // CORS 설정
   app.enableCors({
     origin: true,
