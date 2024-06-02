@@ -33,11 +33,7 @@ export class Storage extends DefaultEntity {
   })
   user: User;
 
-  @OneToMany(() => Tag, (tag) => tag.storage, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @OneToMany(() => Tag, (tag) => tag.storage)
   tags?: Tag[];
 
   @OneToMany(() => Like, (like) => like.storage)

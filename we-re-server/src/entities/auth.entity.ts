@@ -23,7 +23,11 @@ export class Auth extends DefaultEntity {
   @Column({ type: 'varchar', nullable: true })
   google?: string;
 
-  @OneToOne(() => User, { cascade: true })
+  @OneToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 

@@ -30,10 +30,6 @@ export class Review extends DefaultEntity {
   @OneToMany(() => Like, (like) => like.review)
   likes?: Like[];
 
-  @OneToMany(() => Tag, (tag) => tag.review, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @OneToMany(() => Tag, (tag) => tag.review)
   tags?: Tag[];
 }
