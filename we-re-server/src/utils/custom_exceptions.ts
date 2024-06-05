@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  HttpException,
   HttpStatus,
   InternalServerErrorException,
   NotFoundException,

@@ -42,7 +42,10 @@ export class AuthGuard implements CanActivate {
 
     if (!token) {
       if (isPublic) return true;
-      else throw new CustomUnauthorziedException('Token is unvalid.');
+      else
+        throw new CustomUnauthorziedException(
+          `${isRefreshRequired ? 'Refresh' : 'Access'} Token is unvalid.`,
+        );
     }
 
     const payload = await this.getPayloadFromToken(token, isRefreshRequired);
@@ -72,7 +75,9 @@ export class AuthGuard implements CanActivate {
 
       return payload;
     } catch {
-      throw new CustomUnauthorziedException('Token is unvalid.');
+      throw new CustomUnauthorziedException(
+        `${isRefreshRequired ? 'Refresh' : 'Access'} Token is unvalid.`,
+      );
     }
   }
 
@@ -115,7 +120,7 @@ export class AuthGuard implements CanActivate {
       userId,
     );
     if (token !== savedRefreshToken)
-      throw new CustomUnauthorziedException('Token is unvalid');
+      throw new CustomUnauthorziedException('Token is unvalid.');
 
     return true;
   }
