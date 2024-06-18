@@ -64,9 +64,6 @@ export class UsersService {
    */
   async checkNicknameIsUsed(nickname: string): Promise<boolean> {
     const queryResult = await this.userRepository.getIdByNickname(nickname);
-    if (!!queryResult) {
-      throw new CustomDataAlreadyExistException('this Nickname is already in.');
-    }
     return !!queryResult;
   }
   /**
