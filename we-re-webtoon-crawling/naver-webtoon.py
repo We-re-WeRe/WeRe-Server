@@ -17,8 +17,8 @@ for day in days:
         painter = authorAndPainter[0] if len(authorAndPainter) == 1 else authorAndPainter[1]
         thumbnailUrl = webtoon["thumbnailUrl"]
         webtoonUrl = f"https://comic.naver.com/webtoon/list?titleId={titleId}&tab={day[:3]}"
-        
-        if requests.patch(f'{apiUrl}/webtoons/{titleId}',data={'id':titleId, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter}).status_code == 200:
+
+        if requests.patch(f'{apiUrl}/webtoons?id={titleId}',data={'id':titleId, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter}).status_code == 200:
             print(f"Patch is completed {titleId}")
         else:
             webtoonInfoUrl = f"https://comic.naver.com/api/article/list/info?titleId={titleId}"
@@ -27,5 +27,6 @@ for day in days:
             
             explain = parsedInfoData["synopsis"]
             genre = ', '.join(parsedInfoData["gfpAdCustomParam"]["genreTypes"])
-            response = requests.post(f'{apiUrl}/webtoons',data={'id':titleId,'title': titleName,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': 'painter','providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain})
+            response = requests.post(f'{apiUrl}/webtoons',data={'id':titleId,'title': titleName,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter,'providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain})
+            print(response)
             print(f"Create Webtoon is completed {titleId}")

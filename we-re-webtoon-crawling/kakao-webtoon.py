@@ -34,7 +34,7 @@ for day in days:
         author = ', '.join(authorArr if len(authorArr) > 0 else originalStoryArr)
         painter = ', '.join(painterArr if len(painterArr) > 0 else publisherArr)
 
-        if requests.patch(f'{apiUrl}/webtoons/{id}',data={'id':id, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter}).status_code == 200:
+        if requests.patch(f'{apiUrl}/webtoons?id={id}',data={'id':id, 'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter}).status_code == 200:
             print(f"Patch is completed {id}")
         else:
             webtoonInfoUrl = f"https://gateway-kw.kakao.com/decorator/v2/decorator/contents/{id}/profile"
