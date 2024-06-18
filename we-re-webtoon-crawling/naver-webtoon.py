@@ -27,5 +27,5 @@ for day in days:
             
             explain = parsedInfoData["synopsis"]
             genre = ', '.join(parsedInfoData["gfpAdCustomParam"]["genreTypes"])
-            response = requests.post(f'{apiUrl}/webtoons',data={'id':titleId,'title': titleName,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': 'painter','providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain})
+            response = requests.post(f'{apiUrl}/webtoons',data={'id':titleId,'title': titleName,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter,'providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain})
             print(f"Create Webtoon is completed {titleId}")
