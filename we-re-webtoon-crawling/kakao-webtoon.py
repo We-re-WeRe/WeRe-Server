@@ -15,7 +15,7 @@ for day in days:
         title = content["title"]
         seoId = content["seoId"]
         webtoonUrl = f"https://webtoon.kakao.com/content/{seoId}/{id}"
-        thumbnailUrl = content["featuredCharacterImageB"]
+        thumbnailUrl = content["featuredCharacterImageB"]+'.webp'
         authorAndPainter = content["authors"]
         authorArr = []
         painterArr = []
