@@ -1,7 +1,13 @@
 from .. import connection
 
-def transformQueryStyleString(val):
-    return f"{val}" if type(val) == int else f'\'{val}\''
+def getWebtoonById(id):
+    conn = connection.connectWithDatabase()
+    cur = conn.cursor()
+
+    cur.execute(f"SELECT * FROM webtoon WHERE(id={id})")
+    webtoon = cur.fetchone()
+    conn.close()
+    return webtoon
     
 def createWebtoon(webtoon):
     conn = connection.connectWithDatabase()
@@ -37,3 +43,6 @@ def updateWebtoon(webtoonUpdateContents):
                 """)
     conn.commit()
     conn.close()
+
+def transformQueryStyleString(val):
+    return f"{val}" if type(val) == int else f'\'{val}\''
