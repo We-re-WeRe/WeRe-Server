@@ -9,10 +9,9 @@ dbConfig = {
     "DATABASE_PASSWORD":'',
     "DATABASE_NAME":'',
 }
-env = os.getenv('ENV')
+env = "local" #os.getenv('ENV') 
 path = '/'.join(sys.path[0].split('/')[:-1]) + f'/we-re-server/.env.{env}'
 load_dotenv(path)
-
 
 for key in dbConfig:
     dbConfig[key] = os.getenv(key)
