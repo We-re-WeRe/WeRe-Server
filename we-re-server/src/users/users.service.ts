@@ -96,11 +96,11 @@ export class UsersService {
    * @param updateUserDto update contents
    * @returns {Promise<void>} updated user detail info
    */
-  async updateUserInfo(updateUserDto: UpdateUserDto): Promise<void> {
-    const queryResult = await this.userRepository.update(
-      updateUserDto.id,
-      updateUserDto,
-    );
+  async updateUserInfo(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<void> {
+    const queryResult = await this.userRepository.update(userId, updateUserDto);
     if (!queryResult.affected) {
       throw new CustomNotFoundException('id');
     }

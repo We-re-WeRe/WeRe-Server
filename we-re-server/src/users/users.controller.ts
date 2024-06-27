@@ -156,13 +156,8 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<ReadUserDetailDto> {
     try {
-      if (userId !== updateUserDto.id)
-        throw new CustomUnauthorziedException(`you can't update`);
-      await this.usersService.updateUserInfo(updateUserDto);
-      return await this.usersService.findOneDetailById(
-        userId,
-        updateUserDto.id,
-      );
+      await this.usersService.updateUserInfo(userId, updateUserDto);
+      return await this.usersService.findOneDetailById(userId, userId);
     } catch (error) {
       throw error;
     }
