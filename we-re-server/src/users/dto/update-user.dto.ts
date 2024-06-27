@@ -12,12 +12,6 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @ApiProperty()
-  @IsInt()
-  @IsPositive()
-  @IsNotEmpty()
-  id: number;
-
   @ApiProperty({ required: false })
   @IsUrl()
   @IsOptional()
