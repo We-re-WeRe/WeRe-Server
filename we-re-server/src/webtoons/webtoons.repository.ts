@@ -67,13 +67,10 @@ export class WebtoonRepository extends Repository<Webtoon> {
       .addSelect('ROUND(AVG(reviews.starPoint),1)', 'totalStarPoint')
       .addSelect('COUNT(reviews.id)', 'reviewCount')
       .groupBy('webtoon.id');
-    if (type === 'hot')
-      return await qb.orderBy('reviewCount', 'DESC').limit(5).getRawMany();
-    if (type === 'new')
-      return await qb
-        .orderBy('webtoon.created_at', 'DESC')
-        .limit(5)
-        .getRawMany();
+    if (type === 'hot') qb.orderBy('reviewCount', 'DESC').limit(5).getRawMany();
+    if (type === 'new') qb.orderBy('webtoon.created_at', 'DESC');
+
+    return await qb.limit(5).getRawMany();
   }
 
   /**
