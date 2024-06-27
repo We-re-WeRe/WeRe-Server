@@ -11,7 +11,6 @@ import {
   CustomDataAlreadyExistException,
   CustomDataBaseException,
   CustomNotFoundException,
-  CustomUnauthorziedException,
 } from 'src/utils/custom_exceptions';
 import { LikesService } from 'src/likes/likes.service';
 import { LikeRequestDto } from 'src/likes/dto/cud-like.dto';
@@ -190,8 +189,8 @@ export class ReviewsService {
 
   async checkReviewOwner(id: number, userId: number): Promise<void> {
     const queryResult = await this.reviewRepository.findOneById(id);
-    if (queryResult.user_id == userId)
-      throw new CustomUnauthorziedException("you can't change review");
+    if (queryResult.user_id !== userId)
+      throw new CustomNotFoundException('userId');
   }
 
   private async allocateTagAndLikesInReviewDto(
