@@ -55,7 +55,7 @@ export class ReadWebtoonThumbnailDto extends ReadWebtoonDto {
 
   public rawToDto(raw: any): ReadWebtoonThumbnailDto {
     super.rawToDto(raw);
-    this.totalStarPoint = raw.totalStarPoint;
+    this.totalStarPoint = raw.totalStarPoint | 0;
     this.reviewCount = raw.reviewCount;
     return this;
   }
