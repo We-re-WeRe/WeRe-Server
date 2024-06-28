@@ -113,7 +113,10 @@ export class StoragesController {
     }
   }
 
-  @ApiOperation({ summary: 'get all of the my Storages as list' })
+  @ApiOperation({
+    summary:
+      'get all of the my Storages list which is used when add webtoon in storage.',
+  })
   @ApiOkResponse({
     description: 'Request Success',
     type: [ReadStorageBriefDto],
