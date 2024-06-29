@@ -12,12 +12,15 @@ import { Tag } from './tag.entity';
 import { Like } from './like.entity';
 import { Webtoon } from './webtoon.entity';
 
+const DEFAULT_IMAGE_URL =
+  'https://www.nofire.co.kr/shopimages/ks0713/028012000016.jpg?1642063081';
+
 @Entity()
 export class Storage extends DefaultEntity {
   @Column({ type: 'varchar', length: 30 })
   name: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: DEFAULT_IMAGE_URL })
   imageURL?: string;
 
   @Column({ type: 'varchar', length: 300 })
