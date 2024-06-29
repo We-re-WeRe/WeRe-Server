@@ -10,9 +10,12 @@ export const SEX = {
 
 export type Sex = (typeof SEX)[keyof typeof SEX];
 
+const DEFAULT_IMAGE_URL =
+  'https://d3kxs6kpbh59hp.cloudfront.net/community/COMMUNITY/451e60229e7945a5a81258ebb8cabdaa/aaaa744cf80b4c71b2473334addcde9e_1535190560.jpg';
+
 @Entity()
 export class User extends DefaultEntity {
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: DEFAULT_IMAGE_URL })
   imageURL?: string;
 
   @Column({ type: 'varchar', length: 20, unique: true })
