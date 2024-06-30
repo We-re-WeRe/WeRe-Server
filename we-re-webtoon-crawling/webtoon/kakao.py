@@ -7,7 +7,7 @@ webtoonListURL = "https://gateway-kw.kakao.com/section/v1/timetables/days"
 webtoonPageURL = "https://webtoon.kakao.com/content"
 webtoonDetailURL = "https://gateway-kw.kakao.com/decorator/v2/decorator/contents"
 
-def kakaoCrawling(day):
+def getParsedKakaoWebtoonList(day):
     webtoonArray = []
     query = f"placement=timetable_{day.lower()[:3]}"
     response = requests.get(f"{webtoonListURL}?{query}")
