@@ -1,7 +1,7 @@
 import requests
 import json
 
-providingCompany = "naver"
+providingCompany = "n"
 webtoonListURL = "https://comic.naver.com/api/webtoon/titlelist/weekday"
 webtoonPageURL = "https://comic.naver.com/webtoon/list"
 webtoonDetailURL = "https://comic.naver.com/api/article/list/info"
@@ -28,6 +28,6 @@ def getParsedNaverWebtoonList(day):
         
         explain = parsedInfoData["synopsis"]
         genre = ', '.join(parsedInfoData["gfpAdCustomParam"]["genreTypes"])
-        result={'id':id,'title': title,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter,'providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain}
+        result={'id':id,'title': title,'image_url': thumbnailUrl,'webtoon_url': webtoonUrl,'author': author,'painter': painter,'providing_company': providingCompany, 'day': day.lower()[:3],'genre': genre,'explain': explain}
         webtoonArray.append(result)
     return webtoonArray

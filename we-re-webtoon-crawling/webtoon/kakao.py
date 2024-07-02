@@ -1,7 +1,7 @@
 import requests
 import json
 
-providingCompany = "kakao"
+providingCompany = "k"
 genreDictionary = { "#드라마":"DRAMA", "#코믹/일상":"COMIC/DAILY","#액션/무협":'ACTION', "#공포/스릴러":'THRILL', "#로맨스":"PURE", "#판타지 드라마":'FANTASY/DRAMA', "#로맨스 판타지":'ROMANSE/FANTASY', "#학원/판타지":"ACADEMY/FANTASY"}
 webtoonListURL = "https://gateway-kw.kakao.com/section/v1/timetables/days"
 webtoonPageURL = "https://webtoon.kakao.com/content"
@@ -45,6 +45,6 @@ def getParsedKakaoWebtoonList(day):
         
         explain = parsedInfoData["synopsis"]
         genre = genreDictionary[parsedInfoData["seoKeywords"][2]]
-        result = {'id':id,'title': title,'imageURL': thumbnailUrl,'webtoonURL': webtoonUrl,'author': author,'painter': painter,'providingCompany': providingCompany, 'day': day,'genre': genre,'explain': explain}
+        result = {'id':id,'title': title,'image_url': thumbnailUrl,'webtoon_url': webtoonUrl,'author': author,'painter': painter,'providing_company': providingCompany, 'day': day.lower()[:3],'genre': genre,'explain': explain}
         webtoonArray.append(result)
     return webtoonArray
