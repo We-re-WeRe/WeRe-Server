@@ -16,8 +16,10 @@ def getParsedNaverWebtoonList(day):
     for webtoon in webtoonsAtThatDay:
         id = webtoon["titleId"]
         title = webtoon["titleName"]
-        author = list(map(lambda o:o["name"], webtoon["writers"]))
-        painter = list(map(lambda o:o["name"], webtoon["painters"]))
+        authorArr = list(map(lambda o:o["name"], webtoon["writers"]))
+        painterArr = list(map(lambda o:o["name"], webtoon["painters"]))
+        author = ', '.join(authorArr)
+        painter = ', '.join(painterArr)
         thumbnailUrl = webtoon["thumbnailUrl"]
         webtoonUrl = f"{webtoonPageURL}?titleId={id}&tab={day[:3]}"
         webtoonInfoUrl = f"{webtoonDetailURL}?titleId={id}"
