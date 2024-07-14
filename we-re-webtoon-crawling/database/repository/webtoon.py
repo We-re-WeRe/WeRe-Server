@@ -9,7 +9,7 @@ def getWebtoonById(id):
     conn.close()
     return webtoon
     
-def createWebtoon(webtoon):
+def createWebtoon(webtoons):
     conn = connection.connectWithDatabase()
     cur = conn.cursor()
 
@@ -20,29 +20,33 @@ def createWebtoon(webtoon):
         valueString = ', '.join(vals)
         return keyString, valueString
 
-    keys,values = transformDictToKeyValueString(**webtoon)
-    cur.execute(f"INSERT INTO webtoon({keys}) VALUES({values})")
+    for webtoon in webtoons:
+        keys,values = transformDictToKeyValueString(**webtoon)
+        cur.execute(f"INSERT INTO webtoon({keys}) VALUES({values})")
+        
     conn.commit()
     conn.close()
 
-def updateWebtoon(webtoonUpdateContents):
+def updateWebtoon(webtoons):
     conn = connection.connectWithDatabase()
     cur = conn.cursor()
 
     def transformDictToKeyEqualsValueString(id,**kwargs):
         keyEqualsValueStringArr = []
         for key,val in kwargs.items():
-            tempString = f'`{key}`={transformQueryStyleString(val)}'
+            tempString = f"`{key}`={transformQueryStyleString(val)}"
             keyEqualsValueStringArr.append(tempString)
         keyEqualsValueString = ', '.join(keyEqualsValueStringArr)
         return keyEqualsValueString
     
-    keyEqualsValueString = transformDictToKeyEqualsValueString(**webtoonUpdateContents)
-    cur.execute(f"""
-                UPDATE WEBTOON SET {keyEqualsValueString} WHERE( id={webtoonUpdateContents["id"]})
-                """)
+    for webtoon in webtoons:
+        keyEqualsValueString = transformDictToKeyEqualsValueString(**webtoon)
+
+        cur.execute(f"""
+                    UPDATE WEBTOON SET {keyEqualsValueString} WHERE( id={webtoon["id"]})
+                    """)
     conn.commit()
     conn.close()
 
 def transformQueryStyleString(val):
-    return f"{val}" if type(val) == int else f'\'{val}\''
+    return f"{val}" if type(val) == int else f'\"{val}\"'
