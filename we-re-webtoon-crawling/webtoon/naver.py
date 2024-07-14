@@ -26,8 +26,9 @@ def getParsedNaverWebtoonList(day):
         response = requests.get(webtoonInfoUrl)
         parsedInfoData = json.loads(response.text)
         
-        explain = parsedInfoData["synopsis"]
+        explain = parsedInfoData["synopsis"].replace("\"","\\\"")
         genre = ', '.join(parsedInfoData["gfpAdCustomParam"]["genreTypes"])
         result={'id':id,'title': title,'image_url': thumbnailUrl,'webtoon_url': webtoonUrl,'author': author,'painter': painter,'providing_company': providingCompany, 'day': day.lower()[:3],'genre': genre,'explain': explain}
+        
         webtoonArray.append(result)
     return webtoonArray
