@@ -63,13 +63,13 @@ export class UsersController {
   @Get('detail')
   async findOneDetailById(
     @UserId() userId: number,
-    @Query('targetId') targetId: number,
+    @Query('ownerId') ownerId: number,
   ): Promise<ReadUserDetailDto> {
     try {
-      if (!targetId)
-        if (userId) targetId = userId;
-        else throw new CustomBadTypeRequestException('targetId', targetId);
-      return await this.usersService.findOneDetailById(userId, targetId);
+      if (!ownerId)
+        if (userId) ownerId = userId;
+        else throw new CustomBadTypeRequestException('ownerId', ownerId);
+      return await this.usersService.findOneDetailById(userId, ownerId);
     } catch (error) {
       throw error;
     }
