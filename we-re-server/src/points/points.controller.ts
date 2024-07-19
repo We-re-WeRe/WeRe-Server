@@ -34,23 +34,15 @@ export class PointsController {
   })
   @Get('history')
   findHistoryById(@UserId() userId: number): Promise<ReadPointHistoryDto[]> {
-    try {
-      return this.pointsService.findHistoryById(userId);
-    } catch (error) {
-      throw error;
-    }
+    return this.pointsService.findHistoryById(userId);
   }
 
   @ApiOperation({ summary: "get user's total point API" })
   @ApiOkResponse({ description: 'Request Success', type: ReadPointSumDto })
   @Get('sum')
   async findSumById(@UserId() userId: number): Promise<ReadPointSumDto> {
-    try {
-      const result = await this.pointsService.findSumById(userId);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.pointsService.findSumById(userId);
+    return result;
   }
 
   @ApiOperation({ summary: 'create Point object' })
@@ -60,11 +52,7 @@ export class PointsController {
     @UserId() userId: number,
     @Body() createdPointDto: CreatePointDto,
   ) {
-    try {
-      return await this.pointsService.createPoint(userId, createdPointDto);
-    } catch (error) {
-      throw error;
-    }
+    return await this.pointsService.createPoint(userId, createdPointDto);
   }
 
   @ApiOperation({ summary: 'Delete Point object' })
@@ -72,12 +60,8 @@ export class PointsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()
   async delete(@Query('id') id: number): Promise<void> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      return await this.pointsService.delete(id);
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    return await this.pointsService.delete(id);
   }
 
   @ApiOperation({ summary: 'Delete Point object by user Id' })
@@ -85,10 +69,6 @@ export class PointsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('user')
   async deleteByUserId(@UserId() userId: number) {
-    try {
-      return await this.pointsService.deleteByUserId(userId);
-    } catch (error) {
-      throw error;
-    }
+    return await this.pointsService.deleteByUserId(userId);
   }
 }

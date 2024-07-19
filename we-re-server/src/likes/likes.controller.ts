@@ -20,13 +20,9 @@ export class LikesController {
     @UserId() userId: number,
     @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
-    try {
-      likeRequestDto.setUserId(userId);
-      const result = await this.likeService.addLike(likeRequestDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    likeRequestDto.setUserId(userId);
+    const result = await this.likeService.addLike(likeRequestDto);
+    return result;
   }
 
   @ApiOperation({ summary: 'delete like' })
@@ -39,12 +35,8 @@ export class LikesController {
     @UserId() userId: number,
     @Query() likeRequestDto: LikeRequestDto,
   ): Promise<ReadLikeInfoDto> {
-    try {
-      likeRequestDto.setUserId(userId);
-      const result = await this.likeService.softRemoveLike(likeRequestDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    likeRequestDto.setUserId(userId);
+    const result = await this.likeService.softRemoveLike(likeRequestDto);
+    return result;
   }
 }

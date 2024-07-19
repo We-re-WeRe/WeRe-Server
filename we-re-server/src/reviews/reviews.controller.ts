@@ -40,18 +40,11 @@ export class ReviewsController {
     @UserId() userId: number,
     @Query('ownerId') ownerId: number,
   ): Promise<ReadReviewAndWebtoonDto[]> {
-    try {
-      if (!ownerId)
-        if (userId) ownerId = userId;
-        else throw new CustomBadTypeRequestException('ownerId', ownerId);
-      const result = await this.reviewsService.findManyByOwnerId(
-        userId,
-        ownerId,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!ownerId)
+      if (userId) ownerId = userId;
+      else throw new CustomBadTypeRequestException('ownerId', ownerId);
+    const result = await this.reviewsService.findManyByOwnerId(userId, ownerId);
+    return result;
   }
 
   @ApiOperation({ summary: 'create Review' })
@@ -64,11 +57,7 @@ export class ReviewsController {
     @UserId() userId: number,
     @Body() createReviewDto: CreateReviewDto,
   ): Promise<ReadReviewDto> {
-    try {
-      return this.reviewsService.createReview(userId, createReviewDto);
-    } catch (error) {
-      throw error;
-    }
+    return this.reviewsService.createReview(userId, createReviewDto);
   }
 
   @ApiOperation({ summary: 'update Review' })
@@ -81,11 +70,7 @@ export class ReviewsController {
     @UserId() userId: number,
     @Body() updateReviewDto: UpdateReviewDto,
   ): Promise<ReadReviewDto> {
-    try {
-      return this.reviewsService.updateReview(userId, updateReviewDto);
-    } catch (error) {
-      throw error;
-    }
+    return this.reviewsService.updateReview(userId, updateReviewDto);
   }
 
   @ApiOperation({ summary: 'delete Review' })
@@ -96,11 +81,7 @@ export class ReviewsController {
     @UserId() userId: number,
     @Query('id') id: number,
   ): Promise<void> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      return this.reviewsService.deleteReview(id, userId);
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    return this.reviewsService.deleteReview(id, userId);
   }
 }

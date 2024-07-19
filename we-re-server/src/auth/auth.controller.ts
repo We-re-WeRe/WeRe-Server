@@ -45,14 +45,10 @@ export class AuthController {
     @Body() localAuthDto: LocalAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      const readJWTDto = await this.authService.localLogin(localAuthDto);
-      this.setTokenInResponseAndHeader(res, readJWTDto);
-      const result = new ReadAccessTokenDto(readJWTDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const readJWTDto = await this.authService.localLogin(localAuthDto);
+    this.setTokenInResponseAndHeader(res, readJWTDto);
+    const result = new ReadAccessTokenDto(readJWTDto);
+    return result;
   }
 
   @ApiOperation({
@@ -67,13 +63,9 @@ export class AuthController {
     @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      const result = await this.authService.logout(userId);
-      this.removeTokenInCookie(res);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.authService.logout(userId);
+    this.removeTokenInCookie(res);
+    return result;
   }
 
   @ApiOperation({
@@ -89,14 +81,10 @@ export class AuthController {
     @UserId() userId: number,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      const readJWTDto = await this.authService.getJWTDto(userId);
-      this.setTokenInResponseAndHeader(res, readJWTDto);
-      const result = new ReadAccessTokenDto(readJWTDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const readJWTDto = await this.authService.getJWTDto(userId);
+    this.setTokenInResponseAndHeader(res, readJWTDto);
+    const result = new ReadAccessTokenDto(readJWTDto);
+    return result;
   }
 
   @ApiOperation({ summary: 'sign on' })
@@ -110,23 +98,17 @@ export class AuthController {
     @Body() createLocalAuthDto: CreateLocalAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    try {
-      await this.authService.checkIsDuplicatedAccount(
-        createLocalAuthDto.account,
-      );
+    await this.authService.checkIsDuplicatedAccount(createLocalAuthDto.account);
 
-      await this.userService.checkNicknameIsUsed(
-        createLocalAuthDto.user.nickname,
-      );
-      const readJWTDto = await this.authService.createUserAndLoginInfo(
-        createLocalAuthDto,
-      );
-      this.setTokenInResponseAndHeader(res, readJWTDto);
-      const result = new ReadAccessTokenDto(readJWTDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    await this.userService.checkNicknameIsUsed(
+      createLocalAuthDto.user.nickname,
+    );
+    const readJWTDto = await this.authService.createUserAndLoginInfo(
+      createLocalAuthDto,
+    );
+    this.setTokenInResponseAndHeader(res, readJWTDto);
+    const result = new ReadAccessTokenDto(readJWTDto);
+    return result;
   }
 
   /**

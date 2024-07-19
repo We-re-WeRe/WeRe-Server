@@ -44,11 +44,7 @@ export class UsersController {
   })
   @Get('my-profile-image')
   async findMyProfileImageById(@UserId() id: number): Promise<ReadUserDto> {
-    try {
-      return await this.usersService.findOneProfileImageById(id);
-    } catch (error) {
-      throw error;
-    }
+    return await this.usersService.findOneProfileImageById(id);
   }
 
   @ApiOperation({
@@ -65,14 +61,10 @@ export class UsersController {
     @UserId() userId: number,
     @Query('ownerId') ownerId: number,
   ): Promise<ReadUserDetailDto> {
-    try {
-      if (!ownerId)
-        if (userId) ownerId = userId;
-        else throw new CustomBadTypeRequestException('ownerId', ownerId);
-      return await this.usersService.findOneDetailById(userId, ownerId);
-    } catch (error) {
-      throw error;
-    }
+    if (!ownerId)
+      if (userId) ownerId = userId;
+      else throw new CustomBadTypeRequestException('ownerId', ownerId);
+    return await this.usersService.findOneDetailById(userId, ownerId);
   }
 
   @ApiOperation({ summary: 'check this nickname is used.' })
@@ -84,12 +76,8 @@ export class UsersController {
   async checkNicknameIsUsed(
     @Query('nickname') nickname: string,
   ): Promise<boolean> {
-    try {
-      const result = this.usersService.checkNicknameIsUsed(nickname);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = this.usersService.checkNicknameIsUsed(nickname);
+    return result;
   }
 
   @ApiOperation({ summary: 'User followed target id' })
@@ -102,22 +90,14 @@ export class UsersController {
     @UserId() userId: number,
     @Query('targetId') targetId: number,
   ): Promise<ReadUserDetailDto> {
-    try {
-      if (userId === targetId)
-        throw new BadRequestException("can't follow self");
-      const followDto = new FollowDto(userId, targetId);
-      if (await this.usersService.checkUserIsFollowing(followDto))
-        throw new CustomDataAlreadyExistException();
-      await this.usersService.createFollowRelation(followDto);
-      const result = await this.usersService.findOneDetailById(
-        userId,
-        targetId,
-      );
-      if (!result) throw new CustomNotFoundException('targetId');
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (userId === targetId) throw new BadRequestException("can't follow self");
+    const followDto = new FollowDto(userId, targetId);
+    if (await this.usersService.checkUserIsFollowing(followDto))
+      throw new CustomDataAlreadyExistException();
+    await this.usersService.createFollowRelation(followDto);
+    const result = await this.usersService.findOneDetailById(userId, targetId);
+    if (!result) throw new CustomNotFoundException('targetId');
+    return result;
   }
 
   @ApiOperation({ summary: 'User unfollowed target id' })
@@ -130,19 +110,12 @@ export class UsersController {
     @UserId() userId: number,
     @Query('targetId') targetId: number,
   ): Promise<ReadUserDetailDto> {
-    try {
-      if (userId === targetId)
-        throw new BadRequestException("can't unfollow self");
-      const followDto = new FollowDto(userId, targetId);
-      await this.usersService.deleteFollowRelation(followDto);
-      const result = await this.usersService.findOneDetailById(
-        userId,
-        targetId,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (userId === targetId)
+      throw new BadRequestException("can't unfollow self");
+    const followDto = new FollowDto(userId, targetId);
+    await this.usersService.deleteFollowRelation(followDto);
+    const result = await this.usersService.findOneDetailById(userId, targetId);
+    return result;
   }
 
   @ApiOperation({ summary: 'update User information and Return User detail' })
@@ -155,12 +128,8 @@ export class UsersController {
     @UserId() userId: number,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<ReadUserDetailDto> {
-    try {
-      await this.usersService.updateUserInfo(userId, updateUserDto);
-      return await this.usersService.findOneDetailById(userId, userId);
-    } catch (error) {
-      throw error;
-    }
+    await this.usersService.updateUserInfo(userId, updateUserDto);
+    return await this.usersService.findOneDetailById(userId, userId);
   }
 
   @ApiOperation({ summary: 'Delete user' })
@@ -170,11 +139,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()
   async delete(@UserId() userId: number): Promise<void> {
-    try {
-      return await this.usersService.delete(userId);
-    } catch (error) {
-      throw error;
-    }
+    return await this.usersService.delete(userId);
   }
 
   // Deprecated
@@ -187,11 +152,7 @@ export class UsersController {
   })
   @Post()
   async createUserInfo(@Body() createUserDto: CreateUserDto): Promise<number> {
-    try {
-      const result = await this.usersService.createUserInfo(createUserDto);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.usersService.createUserInfo(createUserDto);
+    return result;
   }
 }

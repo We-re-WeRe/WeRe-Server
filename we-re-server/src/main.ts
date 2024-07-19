@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { version } from '../package.json';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { HttpExceptionFilter } from './request-life-cycle/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,6 +25,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  // 글로벌 http exception filter.
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // 파이프 선언.
   app.useGlobalPipes(

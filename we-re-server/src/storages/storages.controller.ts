@@ -55,16 +55,10 @@ export class StoragesController {
     @UserId() userId: number,
     @Query('id') id: number,
   ): Promise<ReadStorageDetailDto> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      const result = await this.storagesService.findOneDetailById(id, userId);
-      result.user = await this.userService.findOneBriefById(
-        result.user.getId(),
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    const result = await this.storagesService.findOneDetailById(id, userId);
+    result.user = await this.userService.findOneBriefById(result.user.getId());
+    return result;
   }
 
   @ApiOperation({ summary: 'get all of the Storages as list' })
@@ -77,14 +71,8 @@ export class StoragesController {
   async findManyPublicStorageList(
     @UserId() userId: number,
   ): Promise<ReadStorageBriefDto[]> {
-    try {
-      const result = await this.storagesService.findManyPublicStorageList(
-        userId,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = await this.storagesService.findManyPublicStorageList(userId);
+    return result;
   }
 
   @ApiOperation({ summary: 'get Storages which is owned by User as list' })
@@ -98,19 +86,14 @@ export class StoragesController {
     @UserId() userId: number,
     @Query('userId') ownerId: number,
   ): Promise<ReadStorageBriefDto[]> {
-    try {
-      if (!ownerId)
-        if (!userId)
-          throw new CustomBadTypeRequestException('ownerId', ownerId);
-        else ownerId = userId;
-      const result = await this.storagesService.findManyStorageListByUserId(
-        userId,
-        ownerId,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!ownerId)
+      if (!userId) throw new CustomBadTypeRequestException('ownerId', ownerId);
+      else ownerId = userId;
+    const result = await this.storagesService.findManyStorageListByUserId(
+      userId,
+      ownerId,
+    );
+    return result;
   }
 
   @ApiOperation({
@@ -126,17 +109,13 @@ export class StoragesController {
     @UserId() userId: number,
     @Query('webtoonId') webtoonId: number,
   ): Promise<ReadMyStorageBriefDto[]> {
-    try {
-      if (!webtoonId)
-        throw new CustomBadTypeRequestException('webtoonId', webtoonId);
-      const result = await this.storagesService.findManyMyStorageList(
-        userId,
-        webtoonId,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!webtoonId)
+      throw new CustomBadTypeRequestException('webtoonId', webtoonId);
+    const result = await this.storagesService.findManyMyStorageList(
+      userId,
+      webtoonId,
+    );
+    return result;
   }
 
   @ApiOperation({ summary: 'get Storages which is liked by User as list' })
@@ -148,17 +127,13 @@ export class StoragesController {
   async findManyPublicStorageLikedListByIds(
     @UserId() userId: number,
   ): Promise<ReadStorageBriefDto[]> {
-    try {
-      const { storageIds: ids } =
-        await this.likesService.findManyStorageIdsByUserId(userId);
-      const result = await this.storagesService.findManyPublicStorageListByIds(
-        userId,
-        ids,
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const { storageIds: ids } =
+      await this.likesService.findManyStorageIdsByUserId(userId);
+    const result = await this.storagesService.findManyPublicStorageListByIds(
+      userId,
+      ids,
+    );
+    return result;
   }
 
   @ApiOperation({ summary: 'create Storage' })
@@ -171,27 +146,23 @@ export class StoragesController {
     @UserId() userId: number,
     @Body() createStorageDto: CreateStorageDto,
   ): Promise<ReadStorageDetailDto> {
-    try {
-      // TODO:: create data 조건 해야함.
-      const { tags } = createStorageDto;
-      const result = await this.storagesService.createStorage(
-        userId,
-        createStorageDto,
-      );
-      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
-        TARGET_TYPES.STORAGE,
-        result.id,
-        tags,
-      );
-      const createTagResult = await this.tagsService.addAndRemoveTag(
-        addAndRemoveTagRequestDto,
-      );
-      result.tags = createTagResult;
-      result.setIsMine(userId);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    // TODO:: create data 조건 해야함.
+    const { tags } = createStorageDto;
+    const result = await this.storagesService.createStorage(
+      userId,
+      createStorageDto,
+    );
+    const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+      TARGET_TYPES.STORAGE,
+      result.id,
+      tags,
+    );
+    const createTagResult = await this.tagsService.addAndRemoveTag(
+      addAndRemoveTagRequestDto,
+    );
+    result.tags = createTagResult;
+    result.setIsMine(userId);
+    return result;
   }
 
   @ApiOperation({ summary: 'update webtoon to Storage' })
@@ -201,26 +172,22 @@ export class StoragesController {
     @UserId() userId: number,
     @Body() updateStorageDto: UpdateStorageDto,
   ): Promise<ReadStorageDetailDto> {
-    try {
-      const { tags, ...tempUpdateStorageDto } = updateStorageDto;
-      const result = await this.storagesService.updateStorage(
-        userId,
-        tempUpdateStorageDto,
-      );
-      const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
-        TARGET_TYPES.STORAGE,
-        result.id,
-        tags,
-      );
-      const createTagResult = await this.tagsService.addAndRemoveTag(
-        addAndRemoveTagRequestDto,
-      );
-      result.tags = createTagResult;
-      result.setIsMine(userId);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const { tags, ...tempUpdateStorageDto } = updateStorageDto;
+    const result = await this.storagesService.updateStorage(
+      userId,
+      tempUpdateStorageDto,
+    );
+    const addAndRemoveTagRequestDto = new AddAndRemoveTagRequestDto(
+      TARGET_TYPES.STORAGE,
+      result.id,
+      tags,
+    );
+    const createTagResult = await this.tagsService.addAndRemoveTag(
+      addAndRemoveTagRequestDto,
+    );
+    result.tags = createTagResult;
+    result.setIsMine(userId);
+    return result;
   }
 
   @ApiOperation({ summary: 'add webtoon to Storage' })
@@ -233,14 +200,7 @@ export class StoragesController {
     @UserId() userId: number,
     @Query() webtoonInStorageDto: WebtoonInStorageDto,
   ): Promise<void> {
-    try {
-      await this.storagesService.addWebtoonAtStorage(
-        userId,
-        webtoonInStorageDto,
-      );
-    } catch (error) {
-      throw error;
-    }
+    await this.storagesService.addWebtoonAtStorage(userId, webtoonInStorageDto);
   }
 
   @ApiOperation({ summary: 'delete webtoon to Storage' })
@@ -253,14 +213,10 @@ export class StoragesController {
     @UserId() userId: number,
     @Query() webtoonInStorageDto: WebtoonInStorageDto,
   ): Promise<void> {
-    try {
-      await this.storagesService.removeWebtoonAtStorage(
-        userId,
-        webtoonInStorageDto,
-      );
-    } catch (error) {
-      throw error;
-    }
+    await this.storagesService.removeWebtoonAtStorage(
+      userId,
+      webtoonInStorageDto,
+    );
   }
 
   @ApiOperation({ summary: 'delete Storage' })
@@ -271,11 +227,7 @@ export class StoragesController {
     @UserId() userId: number,
     @Query('id') id: number,
   ): Promise<void> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      return this.storagesService.deleteStorage(id, userId);
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    return this.storagesService.deleteStorage(id, userId);
   }
 }
