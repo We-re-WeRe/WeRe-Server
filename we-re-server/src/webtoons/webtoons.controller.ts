@@ -198,12 +198,8 @@ export class WebtoonsController {
   @Post()
   async createWebtoon(@Body() createWebtoonDto: CreateWebtoonDto) {
     // 아무나 upload 못하게 해야할듯. webtoon 추가를 그냥 python에서 하든동.
-    try {
-      await this.webtoonsService.createWebtoon(createWebtoonDto);
-      return;
-    } catch (error) {
-      throw error;
-    }
+    await this.webtoonsService.createWebtoon(createWebtoonDto);
+    return;
   }
 
   @ApiOperation({ summary: 'update Webtoon' })
@@ -217,15 +213,11 @@ export class WebtoonsController {
     @Query('id') id: number,
     @Body() updateWebtoonDto: UpdateWebtoonDto,
   ) {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      if (id !== updateWebtoonDto.id)
-        throw new CustomUnauthorziedException(`id is wrong.`);
-      await this.webtoonsService.updateWebtoon(updateWebtoonDto);
-      return;
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    if (id !== updateWebtoonDto.id)
+      throw new CustomUnauthorziedException(`id is wrong.`);
+    await this.webtoonsService.updateWebtoon(updateWebtoonDto);
+    return;
   }
 
   @ApiOperation({ summary: 'delete Webtoon' })
@@ -233,11 +225,7 @@ export class WebtoonsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()
   async deleteWebtoon(@Query('id') id: number): Promise<void> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      return await this.webtoonsService.deleteWebtoon(id);
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    return await this.webtoonsService.deleteWebtoon(id);
   }
 }
