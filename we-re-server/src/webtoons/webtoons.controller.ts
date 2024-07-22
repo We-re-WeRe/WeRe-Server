@@ -58,18 +58,14 @@ export class WebtoonsController {
     @UserId() userId: number,
     @Query('id') id: number,
   ): Promise<ReadWebtoonDetailDto> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      const result = await this.webtoonsService.findOneDetailById(id, userId);
-      result.storages = await this.storageService.findManyPublicListByWebtoonId(
-        userId,
-        id,
-      );
-      result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+    const result = await this.webtoonsService.findOneDetailById(id, userId);
+    result.storages = await this.storageService.findManyPublicListByWebtoonId(
+      userId,
+      id,
+    );
+    result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
+    return result;
   }
 
   @ApiOperation({
@@ -83,13 +79,9 @@ export class WebtoonsController {
   async findManyLikedThumbnailByUserId(
     @UserId() userId: number,
   ): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      const { webtoonIds: ids } =
-        await this.likeService.findManyWebtoonIdsByUserId(userId);
-      return this.webtoonsService.findManyThumbnailByIds(ids);
-    } catch (error) {
-      throw error;
-    }
+    const { webtoonIds: ids } =
+      await this.likeService.findManyWebtoonIdsByUserId(userId);
+    return this.webtoonsService.findManyThumbnailByIds(ids);
   }
 
   @ApiOperation({
@@ -102,11 +94,7 @@ export class WebtoonsController {
   @Public()
   @Get('list/new')
   findManyNewThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      return this.webtoonsService.findManyNewThumbnail();
-    } catch (error) {
-      throw error;
-    }
+    return this.webtoonsService.findManyNewThumbnail();
   }
 
   @ApiOperation({
@@ -119,11 +107,7 @@ export class WebtoonsController {
   @Public()
   @Get('list/hot')
   findManyHotThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      return this.webtoonsService.findManyHotThumbnail();
-    } catch (error) {
-      throw error;
-    }
+    return this.webtoonsService.findManyHotThumbnail();
   }
 
   @ApiOperation({
@@ -139,21 +123,17 @@ export class WebtoonsController {
     @UserId() userId: number,
     @Query('storageId') storageId: number,
   ): Promise<ReadWebtoonBriefDto[]> {
-    try {
-      if (!storageId)
-        throw new CustomBadTypeRequestException('storageId', storageId);
-      const { webtoonIds: ids, userId: ownerId } =
-        await this.storageService.findWebtoonIdListById(storageId);
-      const result =
-        await this.webtoonsService.findManyBreifInfoWithReviewByOwnerId(
-          ids,
-          ownerId,
-          userId,
-        );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!storageId)
+      throw new CustomBadTypeRequestException('storageId', storageId);
+    const { webtoonIds: ids, userId: ownerId } =
+      await this.storageService.findWebtoonIdListById(storageId);
+    const result =
+      await this.webtoonsService.findManyBreifInfoWithReviewByOwnerId(
+        ids,
+        ownerId,
+        userId,
+      );
+    return result;
   }
 
   @ApiOperation({
@@ -170,23 +150,19 @@ export class WebtoonsController {
     @Query('day') day: string,
     @Query('providingCompany') providingCompany: string,
   ): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      if (!stringToDays(day)) {
-        throw new CustomBadTypeRequestException('day', day);
-      }
-      if (!stringToProvidingCompany(providingCompany)) {
-        throw new CustomBadTypeRequestException(
-          'providingCompany',
-          providingCompany,
-        );
-      }
-      return this.webtoonsService.findManyFilteredThumbnail(
-        day,
+    if (!stringToDays(day)) {
+      throw new CustomBadTypeRequestException('day', day);
+    }
+    if (!stringToProvidingCompany(providingCompany)) {
+      throw new CustomBadTypeRequestException(
+        'providingCompany',
         providingCompany,
       );
-    } catch (error) {
-      throw error;
     }
+    return this.webtoonsService.findManyFilteredThumbnail(
+      day,
+      providingCompany,
+    );
   }
 
   @ApiOperation({ summary: 'create Webtoon' })
