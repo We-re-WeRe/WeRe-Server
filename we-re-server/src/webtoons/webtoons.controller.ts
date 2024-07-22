@@ -170,7 +170,6 @@ export class WebtoonsController {
     description: 'Request Success',
     type: ReadWebtoonDetailDto,
   })
-  @Public()
   @Post()
   async createWebtoon(@Body() createWebtoonDto: CreateWebtoonDto) {
     // 아무나 upload 못하게 해야할듯. webtoon 추가를 그냥 python에서 하든동.
