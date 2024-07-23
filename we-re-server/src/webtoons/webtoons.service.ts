@@ -168,6 +168,23 @@ export class WebtoonsService {
   }
 
   /**
+   * 조회수 증가 함수.
+   * @param id webtoon ID
+   * @returns void
+   */
+  async updateViewCount(id: number) {
+    const queryResult = await this.webtoonRepository.increment(
+      { id },
+      'viewCount',
+      1,
+    );
+    if (!queryResult.affected) {
+      throw new CustomNotFoundException('id');
+    }
+    return;
+  }
+
+  /**
    * delete Webtoon.
    * @param id
    * @returns {Promise<void>}

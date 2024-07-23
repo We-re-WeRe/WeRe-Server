@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Res,
 } from '@nestjs/common';
 import { WebtoonsService } from './webtoons.service';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
@@ -35,7 +36,9 @@ import {
   stringToDays,
   stringToProvidingCompany,
 } from 'src/entities/webtoon.entity';
-import { Public, UserId } from 'src/utils/custom_decorators';
+import { Cookies, Public, UserId } from 'src/utils/custom_decorators';
+import { Response } from 'express';
+import { VISITED_LIST_COOKIE_KEY } from 'src/utils/types_and_enums';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -57,19 +60,24 @@ export class WebtoonsController {
   async findOneDetailById(
     @UserId() userId: number,
     @Query('id') id: number,
+    @Cookies(VISITED_LIST_COOKIE_KEY) visitedList: string,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ReadWebtoonDetailDto> {
-    try {
-      if (!id) throw new CustomBadTypeRequestException('id', id);
-      const result = await this.webtoonsService.findOneDetailById(id, userId);
-      result.storages = await this.storageService.findManyPublicListByWebtoonId(
-        userId,
-        id,
-      );
-      result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
-      return result;
-    } catch (error) {
-      throw error;
+    if (!id) throw new CustomBadTypeRequestException('id', id);
+
+    if (!this.checkVistedListFromCookie(visitedList, id)) {
+      const updatedVisitedList = this.updateVisitedList(visitedList, id);
+      this.webtoonsService.updateViewCount(id);
+      this.setVisitedListInCookie(res, updatedVisitedList);
     }
+
+    const result = await this.webtoonsService.findOneDetailById(id, userId);
+    result.storages = await this.storageService.findManyPublicListByWebtoonId(
+      userId,
+      id,
+    );
+    result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
+    return result;
   }
 
   @ApiOperation({
@@ -83,13 +91,9 @@ export class WebtoonsController {
   async findManyLikedThumbnailByUserId(
     @UserId() userId: number,
   ): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      const { webtoonIds: ids } =
-        await this.likeService.findManyWebtoonIdsByUserId(userId);
-      return this.webtoonsService.findManyThumbnailByIds(ids);
-    } catch (error) {
-      throw error;
-    }
+    const { webtoonIds: ids } =
+      await this.likeService.findManyWebtoonIdsByUserId(userId);
+    return this.webtoonsService.findManyThumbnailByIds(ids);
   }
 
   @ApiOperation({
@@ -102,11 +106,7 @@ export class WebtoonsController {
   @Public()
   @Get('list/new')
   findManyNewThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      return this.webtoonsService.findManyNewThumbnail();
-    } catch (error) {
-      throw error;
-    }
+    return this.webtoonsService.findManyNewThumbnail();
   }
 
   @ApiOperation({
@@ -119,11 +119,7 @@ export class WebtoonsController {
   @Public()
   @Get('list/hot')
   findManyHotThumbnail(): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      return this.webtoonsService.findManyHotThumbnail();
-    } catch (error) {
-      throw error;
-    }
+    return this.webtoonsService.findManyHotThumbnail();
   }
 
   @ApiOperation({
@@ -139,21 +135,17 @@ export class WebtoonsController {
     @UserId() userId: number,
     @Query('storageId') storageId: number,
   ): Promise<ReadWebtoonBriefDto[]> {
-    try {
-      if (!storageId)
-        throw new CustomBadTypeRequestException('storageId', storageId);
-      const { webtoonIds: ids, userId: ownerId } =
-        await this.storageService.findWebtoonIdListById(storageId);
-      const result =
-        await this.webtoonsService.findManyBreifInfoWithReviewByOwnerId(
-          ids,
-          ownerId,
-          userId,
-        );
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    if (!storageId)
+      throw new CustomBadTypeRequestException('storageId', storageId);
+    const { webtoonIds: ids, userId: ownerId } =
+      await this.storageService.findWebtoonIdListById(storageId);
+    const result =
+      await this.webtoonsService.findManyBreifInfoWithReviewByOwnerId(
+        ids,
+        ownerId,
+        userId,
+      );
+    return result;
   }
 
   @ApiOperation({
@@ -170,23 +162,19 @@ export class WebtoonsController {
     @Query('day') day: string,
     @Query('providingCompany') providingCompany: string,
   ): Promise<ReadWebtoonThumbnailDto[]> {
-    try {
-      if (!stringToDays(day)) {
-        throw new CustomBadTypeRequestException('day', day);
-      }
-      if (!stringToProvidingCompany(providingCompany)) {
-        throw new CustomBadTypeRequestException(
-          'providingCompany',
-          providingCompany,
-        );
-      }
-      return this.webtoonsService.findManyFilteredThumbnail(
-        day,
+    if (!stringToDays(day)) {
+      throw new CustomBadTypeRequestException('day', day);
+    }
+    if (!stringToProvidingCompany(providingCompany)) {
+      throw new CustomBadTypeRequestException(
+        'providingCompany',
         providingCompany,
       );
-    } catch (error) {
-      throw error;
     }
+    return this.webtoonsService.findManyFilteredThumbnail(
+      day,
+      providingCompany,
+    );
   }
 
   @ApiOperation({ summary: 'create Webtoon' })
@@ -194,7 +182,6 @@ export class WebtoonsController {
     description: 'Request Success',
     type: ReadWebtoonDetailDto,
   })
-  @Public()
   @Post()
   async createWebtoon(@Body() createWebtoonDto: CreateWebtoonDto) {
     // 아무나 upload 못하게 해야할듯. webtoon 추가를 그냥 python에서 하든동.
@@ -228,4 +215,37 @@ export class WebtoonsController {
     if (!id) throw new CustomBadTypeRequestException('id', id);
     return await this.webtoonsService.deleteWebtoon(id);
   }
+
+  checkVistedListFromCookie = (visitedList: string, id: number): boolean => {
+    if (!!visitedList) {
+      const vlistJson = JSON.parse(visitedList);
+      return !!vlistJson[id];
+    } else {
+      return false;
+    }
+  };
+
+  updateVisitedList = (visitedList: string, id: number): string => {
+    let vlistJson: any;
+    if (!!!visitedList) {
+      vlistJson = {};
+    } else {
+      vlistJson = JSON.parse(visitedList);
+    }
+    vlistJson[id] = 0b1;
+
+    return JSON.stringify(vlistJson);
+  };
+
+  setVisitedListInCookie = (res: Response, value: string): void => {
+    const today = new Date(new Date().toLocaleDateString());
+    today.setDate(today.getDate() + 1);
+    today.setHours(today.getHours() + 9);
+
+    res.cookie(VISITED_LIST_COOKIE_KEY, value, {
+      path: '', // cookie path는 domain을 따라야하는 듯하다..? 빈 값을 넣어서 webtoons path의 쿠키를 가져온다.
+      httpOnly: true,
+      expires: today,
+    });
+  };
 }
