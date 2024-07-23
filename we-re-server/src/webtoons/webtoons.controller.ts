@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Res,
 } from '@nestjs/common';
 import { WebtoonsService } from './webtoons.service';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
@@ -35,7 +36,9 @@ import {
   stringToDays,
   stringToProvidingCompany,
 } from 'src/entities/webtoon.entity';
-import { Public, UserId } from 'src/utils/custom_decorators';
+import { Cookies, Public, UserId } from 'src/utils/custom_decorators';
+import { Response } from 'express';
+import { VISITED_LIST_COOKIE_KEY } from 'src/utils/types_and_enums';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -57,8 +60,17 @@ export class WebtoonsController {
   async findOneDetailById(
     @UserId() userId: number,
     @Query('id') id: number,
+    @Cookies(VISITED_LIST_COOKIE_KEY) visitedList: string,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<ReadWebtoonDetailDto> {
     if (!id) throw new CustomBadTypeRequestException('id', id);
+
+    if (!this.checkVistedListFromCookie(visitedList, id)) {
+      const updatedVisitedList = this.updateVisitedList(visitedList, id);
+      this.webtoonsService.updateViewCount(id);
+      this.setVisitedListInCookie(res, updatedVisitedList);
+    }
+
     const result = await this.webtoonsService.findOneDetailById(id, userId);
     result.storages = await this.storageService.findManyPublicListByWebtoonId(
       userId,
@@ -203,4 +215,37 @@ export class WebtoonsController {
     if (!id) throw new CustomBadTypeRequestException('id', id);
     return await this.webtoonsService.deleteWebtoon(id);
   }
+
+  checkVistedListFromCookie = (visitedList: string, id: number): boolean => {
+    if (!!visitedList) {
+      const vlistJson = JSON.parse(visitedList);
+      return !!vlistJson[id];
+    } else {
+      return false;
+    }
+  };
+
+  updateVisitedList = (visitedList: string, id: number): string => {
+    let vlistJson: any;
+    if (!!!visitedList) {
+      vlistJson = {};
+    } else {
+      vlistJson = JSON.parse(visitedList);
+    }
+    vlistJson[id] = 0b1;
+
+    return JSON.stringify(vlistJson);
+  };
+
+  setVisitedListInCookie = (res: Response, value: string): void => {
+    const today = new Date(new Date().toLocaleDateString());
+    today.setDate(today.getDate() + 1);
+    today.setHours(today.getHours() + 9);
+
+    res.cookie(VISITED_LIST_COOKIE_KEY, value, {
+      path: '', // cookie path는 domain을 따라야하는 듯하다..? 빈 값을 넣어서 webtoons path의 쿠키를 가져온다.
+      httpOnly: true,
+      expires: today,
+    });
+  };
 }
