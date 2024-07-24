@@ -75,6 +75,26 @@ export class StoragesController {
     return result;
   }
 
+  @ApiOperation({ summary: '한 웹툰이 속해있는 보관함 리스트.' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadStorageBriefDto],
+  })
+  @Public()
+  @Get('list/webtoon')
+  async findManyPublicStorageListByWebtoonId(
+    @UserId() userId: number,
+    @Query('webtoonId') webtoonId: number,
+  ): Promise<ReadStorageBriefDto[]> {
+    if (!webtoonId)
+      throw new CustomBadTypeRequestException('webtoonId', webtoonId);
+    const result = await this.storagesService.findManyPublicListByWebtoonId(
+      userId,
+      webtoonId,
+    );
+    return result;
+  }
+
   @ApiOperation({ summary: 'get Storages which is owned by User as list' })
   @ApiOkResponse({
     description: 'Request Success',
