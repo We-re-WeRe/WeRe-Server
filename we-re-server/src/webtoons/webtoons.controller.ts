@@ -66,10 +66,10 @@ export class WebtoonsController {
     if (!id) throw new CustomBadTypeRequestException('id', id);
 
     if (!this.checkVistedListFromCookie(visitedList, id)) {
-      const updatedVisitedList = this.updateVisitedList(visitedList, id);
       this.webtoonsService.updateViewCount(id);
-      this.setVisitedListInCookie(res, updatedVisitedList);
     }
+    const updatedVisitedList = this.updateVisitedList(visitedList, id);
+    this.setVisitedListInCookie(res, updatedVisitedList);
 
     const result = await this.webtoonsService.findOneDetailById(id, userId);
     result.storages = await this.storageService.findManyPublicListByWebtoonId(
@@ -218,23 +218,21 @@ export class WebtoonsController {
 
   checkVistedListFromCookie = (visitedList: string, id: number): boolean => {
     if (!!visitedList) {
-      const vlistJson = JSON.parse(visitedList);
-      return !!vlistJson[id];
+      const vlist = visitedList.split('_');
+      return vlist.indexOf(id.toString(32)) >= 0;
     } else {
       return false;
     }
   };
 
   updateVisitedList = (visitedList: string, id: number): string => {
-    let vlistJson: any;
-    if (!!!visitedList) {
-      vlistJson = {};
-    } else {
-      vlistJson = JSON.parse(visitedList);
-    }
-    vlistJson[id] = 0b1;
+    const idEncoded32 = id.toString(32);
+    let vlist = visitedList?.split(',') || [];
+    const ind = vlist.indexOf(idEncoded32);
+    if (ind >= 0) vlist = vlist.slice(0, ind).concat(vlist.slice(ind + 1));
+    vlist.push(idEncoded32);
 
-    return JSON.stringify(vlistJson);
+    return vlist.join('_');
   };
 
   setVisitedListInCookie = (res: Response, value: string): void => {
