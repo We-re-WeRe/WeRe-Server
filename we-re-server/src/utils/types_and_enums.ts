@@ -5,3 +5,4 @@ export const TARGET_TYPES = {
 } as const;
 export type TargetTypes = (typeof TARGET_TYPES)[keyof typeof TARGET_TYPES];
 export const VISITED_LIST_COOKIE_KEY = 'VST_LIST';
+export const RECENT_VIEWED_COOKIE_KEY = 'REC_LIST';

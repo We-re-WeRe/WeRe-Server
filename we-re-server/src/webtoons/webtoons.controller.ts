@@ -38,7 +38,10 @@ import {
 } from 'src/entities/webtoon.entity';
 import { Cookies, Public, UserId } from 'src/utils/custom_decorators';
 import { Response } from 'express';
-import { VISITED_LIST_COOKIE_KEY } from 'src/utils/types_and_enums';
+import {
+  RECENT_VIEWED_COOKIE_KEY,
+  VISITED_LIST_COOKIE_KEY,
+} from 'src/utils/types_and_enums';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -61,17 +64,25 @@ export class WebtoonsController {
     @UserId() userId: number,
     @Query('id') id: number,
     @Cookies(VISITED_LIST_COOKIE_KEY) visitedList: string,
+    @Cookies(RECENT_VIEWED_COOKIE_KEY) recentList: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<ReadWebtoonDetailDto> {
     if (!id) throw new CustomBadTypeRequestException('id', id);
 
-    if (!this.checkVistedListFromCookie(visitedList, id)) {
-      const updatedVisitedList = this.updateVisitedList(visitedList, id);
-      this.webtoonsService.updateViewCount(id);
-      this.setVisitedListInCookie(res, updatedVisitedList);
-    }
-
     const result = await this.webtoonsService.findOneDetailById(id, userId);
+    if (!!result && !this.checkVistedListFromCookie(visitedList, id)) {
+      const updatedVisitedList = this.updateVisitedList(visitedList, id);
+      const updatedRecentList = this.updateRecentList(recentList, id);
+      // 새로 조회할 때마다 조회수 업데이트 맞아...? 고민 ㄱ
+      this.webtoonsService.updateViewCount(id);
+      this.setDataInCookie(res, VISITED_LIST_COOKIE_KEY, updatedVisitedList, 1);
+      this.setDataInCookie(
+        res,
+        RECENT_VIEWED_COOKIE_KEY,
+        updatedRecentList,
+        14,
+      );
+    }
     result.storages = await this.storageService.findManyPublicListByWebtoonId(
       userId,
       id,
@@ -79,6 +90,22 @@ export class WebtoonsController {
     result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
     return result;
   }
+
+  // @ApiOperation({
+  //   summary: 'get Webtoon Thumbnail List which is liked by user',
+  // })
+  // @ApiOkResponse({
+  //   description: 'Request Success',
+  //   type: [ReadWebtoonThumbnailDto],
+  // })
+  // @Public()
+  // @Get('list/recent')
+  // async findManyRecentThumbnailByUserId(
+  //   @UserId() userId: number,
+  //   @Cookies(VISITED_LIST_COOKIE_KEY) visitedList: string,
+  // ): Promise<ReadWebtoonThumbnailDto[]> {
+  //   return this.webtoonsService.findManyThumbnailByIds(ids);
+  // }
 
   @ApiOperation({
     summary: 'get Webtoon Thumbnail List which is liked by user',
@@ -216,29 +243,50 @@ export class WebtoonsController {
     return await this.webtoonsService.deleteWebtoon(id);
   }
 
-  checkVistedListFromCookie = (visitedList: string, id: number): boolean => {
-    if (!!visitedList) {
-      const vlist = visitedList.split('_');
-      return vlist.indexOf(id.toString(32)) >= 0;
-    } else {
-      return false;
-    }
+  checkVistedListFromCookie = (
+    underBarSplittedList: string,
+    id: number,
+  ): boolean => {
+    const vlist = underBarSplittedList?.split('_') || [];
+    return vlist.indexOf(id.toString(32)) >= 0;
   };
 
   updateVisitedList = (visitedList: string, id: number): string => {
     const idEncoded32 = id.toString(32);
-    const vlist = visitedList?.split(',') || [];
-    vlist.push(idEncoded32);
 
-    return vlist.join('_');
+    return (!!visitedList ? visitedList + '_' : '') + idEncoded32;
   };
 
-  setVisitedListInCookie = (res: Response, value: string): void => {
+  updateRecentList = (recentList: string, id: number): string => {
+    const idEncoded32 = id.toString(32);
+    const rlist = recentList?.split('_') || [];
+
+    const idx = rlist.indexOf(idEncoded32);
+    if (idx >= 0)
+      rlist[idx],
+        (rlist[rlist.length - 1] = rlist[rlist.length - 1]),
+        rlist[idx];
+    else {
+      if (rlist.length >= 10) {
+        rlist.shift();
+      }
+      rlist.push(idEncoded32);
+    }
+
+    return rlist.join('_');
+  };
+
+  setDataInCookie = (
+    res: Response,
+    key: string,
+    value: string,
+    expires: number,
+  ): void => {
     const today = new Date(new Date().toLocaleDateString());
-    today.setDate(today.getDate() + 1);
+    today.setDate(today.getDate() + expires);
     today.setHours(today.getHours() + 9);
 
-    res.cookie(VISITED_LIST_COOKIE_KEY, value, {
+    res.cookie(key, value, {
       path: '', // cookie path는 domain을 따라야하는 듯하다..? 빈 값을 넣어서 webtoons path의 쿠키를 가져온다.
       httpOnly: true,
       expires: today,
