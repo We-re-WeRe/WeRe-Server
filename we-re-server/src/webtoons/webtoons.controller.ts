@@ -66,10 +66,10 @@ export class WebtoonsController {
     if (!id) throw new CustomBadTypeRequestException('id', id);
 
     if (!this.checkVistedListFromCookie(visitedList, id)) {
+      const updatedVisitedList = this.updateVisitedList(visitedList, id);
       this.webtoonsService.updateViewCount(id);
+      this.setVisitedListInCookie(res, updatedVisitedList);
     }
-    const updatedVisitedList = this.updateVisitedList(visitedList, id);
-    this.setVisitedListInCookie(res, updatedVisitedList);
 
     const result = await this.webtoonsService.findOneDetailById(id, userId);
     result.storages = await this.storageService.findManyPublicListByWebtoonId(
@@ -227,9 +227,7 @@ export class WebtoonsController {
 
   updateVisitedList = (visitedList: string, id: number): string => {
     const idEncoded32 = id.toString(32);
-    let vlist = visitedList?.split(',') || [];
-    const ind = vlist.indexOf(idEncoded32);
-    if (ind >= 0) vlist = vlist.slice(0, ind).concat(vlist.slice(ind + 1));
+    const vlist = visitedList?.split(',') || [];
     vlist.push(idEncoded32);
 
     return vlist.join('_');
