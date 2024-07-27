@@ -89,21 +89,23 @@ export class WebtoonsController {
     return result;
   }
 
-  // @ApiOperation({
-  //   summary: 'get Webtoon Thumbnail List which is liked by user',
-  // })
-  // @ApiOkResponse({
-  //   description: 'Request Success',
-  //   type: [ReadWebtoonThumbnailDto],
-  // })
-  // @Public()
-  // @Get('list/recent')
-  // async findManyRecentThumbnailByUserId(
-  //   @UserId() userId: number,
-  //   @Cookies(VISITED_LIST_COOKIE_KEY) visitedList: string,
-  // ): Promise<ReadWebtoonThumbnailDto[]> {
-  //   return this.webtoonsService.findManyThumbnailByIds(ids);
-  // }
+  @ApiOperation({
+    summary: '최근 본 웹툰 목록(10개) 전달 api',
+  })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadWebtoonThumbnailDto],
+  })
+  @Public()
+  @Get('list/recent')
+  async findManyRecentThumbnail(
+    @Cookies(RECENT_VIEWED_COOKIE_KEY) recentList: string,
+  ): Promise<ReadWebtoonThumbnailDto[]> {
+    const ids = this.decodeUnderbarStringToList(recentList).map(
+      this.decodeBase32ToNumber,
+    );
+    return this.webtoonsService.findManyThumbnailByIds(ids);
+  }
 
   @ApiOperation({
     summary: 'get Webtoon Thumbnail List which is liked by user',
