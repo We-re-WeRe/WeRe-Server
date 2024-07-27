@@ -20,7 +20,6 @@ import {
   ReadWebtoonThumbnailDto,
 } from './dto/read-webtoon.dto';
 import { StoragesService } from 'src/storages/storages.service';
-import { ReviewsService } from 'src/reviews/reviews.service';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -50,7 +49,6 @@ export class WebtoonsController {
     private readonly webtoonsService: WebtoonsService,
     private readonly likeService: LikesService,
     private readonly storageService: StoragesService,
-    private readonly reviewService: ReviewsService,
   ) {}
 
   @ApiOperation({ summary: 'get Webtoon detail' })
@@ -81,11 +79,7 @@ export class WebtoonsController {
     const updatedRecentList = this.updateRecentList(recentList, id);
     this.setDataInCookie(res, RECENT_VIEWED_COOKIE_KEY, updatedRecentList, 14);
 
-    result.storages = await this.storageService.findManyPublicListByWebtoonId(
-      userId,
-      id,
-    );
-    result.reviews = await this.reviewService.findManyByWebtoonId(userId, id);
+    const result = await this.webtoonsService.findOneDetailById(id, userId);
     return result;
   }
 

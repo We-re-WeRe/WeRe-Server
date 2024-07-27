@@ -12,7 +12,11 @@ import {
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { ReadReviewAndWebtoonDto, ReadReviewDto } from './dto/read-review.dto';
+import {
+  ReadReviewAndUserDto,
+  ReadReviewAndWebtoonDto,
+  ReadReviewDto,
+} from './dto/read-review.dto';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -47,6 +51,25 @@ export class ReviewsController {
     return result;
   }
 
+  @ApiOperation({ summary: '한 웹툰의 리뷰 리스트.' })
+  @ApiOkResponse({
+    description: 'Request Success',
+    type: [ReadReviewAndUserDto],
+  })
+  @Public()
+  @Get('list/webtoon')
+  async findManyByWebtoonId(
+    @UserId() userId: number,
+    @Query('webtoonId') webtoonId: number,
+  ): Promise<ReadReviewAndUserDto[]> {
+    if (!webtoonId)
+      throw new CustomBadTypeRequestException('webtoonId', webtoonId);
+    const result = await this.reviewsService.findManyByWebtoonId(
+      userId,
+      webtoonId,
+    );
+    return result;
+  }
   @ApiOperation({ summary: 'create Review' })
   @ApiCreatedResponse({
     description: 'Request Success',

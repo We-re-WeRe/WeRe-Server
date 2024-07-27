@@ -1,11 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Days, ProvidingCompany } from 'src/entities/webtoon.entity';
 import { ReadLikeInfoDto } from 'src/likes/dto/read-like.dto';
-import {
-  ReadReviewAndUserDto,
-  ReadReviewDto,
-} from 'src/reviews/dto/read-review.dto';
-import { ReadStorageBriefDto } from 'src/storages/dto/read-storage.dto';
+import { ReadReviewDto } from 'src/reviews/dto/read-review.dto';
 
 export class ReadWebtoonDto {
   constructor(raw?: any) {
@@ -110,12 +106,6 @@ export class ReadWebtoonDetailDto extends ReadWebtoonDto {
 
   @ApiProperty({ type: () => ReadLikeInfoDto })
   like: ReadLikeInfoDto;
-
-  @ApiProperty({ type: () => [ReadStorageBriefDto] })
-  storages: ReadStorageBriefDto[];
-
-  @ApiProperty({ type: () => [ReadReviewAndUserDto] })
-  reviews: ReadReviewAndUserDto[];
 
   public rawToDto(raw: any): ReadWebtoonDetailDto {
     super.rawToDto(raw);
