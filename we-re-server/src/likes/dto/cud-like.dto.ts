@@ -8,7 +8,6 @@ export class LikeRequestDto {
     this.targetType = targetType;
     this.targetId = targetId;
   }
-  @ApiProperty()
   @IsInt()
   @IsOptional()
   userId?: number;

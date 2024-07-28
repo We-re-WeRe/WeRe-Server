@@ -104,7 +104,7 @@ export class StoragesController {
   @Get('list/user')
   async findManyStorageListByUserId(
     @UserId() userId: number,
-    @Query('userId') ownerId: number,
+    @Query('ownerId') ownerId: number,
   ): Promise<ReadStorageBriefDto[]> {
     if (!ownerId)
       if (!userId) throw new CustomBadTypeRequestException('ownerId', ownerId);

@@ -79,7 +79,6 @@ export class WebtoonsController {
     const updatedRecentList = this.updateRecentList(recentList, id);
     this.setDataInCookie(res, RECENT_VIEWED_COOKIE_KEY, updatedRecentList, 14);
 
-    const result = await this.webtoonsService.findOneDetailById(id, userId);
     return result;
   }
 
