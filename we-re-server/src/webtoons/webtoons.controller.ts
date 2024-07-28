@@ -197,6 +197,17 @@ export class WebtoonsController {
     );
   }
 
+  @Public()
+  @Get('image')
+  async getImageByProxy(@Query('url') url: string) {
+    const result = await this.webtoonsService.getDataFromOtherOriginURL(url);
+    const contents = await result.text();
+    // const contents = (await blob.arrayBuffer()).slice(0);
+    console.log(contents);
+
+    return contents;
+  }
+
   @ApiOperation({ summary: 'create Webtoon' })
   @ApiCreatedResponse({
     description: 'Request Success',
