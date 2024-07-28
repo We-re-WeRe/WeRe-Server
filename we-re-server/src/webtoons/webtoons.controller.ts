@@ -41,6 +41,7 @@ import {
   RECENT_VIEWED_COOKIE_KEY,
   VISITED_LIST_COOKIE_KEY,
 } from 'src/utils/types_and_enums';
+import { URL } from 'url';
 
 @ApiTags('Webtoons')
 @Controller('webtoons')
@@ -199,12 +200,15 @@ export class WebtoonsController {
 
   @Public()
   @Get('image')
-  async getImageByProxy(@Query('url') url: string) {
+  async getImageByProxy(
+    @Res({ passthrough: true }) res: Response,
+    @Query('url') url: string,
+  ) {
     const result = await this.webtoonsService.getDataFromOtherOriginURL(url);
     const contents = await result.text();
     // const contents = (await blob.arrayBuffer()).slice(0);
     console.log(contents);
-
+    res.setHeader('Content-Type', 'image/jpeg');
     return contents;
   }
 
