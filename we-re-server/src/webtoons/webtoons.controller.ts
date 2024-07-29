@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Query,
   Res,
+  Header,
 } from '@nestjs/common';
 import { WebtoonsService } from './webtoons.service';
 import { CreateWebtoonDto } from './dto/create-webtoon.dto';
@@ -199,17 +200,18 @@ export class WebtoonsController {
   }
 
   @Public()
+  @Header('Content-Type', 'image/jpeg')
   @Get('image')
   async getImageByProxy(
     @Res({ passthrough: true }) res: Response,
     @Query('url') url: string,
   ) {
     const result = await this.webtoonsService.getDataFromOtherOriginURL(url);
-    const contents = await result.text();
-    // const contents = (await blob.arrayBuffer()).slice(0);
-    console.log(contents);
-    res.setHeader('Content-Type', 'image/jpeg');
-    return contents;
+    const contents = await result.arrayBuffer();
+    const buffer = Buffer.from(contents);
+    res.setHeader('Content-Length', buffer.byteLength);
+
+    return res.status(200).send(buffer);
   }
 
   @ApiOperation({ summary: 'create Webtoon' })
