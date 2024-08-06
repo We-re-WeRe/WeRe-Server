@@ -13,6 +13,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const exceptionResponse = exception.getResponse();
 
-    response.send(exceptionResponse);
+    response.status(exception.getStatus()).send(exceptionResponse);
   }
 }
