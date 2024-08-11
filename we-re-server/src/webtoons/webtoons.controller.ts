@@ -202,10 +202,7 @@ export class WebtoonsController {
   @Public()
   @Header('Content-Type', 'image/jpeg')
   @Get('image')
-  async getImageByProxy(
-    @Res({ passthrough: true }) res: Response,
-    @Query('url') url: string,
-  ) {
+  async getImageByProxy(@Res() res: Response, @Query('url') url: string) {
     const result = await this.webtoonsService.getDataFromOtherOriginURL(url);
     const contents = await result.arrayBuffer();
     const buffer = Buffer.from(contents);
