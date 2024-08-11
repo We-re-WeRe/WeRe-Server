@@ -25,7 +25,8 @@ $ yarn
 
 ```bash
 # development
-$ yarn start
+# mySQL server should be turned on.
+$ yarn start:local
 
 # watch mode
 $ yarn start:dev
