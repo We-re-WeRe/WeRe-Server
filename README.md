@@ -22,18 +22,40 @@ $ yarn
 ```
 
 ## Running the app
-
+env file should be set.
 ```bash
 # development
 # mySQL server should be turned on.
 $ yarn start:local
 
-# watch mode
-$ yarn start:dev
+# run program in docker
+$ yarn start:docker
 
 # production mode
 $ yarn start:prod
 ```
+
+env file keys
+```
+# env.local
+DATABASE_HOST={your_host_name}
+DATABASE_PORT={your_port}
+DATABASE_USER={your_user_name}
+DATABASE_PASSWORD={your_password}
+DATABASE_NAME={your_database_name}
+ACCESS_SECRET_KEY={your_access_token_secret_key}
+REFRESH_SECRET_KEY={your_refresh_token_secret_key}
+ACCESS_EXPIRATION_TIME={your_access_expiration_time}
+REFRESH_EXPIRATION_TIME={your_refresh_expiration_time}
+```
+when using docker, you need this file too.
+```
+# env.db
+MYSQL_DATABASE={your_database_name}
+MYSQL_ROOT_HOST={your_host_name}
+MYSQL_ROOT_PASSWORD={your_password}
+```
+
 
 ## Test
 
