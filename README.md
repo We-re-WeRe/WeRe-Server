@@ -1,6 +1,8 @@
 # WeRe-Server
 
 ### 🚀 Latest version: 0.0.0
+⚠️현재 개발 중인 프로젝트입니다.⚠️
+코드를 보실 분은 develop 브랜치에서 확인부탁드립니다.
 
 ## Description
 
