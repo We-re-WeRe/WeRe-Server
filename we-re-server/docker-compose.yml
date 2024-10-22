@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: we-re_db
+    image: mysql
+    restart: unless-stopped
+    env_file:
+      - .env.db
+    environment:
+      TZ: 'Asia/Seoul'
+    ports:
+      - '3306:3306'
+    command:
+      - 'mysqld'
+      - '--character-set-server=utf8mb4'
+      - '--collation-server=utf8mb4_unicode_ci'
+    networks:
+      - dev_net
+
+  application:
+    container_name: we-re-server
+    restart: on-failure
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - '80:3000'
+    env_file:
+      - .env.development
+    environment:
+      NODE_ENV: development
+      TZ: 'Asia/Seoul'
+    depends_on:
+      - database
+    networks:
+      - dev_net
+networks:
+  dev_net:
