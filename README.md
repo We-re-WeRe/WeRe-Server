@@ -1,7 +1,7 @@
 # WeRe-Server
 
 ### 🚀 Latest version: 0.0.0
-⚠️현재 개발 중인 프로젝트입니다.⚠️
+⚠️현제 개발 중인 프로젝트입니다.⚠️
 코드를 보실 분은 develop 브랜치에서 확인부탁드립니다.
 
 ## Description
@@ -24,40 +24,17 @@ $ yarn
 ```
 
 ## Running the app
-env file should be set.
+
 ```bash
 # development
-# mySQL server should be turned on.
 $ yarn start:local
 
-# run program in docker
-$ yarn start:docker
+# watch mode
+$ yarn start:dev
 
 # production mode
 $ yarn start:prod
 ```
-
-env file keys
-```
-# env.local
-DATABASE_HOST={your_host_name}
-DATABASE_PORT={your_port}
-DATABASE_USER={your_user_name}
-DATABASE_PASSWORD={your_password}
-DATABASE_NAME={your_database_name}
-ACCESS_SECRET_KEY={your_access_token_secret_key}
-REFRESH_SECRET_KEY={your_refresh_token_secret_key}
-ACCESS_EXPIRATION_TIME={your_access_expiration_time}
-REFRESH_EXPIRATION_TIME={your_refresh_expiration_time}
-```
-when using docker, you need this file too.
-```
-# env.db
-MYSQL_DATABASE={your_database_name}
-MYSQL_ROOT_HOST={your_host_name}
-MYSQL_ROOT_PASSWORD={your_password}
-```
-
 
 ## Test
 

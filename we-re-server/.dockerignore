@@ -1,9 +1,0 @@
-node_module
-dist
-*.lock
-.env.*
-
-# dockers
-Dockerfile
-.dockerignore
-docker-compose.yml
